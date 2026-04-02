@@ -1,0 +1,6 @@
+# Bind to loopback only (no LAN/public access).
+
+services:
+  web:
+    ports: !override
+      - "127.0.0.1:8004:80"
