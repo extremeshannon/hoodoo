@@ -1,3 +1,5 @@
 services:
-  web:
+  api:
+    restart: unless-stopped
+  db:
     restart: unless-stopped

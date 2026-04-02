@@ -1,6 +1,6 @@
-# Bind to loopback only (no LAN/public access).
+# Bind API to loopback only (no LAN/public access).
 
 services:
-  web:
+  api:
     ports: !override
-      - "127.0.0.1:8004:80"
+      - "127.0.0.1:8004:8000"

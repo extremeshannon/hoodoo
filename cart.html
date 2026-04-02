@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Your Hoodoo Alaska cart — review lines and email a quote." />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Cart | Hoodoo Alaska</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="configurator.css" />
+</head>
+<body class="page-cart">
+  <a class="skip-link" href="#cart-main">Skip to cart</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="Hoodoo Alaska home">
+        <img src="assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="configurator.html">Configurator</a></li>
+          <li><a href="cart.html" aria-current="page">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="cart-main" class="cart-main">
+    <div class="cart-page-head">
+      <h1 class="cart-page-title">Your cart</h1>
+      <p class="cart-page-lede">Guide pricing. Adjust quantities or remove lines, then email the shop for a formal quote.</p>
+    </div>
+
+    <div class="cart-panel">
+      <div id="cart-loading" class="cart-empty">Loading cart…</div>
+      <div id="cart-empty" class="cart-empty" hidden>Your cart is empty. <a href="configurator.html">Open the configurator</a> to add items.</div>
+      <div id="cart-content" hidden>
+        <div class="cart-lines" id="cart-lines"></div>
+        <div class="cart-summary">
+          <p class="cart-summary-row"><span>Subtotal (guide)</span><strong id="cart-subtotal">$0.00</strong></p>
+          <div class="cart-summary-actions">
+            <button type="button" class="btn btn-primary" id="cart-email">Email quote to Hoodoo</button>
+            <button type="button" class="btn btn-ghost" id="cart-clear">Clear cart</button>
+          </div>
+          <p class="config-add-cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Cart · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script src="cart.js"></script>
+</body>
+</html>

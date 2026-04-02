@@ -1,5 +1,7 @@
+# Legacy static-only image (no API/cart). Full stack: docker/Dockerfile.api + docker-compose.yml.
 FROM nginx:1.25-alpine
 
-COPY index.html main.js styles.css favicon.svg /usr/share/nginx/html/
+COPY index.html configurator.html cart.html main.js styles.css configurator.css configurator.js cart.js favicon.svg /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
+COPY data/ /usr/share/nginx/html/data/
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf

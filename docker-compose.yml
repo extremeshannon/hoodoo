@@ -1,19 +1,43 @@
-# Hoodoo Alaska — https://github.com/extremeshannon/hoodoo
-# Static site via nginx. Public test: http://YOUR_SERVER_IP:8004/
+# Hoodoo Alaska — FastAPI + PostgreSQL + static UI
+# http://localhost:8004/  (API + site)
 #
-# Open firewall on VPS:
-#   sudo ufw allow 8004/tcp && sudo ufw reload
-# Loopback-only (no public port):
+# Local-only bind:
 #   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
 
 services:
-  web:
+  db:
+    image: postgres:16-alpine
+    container_name: hoodoo_db
+    environment:
+      POSTGRES_USER: hoodoo
+      POSTGRES_PASSWORD: hoodoo
+      POSTGRES_DB: hoodoo
+    volumes:
+      - hoodoo_pg:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hoodoo -d hoodoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
     build:
       context: .
-      dockerfile: docker/Dockerfile.web
-    container_name: hoodoo_web
+      dockerfile: docker/Dockerfile.api
+    container_name: hoodoo_api
     ports:
-      - "8004:80"
+      - "8004:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://hoodoo:hoodoo@db:5432/hoodoo
+      REPO_ROOT: /app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  hoodoo_pg:
 
 networks:
   default:

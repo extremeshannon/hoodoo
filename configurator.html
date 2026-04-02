@@ -31,6 +31,7 @@
           <li><a href="index.html">Home</a></li>
           <li><a href="index.html#services">Services</a></li>
           <li><a href="configurator.html" aria-current="page">Configurator</a></li>
+          <li><a href="cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
           <li><a href="index.html#contact">Contact</a></li>
           <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
         </ul>
@@ -123,9 +124,11 @@
               <p class="config-disclaimer" id="price-disclaimer"></p>
             </div>
             <div class="config-actions">
-              <button type="button" class="btn btn-primary" id="btn-quote">Email this configuration</button>
+              <button type="button" class="btn btn-primary" id="btn-add-cart">Add to cart</button>
+              <button type="button" class="btn btn-ghost" id="btn-quote">Email this configuration</button>
               <button type="button" class="btn btn-ghost" id="btn-copy">Copy summary</button>
             </div>
+            <p class="config-add-cart-feedback" id="add-cart-feedback" role="status" aria-live="polite"></p>
             <p class="config-copy-feedback" id="copy-feedback" role="status" aria-live="polite"></p>
           </footer>
         </article>

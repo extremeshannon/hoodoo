@@ -1,4 +1,10 @@
 (function () {
+  var apiBase = window.HOODOO_API_BASE || "";
+
+  function apiUrl(path) {
+    return apiBase + "/api" + path;
+  }
+
   var catalog = null;
   var meta = null;
   var catIndex = 0;
@@ -25,8 +31,10 @@
     priceUnit: document.getElementById("price-unit"),
     priceTotal: document.getElementById("price-total"),
     priceDisclaimer: document.getElementById("price-disclaimer"),
+    btnAddCart: document.getElementById("btn-add-cart"),
     btnQuote: document.getElementById("btn-quote"),
     btnCopy: document.getElementById("btn-copy"),
+    addCartFeedback: document.getElementById("add-cart-feedback"),
     copyFeedback: document.getElementById("copy-feedback"),
     inventoryTbody: document.getElementById("inventory-tbody"),
   };
@@ -221,6 +229,59 @@
     lines.push("Contact: shannon@hoodooak.com · 907.202.5634 · Wasilla, AK");
 
     return lines.join("\n");
+  }
+
+  function buildConfiguration() {
+    var product = currentProduct();
+    if (!product) return null;
+    var addons = [];
+    (product.addons || []).forEach(function (a) {
+      if (addonState[a.id]) addons.push(a.id);
+    });
+    if (product.pricingModel === "variants") {
+      return { variant_id: selectedVariantId, addon_ids: addons };
+    }
+    return { option_selections: Object.assign({}, selectedOptionIds), addon_ids: addons };
+  }
+
+  function parseErrorDetail(data) {
+    if (!data || typeof data !== "object") return "Request failed";
+    var d = data.detail;
+    if (typeof d === "string") return d;
+    if (Array.isArray(d) && d[0] && d[0].msg) return d[0].msg;
+    return "Request failed";
+  }
+
+  function addToCart() {
+    var product = currentProduct();
+    if (!product || !el.btnAddCart) return;
+    var cfg = buildConfiguration();
+    if (el.addCartFeedback) el.addCartFeedback.textContent = "";
+    fetch(apiUrl("/cart/items"), {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_slug: product.id,
+        quantity: getQty(),
+        configuration: cfg || {},
+      }),
+    })
+      .then(function (r) {
+        if (!r.ok) {
+          return r.json().then(function (j) {
+            throw new Error(parseErrorDetail(j));
+          });
+        }
+        return r.json();
+      })
+      .then(function () {
+        if (el.addCartFeedback) el.addCartFeedback.textContent = "Added to cart.";
+        if (window.HoodooRefreshCartBadge) window.HoodooRefreshCartBadge();
+      })
+      .catch(function (e) {
+        if (el.addCartFeedback) el.addCartFeedback.textContent = e.message || "Could not add to cart.";
+      });
   }
 
   function renderCategories() {
@@ -427,6 +488,7 @@
     refreshTotals();
 
     if (el.copyFeedback) el.copyFeedback.textContent = "";
+    if (el.addCartFeedback) el.addCartFeedback.textContent = "";
 
     document.querySelectorAll(".config-product-btn").forEach(function (b) {
       b.setAttribute("aria-selected", b.dataset.index === String(index) ? "true" : "false");
@@ -579,11 +641,21 @@
       el.qty.addEventListener("change", refreshTotals);
     }
 
-    fetch("data/catalog.json")
-      .then(function (r) {
-        if (!r.ok) throw new Error("Bad response");
-        return r.json();
-      })
+    if (el.btnAddCart) {
+      el.btnAddCart.addEventListener("click", addToCart);
+    }
+
+    function loadCatalog() {
+      return fetch(apiUrl("/catalog"), { credentials: "same-origin" }).then(function (r) {
+        if (r.ok) return r.json();
+        return fetch("data/catalog.json").then(function (r2) {
+          if (!r2.ok) throw new Error("Bad response");
+          return r2.json();
+        });
+      });
+    }
+
+    loadCatalog()
       .then(function (data) {
         catalog = data;
         meta = data.meta || {};
@@ -606,12 +678,13 @@
       })
       .catch(function () {
         if (el.meta) {
-          el.meta.textContent = "Could not load catalog. Serve this site over http(s) or open from a local server.";
+          el.meta.textContent =
+            "Could not load catalog. Run the API (docker compose / uvicorn) or ensure data/catalog.json is available for static hosting.";
         }
         if (el.empty) {
           el.empty.hidden = false;
           el.empty.querySelector(".config-empty-text").textContent =
-            "Run a local server (e.g. python3 -m http.server) so data/catalog.json can load.";
+            "No catalog source found. Use the full stack, or open via a server with data/catalog.json.";
         }
         if (el.panel) el.panel.hidden = true;
       });

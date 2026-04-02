@@ -32,4 +32,24 @@
       if (e.key === "Escape") setNavOpen(false);
     });
   }
+
+  function refreshCartBadge() {
+    var el = document.getElementById("cart-nav-count");
+    if (!el) return;
+    fetch((window.HOODOO_API_BASE || "") + "/api/cart", { credentials: "same-origin" })
+      .then(function (r) {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then(function (data) {
+        var n = typeof data.item_count === "number" ? data.item_count : 0;
+        el.textContent = n > 0 ? "(" + n + ")" : "";
+      })
+      .catch(function () {
+        el.textContent = "";
+      });
+  }
+
+  refreshCartBadge();
+  window.HoodooRefreshCartBadge = refreshCartBadge;
 })();
