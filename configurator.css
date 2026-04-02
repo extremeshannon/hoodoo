@@ -5,7 +5,7 @@
 }
 
 .config-main {
-  padding-top: var(--header-h);
+  padding-top: var(--header-anchor);
 }
 
 .visually-hidden {
@@ -159,7 +159,7 @@
 
 .config-sidebar {
   position: sticky;
-  top: calc(var(--header-h) + 1rem);
+  top: calc(var(--header-anchor) + 1rem);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -585,7 +585,7 @@
 
 /* Cart page */
 .page-cart .cart-main {
-  padding-top: var(--header-h);
+  padding-top: var(--header-anchor);
 }
 
 .cart-page-head {

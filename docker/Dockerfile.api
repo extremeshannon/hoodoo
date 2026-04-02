@@ -10,8 +10,12 @@ COPY backend/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 COPY backend/app /app/app
+COPY backend/alembic.ini /app/alembic.ini
+COPY backend/alembic /app/alembic
 COPY data /app/data
-COPY index.html configurator.html cart.html main.js styles.css configurator.css configurator.js cart.js favicon.svg /app/
+COPY index.html configurator.html cart.html login.html register.html forgot-password.html account.html order.html viewer.html admin.html main.js styles.css configurator.css configurator.js cart.js favicon.svg /app/
+COPY js /app/js
+COPY 3d /app/3d
 COPY assets /app/assets
 
 EXPOSE 8000

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Staff · Inventory & 3D | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page-app page-admin">
+  <a class="skip-link" href="#admin-main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/viewer.html">3D viewer</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="admin-main" class="app-main">
+    <div class="app-panel">
+      <h1 class="app-title">Staff admin</h1>
+      <p class="app-lede">Inventory counts and garment 3D asset rows. Requires a staff or admin account.</p>
+
+      <div id="admin-login" class="account-gate" hidden>
+        <p><a href="/login?next=%2Fadmin.html">Log in</a> to continue.</p>
+      </div>
+      <div id="admin-denied" class="account-gate" hidden>
+        <p>Your account does not have staff access.</p>
+      </div>
+      <div id="admin-body" class="admin-body" hidden>
+        <section class="admin-section" aria-labelledby="inv-heading">
+          <h2 id="inv-heading" class="app-section-title">Inventory</h2>
+          <p id="admin-inv-status" class="auth-feedback" role="status" aria-live="polite"></p>
+          <div class="admin-scroll">
+            <h3 class="admin-subhead">Variants</h3>
+            <table class="admin-table" id="admin-table-variants">
+              <thead>
+                <tr><th>Product</th><th>Label</th><th>Qty</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <h3 class="admin-subhead">Option choices</h3>
+            <table class="admin-table" id="admin-table-choices">
+              <thead>
+                <tr><th>Product</th><th>Group</th><th>Choice</th><th>Qty</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <h3 class="admin-subhead">Addons</h3>
+            <table class="admin-table" id="admin-table-addons">
+              <thead>
+                <tr><th>Product</th><th>Addon</th><th>Qty</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-section" aria-labelledby="d3-heading">
+          <h2 id="d3-heading" class="app-section-title">3D assets</h2>
+          <p class="muted">URIs are usually under <code>/3d/your-file.glb</code> (served from the repo <code>3d/</code> folder).</p>
+          <div class="admin-3d-toolbar">
+            <label class="admin-field">
+              <span>Product</span>
+              <select id="admin-product-slug"></select>
+            </label>
+            <button type="button" class="btn btn-ghost" id="admin-3d-refresh">Refresh list</button>
+          </div>
+          <p id="admin-3d-status" class="auth-feedback" role="status" aria-live="polite"></p>
+          <ul id="admin-3d-list" class="admin-asset-list"></ul>
+          <form id="admin-3d-add" class="admin-form">
+            <h3 class="admin-subhead">Add asset</h3>
+            <label class="admin-field">
+              <span>Kind</span>
+              <input type="text" name="kind" value="glb" maxlength="40" required />
+            </label>
+            <label class="admin-field">
+              <span>URI</span>
+              <input type="text" name="uri" placeholder="/3d/example.glb" maxlength="1024" required />
+            </label>
+            <label class="admin-field">
+              <span>Label (optional)</span>
+              <input type="text" name="label" maxlength="255" />
+            </label>
+            <label class="admin-field">
+              <span>Sort order</span>
+              <input type="number" name="sort_order" value="0" />
+            </label>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </form>
+        </section>
+      </div>
+      <p id="admin-error" class="auth-feedback" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Staff · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

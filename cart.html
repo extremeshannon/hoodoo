@@ -32,6 +32,7 @@
           <li><a href="/index.html#services">Services</a></li>
           <li><a href="/configurator.html">Configurator</a></li>
           <li><a href="/cart.html" aria-current="page">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a href="/viewer.html">3D viewer</a></li>
           <li><a href="/index.html#contact">Contact</a></li>
           <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
         </ul>
@@ -54,6 +55,7 @@
           <p class="cart-summary-row"><span>Subtotal (guide)</span><strong id="cart-subtotal">$0.00</strong></p>
           <div class="cart-summary-actions">
             <button type="button" class="btn btn-primary" id="cart-email">Email quote to Hoodoo</button>
+            <button type="button" class="btn btn-secondary" id="cart-save-order">Save order to account</button>
             <button type="button" class="btn btn-ghost" id="cart-clear">Clear cart</button>
           </div>
           <p class="config-add-cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p>
@@ -69,7 +71,9 @@
     </div>
   </footer>
 
+  <script src="/js/api.js"></script>
   <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
   <script src="/cart.js"></script>
 </body>
 </html>

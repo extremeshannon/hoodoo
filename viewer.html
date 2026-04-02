@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>3D viewer | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="page-app page-viewer">
+  <a class="skip-link" href="#viewer-wrap">Skip to viewer</a>
+
+  <header class="site-header viewer-header">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="viewer-main">
+    <div class="viewer-toolbar">
+      <label class="viewer-slug-field">
+        <span class="viewer-label">Product slug</span>
+        <input type="text" id="viewer-slug-input" placeholder="e.g. upc-pro" autocomplete="off" />
+      </label>
+      <button type="button" class="btn btn-primary" id="viewer-load-btn">Load 3D</button>
+      <p id="viewer-status" class="viewer-status" role="status" aria-live="polite"></p>
+    </div>
+    <div id="viewer-wrap" class="viewer-wrap" tabindex="-1">
+      <canvas id="viewer-canvas" class="viewer-canvas" aria-label="3D product preview"></canvas>
+      <div id="viewer-empty" class="viewer-empty" hidden>
+        <p>No 3D assets for this product yet, or none could be displayed.</p>
+        <p class="muted">Staff can add GLB paths under <code>/3d/…</code> in the admin UI.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">3D preview · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script type="module" src="/js/viewer-3d.js"></script>
+  <script>
+    (function () {
+      var y = document.getElementById("year");
+      if (y) y.textContent = String(new Date().getFullYear());
+    })();
+  </script>
+</body>
+</html>

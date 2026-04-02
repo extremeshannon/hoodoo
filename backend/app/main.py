@@ -3,14 +3,17 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from alembic import command
+from alembic.config import Config
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from app.bootstrap import bootstrap_staff_if_configured
 from app.config import get_settings
-from app.database import Base, SessionLocal, engine
-from app.routers import auth, cart, catalog, garment_3d, orders
+from app.database import Base, SessionLocal, engine, ensure_legacy_schema
+from app.routers import admin, auth, cart, catalog, garment_3d, orders
 from app.seed import seed_if_empty
 
 
@@ -27,10 +30,26 @@ def resolve_repo_root(settings) -> Path:
     return repo_from_backend
 
 
+def run_db_migrations() -> None:
+    """Apply Alembic migrations when alembic.ini is present (Docker / backend checkout).
+
+    If the database already has tables from an older deploy without ``alembic_version``,
+    stamp once: ``alembic stamp 72bb3bf2d7cb`` (then use ``upgrade`` normally).
+
+    When ``alembic.ini`` is missing, fall back to SQLAlchemy ``create_all`` plus legacy DDL.
+    """
+    ini = Path(__file__).resolve().parent.parent / "alembic.ini"
+    if ini.is_file():
+        command.upgrade(Config(str(ini)), "head")
+        return
+    Base.metadata.create_all(bind=engine)
+    ensure_legacy_schema(engine)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    Base.metadata.create_all(bind=engine)
+    run_db_migrations()
     db = SessionLocal()
     try:
         root = resolve_repo_root(settings)
@@ -38,6 +57,7 @@ async def lifespan(app: FastAPI):
         if not catalog_path.is_absolute():
             catalog_path = root / catalog_path
         seed_if_empty(db, catalog_path)
+        bootstrap_staff_if_configured(db, settings)
     finally:
         db.close()
     yield
@@ -58,6 +78,7 @@ app.include_router(cart.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(orders.router, prefix="/api")
 app.include_router(garment_3d.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 
 
 @app.get("/api/health")
@@ -70,6 +91,29 @@ def _attach_static():
     root = resolve_repo_root(settings)
     if not root.is_dir() or not (root / "index.html").is_file():
         return
+    three_d = root / "3d"
+    if three_d.is_dir():
+        app.mount("/3d", StaticFiles(directory=str(three_d)), name="garment_3d_files")
+
+    # Auth pages: explicit routes so /login (no .html) always serves the current file (avoids stale SPA-style caches).
+    def _html(name: str) -> FileResponse:
+        path = root / name
+        if not path.is_file():
+            raise HTTPException(status_code=404, detail="Not found")
+        return FileResponse(path)
+
+    @app.get("/login")
+    def serve_login():
+        return _html("login.html")
+
+    @app.get("/register")
+    def serve_register():
+        return _html("register.html")
+
+    @app.get("/forgot-password")
+    def serve_forgot_password():
+        return _html("forgot-password.html")
+
     # Explicit home page so we never use StaticFiles(html=True), which serves index.html
     # for *any* missing path (e.g. /api/health) if that mount handles the request first.
     @app.get("/")

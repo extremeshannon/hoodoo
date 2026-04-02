@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Your account | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page-app">
+  <a class="skip-link" href="#account-main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="account-main" class="app-main">
+    <div class="app-panel">
+      <h1 class="app-title">Your account</h1>
+      <div id="account-gate" class="account-gate" hidden>
+        <p>
+          <a href="/login?next=%2Faccount.html">Sign in</a>
+          or <a href="/register?next=%2Faccount.html">create an account</a> to view this page.
+        </p>
+      </div>
+      <div id="account-body" hidden>
+        <p class="account-profile" id="account-profile"></p>
+        <section class="account-orders" aria-labelledby="orders-heading">
+          <h2 id="orders-heading" class="app-section-title">Order history</h2>
+          <p id="orders-empty" class="muted" hidden>No orders yet. Save a cart from the <a href="/cart.html">cart page</a> while logged in.</p>
+          <ul id="orders-list" class="orders-list"></ul>
+        </section>
+      </div>
+      <p id="account-error" class="auth-feedback" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Account · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script>
+    (function () {
+      var y = document.getElementById("year");
+      if (y) y.textContent = String(new Date().getFullYear());
+      var gate = document.getElementById("account-gate");
+      var body = document.getElementById("account-body");
+      var errEl = document.getElementById("account-error");
+      if (!window.HoodooApi.getToken()) {
+        gate.hidden = false;
+        return;
+      }
+      window.HoodooApi
+        .fetchJson("/auth/me")
+        .then(function (u) {
+          gate.hidden = true;
+          body.hidden = false;
+          var prof = document.getElementById("account-profile");
+          prof.textContent =
+            (u.full_name ? u.full_name + " · " : "") +
+            (u.username ? "@" + u.username + " · " : "") +
+            u.email +
+            " · " +
+            u.role;
+          return window.HoodooApi.fetchJson("/orders");
+        })
+        .then(function (orders) {
+          var list = document.getElementById("orders-list");
+          var empty = document.getElementById("orders-empty");
+          if (!orders || !orders.length) {
+            empty.hidden = false;
+            return;
+          }
+          empty.hidden = true;
+          orders.forEach(function (o) {
+            var li = document.createElement("li");
+            li.className = "orders-row";
+            var d = new Date(o.created_at);
+            var sub = o.subtotal;
+            li.innerHTML =
+              '<a class="orders-row-link" href="/order.html?id=' +
+              encodeURIComponent(o.id) +
+              '"><span class="orders-row-date">' +
+              d.toLocaleString() +
+              '</span><span class="orders-row-total">$' +
+              sub +
+              '</span><span class="orders-row-status">' +
+              o.status +
+              "</span></a>";
+            list.appendChild(li);
+          });
+        })
+        .catch(function (e) {
+          errEl.textContent = e.message || "Could not load account.";
+          if (e.message && e.message.indexOf("Not authenticated") !== -1) {
+            gate.hidden = false;
+            body.hidden = true;
+          }
+        });
+    })();
+  </script>
+</body>
+</html>

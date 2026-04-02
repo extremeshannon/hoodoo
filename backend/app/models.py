@@ -165,6 +165,8 @@ class User(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False, index=True)
+    # Lowercase login handle; optional. Log in with this or email.
+    username: Mapped[str | None] = mapped_column(String(80), unique=True, nullable=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str | None] = mapped_column(String(255))
     # customer | staff | admin

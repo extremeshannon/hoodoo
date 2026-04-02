@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Sign in | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
+</head>
+<body class="page-app page-auth page-auth-flow">
+  <a class="skip-link" href="#auth-main">Skip to sign in</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="auth-main" class="auth-flow-main auth-scene">
+    <div class="auth-scene-inner">
+    <article class="auth-hero-card auth-hero-card--login" aria-labelledby="signin-title">
+      <p class="auth-hero-eyebrow">Hoodoo Alaska</p>
+      <h1 id="signin-title" class="auth-hero-title">Welcome back</h1>
+      <p class="auth-hero-lede">Sign in with your email or username and password.</p>
+
+      <form id="login-form" class="auth-hero-form" novalidate>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Email or username</span>
+          <input type="text" name="login" id="login-id" autocomplete="username" required placeholder="you@example.com or handle" />
+        </label>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Password</span>
+          <input type="password" name="password" id="login-password" autocomplete="current-password" required placeholder="••••••••" />
+        </label>
+        <button type="submit" class="btn btn-primary auth-hero-submit">Sign in</button>
+      </form>
+
+      <p id="login-feedback" class="auth-feedback auth-feedback--center" role="status" aria-live="polite"></p>
+
+      <div class="auth-hero-links">
+        <a class="auth-hero-link" href="/forgot-password">Forgot password?</a>
+        <span class="auth-hero-dot" aria-hidden="true"></span>
+        <a class="auth-hero-link auth-hero-link--accent" href="/register">Create an account</a>
+      </div>
+    </article>
+
+    <details class="auth-dev-hint">
+      <summary>Local development</summary>
+      <p>
+        Bootstrap staff/admin user is created from <code>.env</code> on first DB start. See <code>.env.example</code>.
+        After signing in, open <a href="/admin.html">Staff admin</a> if your role allows it.
+      </p>
+    </details>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Account · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script>
+    (function () {
+      var y = document.getElementById("year");
+      if (y) y.textContent = String(new Date().getFullYear());
+      var params = new URLSearchParams(location.search);
+      var next = params.get("next") || "/account.html";
+      document.getElementById("login-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fb = document.getElementById("login-feedback");
+        fb.textContent = "";
+        var loginId = document.getElementById("login-id").value.trim();
+        var password = document.getElementById("login-password").value;
+        var body = new URLSearchParams({ username: loginId, password: password, grant_type: "password" });
+        fetch(window.HoodooApi.apiUrl("/auth/token"), {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: body.toString(),
+          credentials: "same-origin",
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              if (!r.ok) throw new Error(window.HoodooApi.parseDetail(j));
+              return j;
+            });
+          })
+          .then(function (tok) {
+            window.HoodooApi.setToken(tok.access_token);
+            location.href = next;
+          })
+          .catch(function (err) {
+            fb.textContent = err.message || "Sign in failed";
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

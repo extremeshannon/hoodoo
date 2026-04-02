@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
 
+    # Optional: create a staff user on startup if email is not registered (dev / first deploy).
+    bootstrap_staff_email: str | None = None
+    bootstrap_staff_username: str | None = None  # default "admin"; must be unused if set
+    bootstrap_staff_password: str | None = None
+    bootstrap_staff_role: str = "staff"  # staff | admin
+
 
 @lru_cache
 def get_settings() -> Settings:

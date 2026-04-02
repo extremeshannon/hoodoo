@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Order | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page-app">
+  <a class="skip-link" href="#order-main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="order-main" class="app-main">
+    <div class="app-panel">
+      <p class="app-back"><a href="/account.html">← Back to account</a></p>
+      <h1 class="app-title">Order detail</h1>
+      <div id="order-gate" class="account-gate" hidden>
+        <p>You need to <a id="order-login-link" href="/login">log in</a> to view this order.</p>
+      </div>
+      <div id="order-body" hidden>
+        <header class="order-head">
+          <p class="order-meta" id="order-meta"></p>
+          <p class="order-total" id="order-total"></p>
+          <p class="order-note" id="order-note" hidden></p>
+        </header>
+        <ul id="order-lines" class="order-lines"></ul>
+      </div>
+      <p id="order-error" class="auth-feedback" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Orders · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script>
+    (function () {
+      var y = document.getElementById("year");
+      if (y) y.textContent = String(new Date().getFullYear());
+      var params = new URLSearchParams(location.search);
+      var id = params.get("id");
+      var gate = document.getElementById("order-gate");
+      var body = document.getElementById("order-body");
+      var errEl = document.getElementById("order-error");
+      var loginLink = document.getElementById("order-login-link");
+      if (loginLink) {
+        loginLink.href = "/login?next=" + encodeURIComponent(location.pathname + location.search);
+      }
+      if (!id) {
+        errEl.textContent = "Missing order id.";
+        return;
+      }
+      if (!window.HoodooApi.getToken()) {
+        gate.hidden = false;
+        return;
+      }
+      window.HoodooApi
+        .fetchJson("/orders/" + encodeURIComponent(id))
+        .then(function (o) {
+          gate.hidden = true;
+          body.hidden = false;
+          var d = new Date(o.created_at);
+          document.getElementById("order-meta").textContent =
+            "Order " + o.id + " · " + d.toLocaleString() + " · " + o.status;
+          document.getElementById("order-total").textContent = "Subtotal $" + o.subtotal;
+          var note = document.getElementById("order-note");
+          if (o.customer_note) {
+            note.hidden = false;
+            note.textContent = "Note: " + o.customer_note;
+          }
+          var ul = document.getElementById("order-lines");
+          (o.lines || []).forEach(function (line) {
+            var li = document.createElement("li");
+            li.className = "order-line";
+            li.innerHTML =
+              "<strong>" +
+              line.quantity +
+              " × " +
+              line.product_name +
+              "</strong><br /><span class=\"muted\">" +
+              line.label +
+              "</span><br />Unit $" +
+              line.unit_price +
+              " · Line $" +
+              line.line_total;
+            ul.appendChild(li);
+          });
+        })
+        .catch(function (e) {
+          errEl.textContent = e.message || "Could not load order.";
+          if ((e.message || "").indexOf("Not authenticated") !== -1 || (e.message || "").indexOf("401") !== -1) {
+            gate.hidden = false;
+            body.hidden = true;
+          }
+        });
+    })();
+  </script>
+</body>
+</html>

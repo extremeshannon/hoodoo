@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Create account | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
+</head>
+<body class="page-app page-auth page-auth-flow">
+  <a class="skip-link" href="#register-main">Skip to form</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="register-main" class="auth-flow-main auth-flow-main--wide auth-flow-main--stack">
+    <a class="auth-back-link" href="/login">← Back to sign in</a>
+
+    <header class="auth-flow-header">
+      <h1 class="auth-flow-title">Create your account</h1>
+      <p class="auth-flow-lede">A few quick steps — you’ll be signed in when you’re done.</p>
+    </header>
+
+    <form id="register-form" class="auth-stack" novalidate>
+      <article class="auth-item-card">
+        <header class="auth-item-head">
+          <span class="auth-item-step" aria-hidden="true">01</span>
+          <div>
+            <h2 class="auth-item-title">Profile</h2>
+            <p class="auth-item-desc">How we’ll greet you (optional).</p>
+          </div>
+        </header>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Display name</span>
+          <input type="text" name="full_name" id="reg-name" maxlength="255" autocomplete="name" placeholder="Your name" />
+        </label>
+      </article>
+
+      <article class="auth-item-card">
+        <header class="auth-item-head">
+          <span class="auth-item-step" aria-hidden="true">02</span>
+          <div>
+            <h2 class="auth-item-title">Contact</h2>
+            <p class="auth-item-desc">We’ll use this for orders and receipts.</p>
+          </div>
+        </header>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Email</span>
+          <input type="email" name="email" id="reg-email" autocomplete="email" required placeholder="you@example.com" />
+        </label>
+      </article>
+
+      <article class="auth-item-card">
+        <header class="auth-item-head">
+          <span class="auth-item-step" aria-hidden="true">03</span>
+          <div>
+            <h2 class="auth-item-title">Username</h2>
+            <p class="auth-item-desc">Optional — sign in with a short handle instead of email.</p>
+          </div>
+        </header>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Username</span>
+          <input type="text" name="username" id="reg-username" maxlength="32" autocomplete="off" placeholder="e.g. jane_doe" />
+        </label>
+      </article>
+
+      <article class="auth-item-card">
+        <header class="auth-item-head">
+          <span class="auth-item-step" aria-hidden="true">04</span>
+          <div>
+            <h2 class="auth-item-title">Password</h2>
+            <p class="auth-item-desc">At least 8 characters.</p>
+          </div>
+        </header>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Password</span>
+          <input type="password" name="password" id="reg-password" autocomplete="new-password" required minlength="8" placeholder="••••••••" />
+        </label>
+        <label class="auth-field auth-field--sleek">
+          <span class="auth-field-label">Confirm password</span>
+          <input type="password" name="password2" id="reg-password2" autocomplete="new-password" required minlength="8" placeholder="Repeat password" />
+        </label>
+      </article>
+
+      <div class="auth-stack-actions">
+        <button type="submit" class="btn btn-primary auth-stack-submit">Create account</button>
+        <p class="auth-stack-alt">
+          Already have an account? <a href="/login">Sign in</a>
+        </p>
+        <p id="register-feedback" class="auth-feedback auth-feedback--center" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Account · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script>
+    (function () {
+      var y = document.getElementById("year");
+      if (y) y.textContent = String(new Date().getFullYear());
+      var params = new URLSearchParams(location.search);
+      var next = params.get("next") || "/account.html";
+      document.getElementById("register-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fb = document.getElementById("register-feedback");
+        fb.textContent = "";
+        var p1 = document.getElementById("reg-password").value;
+        var p2 = document.getElementById("reg-password2").value;
+        if (p1 !== p2) {
+          fb.textContent = "Passwords don’t match.";
+          return;
+        }
+        var full_name = document.getElementById("reg-name").value.trim() || null;
+        var email = document.getElementById("reg-email").value.trim();
+        var username = document.getElementById("reg-username").value.trim() || null;
+        fetch(window.HoodooApi.apiUrl("/auth/register"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, password: p1, full_name: full_name, username: username }),
+          credentials: "same-origin",
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              if (!r.ok) throw new Error(window.HoodooApi.parseDetail(j));
+              return j;
+            });
+          })
+          .then(function (tok) {
+            window.HoodooApi.setToken(tok.access_token);
+            location.href = next;
+          })
+          .catch(function (err) {
+            fb.textContent = err.message || "Could not create account";
+          });
+      });
+    })();
+  </script>
+</body>
+</html>
