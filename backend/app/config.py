@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     cart_cookie_name: str = "hoodoo_cart_id"
     cart_cookie_max_age: int = 60 * 60 * 24 * 60  # 60 days
 
+    jwt_secret: str = "dev-only-change-me-use-long-random-string-in-production"  # override with JWT_SECRET
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -156,3 +156,84 @@ class CartItem(Base):
 
     cart: Mapped[Cart] = relationship(back_populates="items")
     product: Mapped[Product] = relationship()
+
+
+class User(Base):
+    """Customer, staff, or admin. Inventory and catalog edits use staff/admin (future admin UI)."""
+
+    __tablename__ = "users"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False, index=True)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    full_name: Mapped[str | None] = mapped_column(String(255))
+    # customer | staff | admin
+    role: Mapped[str] = mapped_column(String(20), nullable=False, default="customer")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    orders: Mapped[list["Order"]] = relationship(back_populates="user")
+
+
+class Order(Base):
+    """Submitted quote / order snapshot for repeat customers and history."""
+
+    __tablename__ = "orders"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="submitted")
+    # submitted | acknowledged | in_production | fulfilled | cancelled
+    subtotal: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    customer_note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    user: Mapped[User] = relationship(back_populates="orders")
+    lines: Mapped[list[OrderLine]] = relationship(
+        back_populates="order",
+        cascade="all, delete-orphan",
+        order_by="OrderLine.id",
+    )
+
+
+class OrderLine(Base):
+    __tablename__ = "order_lines"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    order_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id", ondelete="SET NULL"), nullable=True)
+    product_slug_snapshot: Mapped[str] = mapped_column(String(80), nullable=False)
+    product_name_snapshot: Mapped[str] = mapped_column(String(255), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False)
+    configuration: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    line_total: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    label_snapshot: Mapped[str] = mapped_column(Text, nullable=False)
+
+    order: Mapped[Order] = relationship(back_populates="lines")
+    product: Mapped[Product | None] = relationship()
+
+
+class Garment3dAsset(Base):
+    """
+    Paths to assets for the future 3D configurator.
+    Typical flow: CLO3D → export glTF/GLB (or render turntable WEBP) → store under /3d/... or object storage.
+    """
+
+    __tablename__ = "garment_3d_assets"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    # glb | gltf | preview_webp | clo_archive_ref
+    kind: Mapped[str] = mapped_column(String(40), nullable=False)
+    # Public URL path, e.g. /3d/upc-pro/display.glb or S3 key
+    uri: Mapped[str] = mapped_column(String(1024), nullable=False)
+    label: Mapped[str | None] = mapped_column(String(255))
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+
+    product: Mapped[Product] = relationship()

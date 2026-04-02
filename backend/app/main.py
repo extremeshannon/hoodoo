@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.database import Base, SessionLocal, engine
-from app.routers import cart, catalog
+from app.routers import auth, cart, catalog, garment_3d, orders
 from app.seed import seed_if_empty
 
 
@@ -55,6 +55,9 @@ app.add_middleware(
 
 app.include_router(catalog.router, prefix="/api")
 app.include_router(cart.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(orders.router, prefix="/api")
+app.include_router(garment_3d.router, prefix="/api")
 
 
 @app.get("/api/health")
