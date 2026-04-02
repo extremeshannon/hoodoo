@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Configure Hoodoo Alaska apparel and Ultimate Paw Covers gauntlets. Live inventory and guide pricing. Wasilla, AK." />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Configurator | Hoodoo Alaska</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="configurator.css" />
+</head>
+<body class="page-configurator">
+  <a class="skip-link" href="#config-main">Skip to configurator</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="Hoodoo Alaska home">
+        <img src="assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="configurator.html" aria-current="page">Configurator</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+          <li><a class="nav-cta" href="mailto:shannon@hoodooak.com">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="config-main" class="config-main">
+    <section class="config-hero" aria-labelledby="config-hero-title">
+      <div class="config-hero-bg" aria-hidden="true"></div>
+      <div class="section-inner config-hero-inner">
+        <p class="config-hero-badge">Made in Wasilla, Alaska</p>
+        <h1 id="config-hero-title" class="config-hero-title">Build your order</h1>
+        <p class="config-hero-lede">
+          Pick a category, choose options, and see <strong>guide pricing</strong> with <strong>live inventory</strong> from our floor.
+          Ultimate Paw Covers gauntlets are built here—rated for real trail miles.
+        </p>
+        <p class="config-meta" id="catalog-meta"></p>
+      </div>
+    </section>
+
+    <section class="config-spotlight" id="ultimate-paw" aria-labelledby="spotlight-title">
+      <div class="section-inner spotlight-inner">
+        <div class="spotlight-copy">
+          <p class="spotlight-eyebrow">Ultimate Paw Covers</p>
+          <h2 id="spotlight-title" class="spotlight-title">Best gauntlets in the world—home turf is Alaska.</h2>
+          <p class="spotlight-desc">
+            Snowmachine gauntlets engineered for wind, cold, and powder days. From the trail Lite to the insulated Pro line,
+            every pair is cut and sewn under our roof. Select <strong>Ultimate Paw Covers</strong> below to configure sizing, shell, and add-ons.
+          </p>
+        </div>
+        <div class="spotlight-cta">
+          <a class="btn btn-primary" href="#categories">Configure gauntlets</a>
+          <a class="btn btn-ghost" href="tel:+19072025634">907.202.5634</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="config-layout section-inner">
+      <aside class="config-sidebar" aria-label="Categories and products">
+        <h2 class="visually-hidden">Catalog</h2>
+        <div class="config-categories" id="categories" role="tablist" aria-label="Product categories"></div>
+        <div class="config-product-list-wrap">
+          <p class="config-sidebar-label" id="product-list-label">Products</p>
+          <ul class="config-product-list" id="product-list" role="listbox" aria-labelledby="product-list-label"></ul>
+        </div>
+      </aside>
+
+      <div class="config-workspace">
+        <div id="config-empty" class="config-empty" hidden>
+          <p class="config-empty-title">Select a product</p>
+          <p class="config-empty-text">Choose a category on the left, then pick an item to see options, inventory, and pricing.</p>
+        </div>
+
+        <article id="config-panel" class="config-panel" hidden>
+          <header class="config-panel-head">
+            <div>
+              <p class="config-panel-category" id="panel-category"></p>
+              <h2 class="config-panel-title" id="panel-title"></h2>
+              <p class="config-panel-sku" id="panel-sku"></p>
+              <p class="config-panel-summary" id="panel-summary"></p>
+            </div>
+            <div class="config-panel-stock" id="panel-stock" aria-live="polite"></div>
+          </header>
+
+          <div class="config-panel-body">
+            <div id="panel-options" class="config-options"></div>
+
+            <fieldset class="config-addons" id="panel-addons-wrap" hidden>
+              <legend class="config-fieldset-legend">Add-ons</legend>
+              <div id="panel-addons" class="config-addons-list"></div>
+            </fieldset>
+
+            <div class="config-qty-row">
+              <label class="config-qty-label" for="config-qty">Quantity</label>
+              <input type="number" id="config-qty" class="config-qty-input" min="1" max="999" value="1" />
+            </div>
+          </div>
+
+          <footer class="config-panel-footer">
+            <div class="config-totals">
+              <p class="config-price-row">
+                <span>Unit (guide)</span>
+                <strong id="price-unit">—</strong>
+              </p>
+              <p class="config-price-row config-price-total">
+                <span>Line total</span>
+                <strong id="price-total">—</strong>
+              </p>
+              <p class="config-disclaimer" id="price-disclaimer"></p>
+            </div>
+            <div class="config-actions">
+              <button type="button" class="btn btn-primary" id="btn-quote">Email this configuration</button>
+              <button type="button" class="btn btn-ghost" id="btn-copy">Copy summary</button>
+            </div>
+            <p class="config-copy-feedback" id="copy-feedback" role="status" aria-live="polite"></p>
+          </footer>
+        </article>
+      </div>
+    </div>
+
+    <section class="section config-inventory-section" aria-labelledby="inventory-heading">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2 id="inventory-heading" class="section-title">Full inventory</h2>
+          <p class="section-sub">Every SKU and variant on the floor (updates when you edit <code class="config-code">data/catalog.json</code>).</p>
+        </header>
+        <div class="config-table-wrap">
+          <table class="config-table" id="inventory-table">
+            <thead>
+              <tr>
+                <th scope="col">Category</th>
+                <th scope="col">Product</th>
+                <th scope="col">Variant / options</th>
+                <th scope="col">SKU</th>
+                <th scope="col" class="config-th-num">Price</th>
+                <th scope="col" class="config-th-num">Qty</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">Configurator · Ultimate Paw Covers · Wasilla, AK</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script src="configurator.js"></script>
+</body>
+</html>

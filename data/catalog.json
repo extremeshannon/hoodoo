@@ -1,0 +1,333 @@
+{
+  "meta": {
+    "currency": "USD",
+    "currencySymbol": "$",
+    "priceDisclaimer": "Guide pricing for retail and small runs. Team, contract, and volume quotes available.",
+    "lowStockThreshold": 10,
+    "contactEmail": "shannon@hoodooak.com",
+    "lastUpdated": "2026-04-01"
+  },
+  "categories": [
+    {
+      "id": "ultimate-paw",
+      "name": "Ultimate Paw Covers",
+      "subtitle": "Snowmachine gauntlets — made in Alaska",
+      "featured": true,
+      "description": "Home of Ultimate Paw Covers: gauntlets built for real Alaska miles—wind, powder, and cold hands solved. Cut, sewn, and finished in Wasilla.",
+      "products": [
+        {
+          "id": "upc-pro",
+          "name": "Ultimate Paw Cover Pro",
+          "sku": "UPC-PRO",
+          "summary": "Insulated shell, extended cuff, and grip-friendly palm. Our flagship for long rides and deep cold.",
+          "pricingModel": "variants",
+          "variants": [
+            { "id": "s-black", "label": "S · Black / graphite", "price": 94, "inventory": 18 },
+            { "id": "m-black", "label": "M · Black / graphite", "price": 94, "inventory": 24 },
+            { "id": "l-black", "label": "L · Black / graphite", "price": 94, "inventory": 12 },
+            { "id": "xl-black", "label": "XL · Black / graphite", "price": 98, "inventory": 9 },
+            { "id": "m-hivis", "label": "M · Hi-vis accent", "price": 108, "inventory": 7 },
+            { "id": "l-hivis", "label": "L · Hi-vis accent", "price": 108, "inventory": 5 }
+          ],
+          "addons": [
+            { "id": "emb-name", "label": "Embroidered name or call sign", "price": 22, "inventory": 999 },
+            { "id": "pair-draw", "label": "Matching tether / wrist drawcord kit", "price": 12, "inventory": 40 }
+          ]
+        },
+        {
+          "id": "upc-trail",
+          "name": "Ultimate Paw Cover Trail",
+          "sku": "UPC-TRL",
+          "summary": "Lighter build for spring riding and high-output days. Same Alaska-tough stitching, trimmer insulation.",
+          "pricingModel": "variants",
+          "variants": [
+            { "id": "s-coyote", "label": "S · Coyote", "price": 72, "inventory": 10 },
+            { "id": "m-coyote", "label": "M · Coyote", "price": 72, "inventory": 16 },
+            { "id": "l-coyote", "label": "L · Coyote", "price": 72, "inventory": 14 },
+            { "id": "xl-coyote", "label": "XL · Coyote", "price": 76, "inventory": 6 },
+            { "id": "m-black", "label": "M · Black", "price": 72, "inventory": 20 }
+          ],
+          "addons": [
+            { "id": "emb-logo-small", "label": "Small laser-cut patch (your logo)", "price": 18, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "upc-lite",
+          "name": "Ultimate Paw Cover Lite",
+          "sku": "UPC-LTE",
+          "summary": "Minimal bulk wind shell—packs small. Ideal as a backup layer or early-season glove companion.",
+          "pricingModel": "variants",
+          "variants": [
+            { "id": "s-black", "label": "S · Black", "price": 48, "inventory": 22 },
+            { "id": "m-black", "label": "M · Black", "price": 48, "inventory": 30 },
+            { "id": "l-black", "label": "L · Black", "price": 48, "inventory": 25 },
+            { "id": "xl-black", "label": "XL · Black", "price": 52, "inventory": 11 }
+          ],
+          "addons": []
+        }
+      ]
+    },
+    {
+      "id": "tees",
+      "name": "T-shirts",
+      "subtitle": "Blanks through full decoration",
+      "featured": false,
+      "description": "Premium blanks ready for screen print, sublimation, or embroidery. Inventory shown is blank stock on hand.",
+      "products": [
+        {
+          "id": "tee-premium",
+          "name": "Hoodoo Premium Tee",
+          "sku": "TEE-PRM",
+          "summary": "Midweight ringspun cotton. Soft hand, stable for multi-color print.",
+          "pricingModel": "options",
+          "basePrice": 26,
+          "optionGroups": [
+            {
+              "id": "size",
+              "label": "Size",
+              "required": true,
+              "choices": [
+                { "id": "s", "label": "S", "priceAdjust": 0, "inventory": 36 },
+                { "id": "m", "label": "M", "priceAdjust": 0, "inventory": 48 },
+                { "id": "l", "label": "L", "priceAdjust": 0, "inventory": 44 },
+                { "id": "xl", "label": "XL", "priceAdjust": 2, "inventory": 32 },
+                { "id": "2xl", "label": "2XL", "priceAdjust": 4, "inventory": 18 },
+                { "id": "3xl", "label": "3XL", "priceAdjust": 6, "inventory": 9 }
+              ]
+            },
+            {
+              "id": "color",
+              "label": "Color (blank)",
+              "required": true,
+              "choices": [
+                { "id": "black", "label": "Black", "priceAdjust": 0, "inventory": 55 },
+                { "id": "white", "label": "White", "priceAdjust": 0, "inventory": 42 },
+                { "id": "heather", "label": "Heather slate", "priceAdjust": 1, "inventory": 28 },
+                { "id": "navy", "label": "Navy", "priceAdjust": 0, "inventory": 24 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "screen-1c", "label": "Screen print · 1 color (per shirt)", "price": 8, "inventory": 999 },
+            { "id": "screen-3c", "label": "Screen print · up to 3 colors (per shirt)", "price": 14, "inventory": 999 },
+            { "id": "emb-chest", "label": "Embroidery · left chest (per shirt)", "price": 12, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "tee-heavy",
+          "name": "Heavyweight Box Tee",
+          "sku": "TEE-HVY",
+          "summary": "Structured collar, dense knit—great for bold graphics and retail hand-feel.",
+          "pricingModel": "options",
+          "basePrice": 32,
+          "optionGroups": [
+            {
+              "id": "size",
+              "label": "Size",
+              "required": true,
+              "choices": [
+                { "id": "s", "label": "S", "priceAdjust": 0, "inventory": 14 },
+                { "id": "m", "label": "M", "priceAdjust": 0, "inventory": 22 },
+                { "id": "l", "label": "L", "priceAdjust": 0, "inventory": 20 },
+                { "id": "xl", "label": "XL", "priceAdjust": 3, "inventory": 16 },
+                { "id": "2xl", "label": "2XL", "priceAdjust": 5, "inventory": 10 }
+              ]
+            },
+            {
+              "id": "color",
+              "label": "Color (blank)",
+              "required": true,
+              "choices": [
+                { "id": "black", "label": "Black", "priceAdjust": 0, "inventory": 30 },
+                { "id": "natural", "label": "Natural", "priceAdjust": 0, "inventory": 18 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "sub-full", "label": "Dye sub front panel (poly blend areas)", "price": 22, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "tee-performance",
+          "name": "Performance Tri-Blend",
+          "sku": "TEE-PERF",
+          "summary": "Moisture movement and stretch—ideal for sublimation-friendly panels.",
+          "pricingModel": "options",
+          "basePrice": 34,
+          "optionGroups": [
+            {
+              "id": "size",
+              "label": "Size",
+              "required": true,
+              "choices": [
+                { "id": "s", "label": "S", "priceAdjust": 0, "inventory": 20 },
+                { "id": "m", "label": "M", "priceAdjust": 0, "inventory": 26 },
+                { "id": "l", "label": "L", "priceAdjust": 0, "inventory": 24 },
+                { "id": "xl", "label": "XL", "priceAdjust": 2, "inventory": 18 }
+              ]
+            },
+            {
+              "id": "color",
+              "label": "Color (blank)",
+              "required": true,
+              "choices": [
+                { "id": "charcoal", "label": "Charcoal", "priceAdjust": 0, "inventory": 32 },
+                { "id": "royal", "label": "Royal", "priceAdjust": 0, "inventory": 14 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "sub-allover", "label": "Sublimated graphic (quoted per art)", "price": 28, "inventory": 999 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jerseys",
+      "name": "Jerseys",
+      "subtitle": "Team and club builds",
+      "featured": false,
+      "description": "On-field and pit jerseys: sublimated or decorated mesh and knit bodies. Numbers and names quoted per roster.",
+      "products": [
+        {
+          "id": "jersey-pro-sub",
+          "name": "Pro Sublimated Jersey",
+          "sku": "JRSY-SUB",
+          "summary": "Full-color sublimated body—no crack, no peel. Designed for aggressive wash cycles.",
+          "pricingModel": "options",
+          "basePrice": 78,
+          "optionGroups": [
+            {
+              "id": "size",
+              "label": "Size",
+              "required": true,
+              "choices": [
+                { "id": "ys", "label": "Youth S", "priceAdjust": -4, "inventory": 8 },
+                { "id": "ym", "label": "Youth M", "priceAdjust": -4, "inventory": 10 },
+                { "id": "yl", "label": "Youth L", "priceAdjust": -4, "inventory": 7 },
+                { "id": "s", "label": "Adult S", "priceAdjust": 0, "inventory": 12 },
+                { "id": "m", "label": "Adult M", "priceAdjust": 0, "inventory": 18 },
+                { "id": "l", "label": "Adult L", "priceAdjust": 0, "inventory": 16 },
+                { "id": "xl", "label": "Adult XL", "priceAdjust": 4, "inventory": 14 },
+                { "id": "2xl", "label": "Adult 2XL", "priceAdjust": 8, "inventory": 9 }
+              ]
+            },
+            {
+              "id": "fit",
+              "label": "Cut",
+              "required": true,
+              "choices": [
+                { "id": "set-in", "label": "Set-in sleeve", "priceAdjust": 0, "inventory": 999 },
+                { "id": "raglan", "label": "Raglan", "priceAdjust": 6, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "num-name", "label": "Number + name (per jersey)", "price": 16, "inventory": 999 },
+            { "id": "captain-patch", "label": "Captain / alternate patch", "price": 8, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "jersey-mesh",
+          "name": "Classic Mesh Jersey",
+          "sku": "JRSY-MSH",
+          "summary": "Traditional mesh body with sewn or printed tackle twill options.",
+          "pricingModel": "options",
+          "basePrice": 52,
+          "optionGroups": [
+            {
+              "id": "size",
+              "label": "Size",
+              "required": true,
+              "choices": [
+                { "id": "s", "label": "S", "priceAdjust": 0, "inventory": 15 },
+                { "id": "m", "label": "M", "priceAdjust": 0, "inventory": 22 },
+                { "id": "l", "label": "L", "priceAdjust": 0, "inventory": 20 },
+                { "id": "xl", "label": "XL", "priceAdjust": 3, "inventory": 17 },
+                { "id": "2xl", "label": "2XL", "priceAdjust": 5, "inventory": 11 }
+              ]
+            },
+            {
+              "id": "decoration",
+              "label": "Decoration style",
+              "required": true,
+              "choices": [
+                { "id": "screen", "label": "Screen print front + back", "priceAdjust": 0, "inventory": 999 },
+                { "id": "twill", "label": "Sewn tackle twill (quoted per design)", "priceAdjust": 24, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "sponsor-sleeve", "label": "Sponsor hit · sleeve", "price": 10, "inventory": 999 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layers",
+      "name": "Layers & more",
+      "subtitle": "Hoodies, crews, beanies",
+      "featured": false,
+      "description": "Core blanks and finished goods we keep on hand. Extend this list anytime in catalog.json.",
+      "products": [
+        {
+          "id": "hood-pullover",
+          "name": "Pullover Hoodie",
+          "sku": "LAY-HOOD",
+          "summary": "Fleece-lined pullover—ready for embroidery or screen.",
+          "pricingModel": "options",
+          "basePrice": 48,
+          "optionGroups": [
+            {
+              "id": "size",
+              "label": "Size",
+              "required": true,
+              "choices": [
+                { "id": "s", "label": "S", "priceAdjust": 0, "inventory": 10 },
+                { "id": "m", "label": "M", "priceAdjust": 0, "inventory": 16 },
+                { "id": "l", "label": "L", "priceAdjust": 0, "inventory": 14 },
+                { "id": "xl", "label": "XL", "priceAdjust": 4, "inventory": 12 },
+                { "id": "2xl", "label": "2XL", "priceAdjust": 6, "inventory": 8 }
+              ]
+            },
+            {
+              "id": "color",
+              "label": "Color",
+              "required": true,
+              "choices": [
+                { "id": "black", "label": "Black", "priceAdjust": 0, "inventory": 28 },
+                { "id": "athletic-heather", "label": "Athletic heather", "priceAdjust": 0, "inventory": 14 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "emb-front", "label": "Embroidery · front (per piece)", "price": 18, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "beanie-watch",
+          "name": "Watch Cap Beanie",
+          "sku": "LAY-BNIE",
+          "summary": "Acrylic watch cap—patch- and embroidery-friendly.",
+          "pricingModel": "options",
+          "basePrice": 16,
+          "optionGroups": [
+            {
+              "id": "color",
+              "label": "Color",
+              "required": true,
+              "choices": [
+                { "id": "black", "label": "Black", "priceAdjust": 0, "inventory": 40 },
+                { "id": "navy", "label": "Navy", "priceAdjust": 0, "inventory": 22 },
+                { "id": "blaze", "label": "Blaze orange", "priceAdjust": 1, "inventory": 15 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "leather-patch", "label": "Leather deboss or laser patch", "price": 14, "inventory": 999 }
+          ]
+        }
+      ]
+    }
+  ]
+}
