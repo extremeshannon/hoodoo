@@ -5,6 +5,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
@@ -64,8 +65,15 @@ def health():
 def _attach_static():
     settings = get_settings()
     root = resolve_repo_root(settings)
-    if root.is_dir() and (root / "index.html").is_file():
-        app.mount("/", StaticFiles(directory=str(root), html=True), name="site")
+    if not root.is_dir() or not (root / "index.html").is_file():
+        return
+    # Explicit home page so we never use StaticFiles(html=True), which serves index.html
+    # for *any* missing path (e.g. /api/health) if that mount handles the request first.
+    @app.get("/")
+    def serve_index():
+        return FileResponse(root / "index.html")
+
+    app.mount("/", StaticFiles(directory=str(root), html=False), name="site")
 
 
 _attach_static()
