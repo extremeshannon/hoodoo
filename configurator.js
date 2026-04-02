@@ -648,7 +648,7 @@
     function loadCatalog() {
       return fetch(apiUrl("/catalog"), { credentials: "same-origin" }).then(function (r) {
         if (r.ok) return r.json();
-        return fetch("data/catalog.json").then(function (r2) {
+        return fetch("/data/catalog.json").then(function (r2) {
           if (!r2.ok) throw new Error("Bad response");
           return r2.json();
         });

@@ -1,5 +1,9 @@
-# Hoodoo Alaska — FastAPI + PostgreSQL + static UI
-# http://localhost:8004/  (API + site)
+# Hoodoo Alaska — FastAPI + PostgreSQL + static UI (service name: api)
+# http://localhost:8004/           → site
+# http://localhost:8004/api/health → {"status":"ok"}
+#
+# If /api/health shows HTML, an old nginx-only container may still own port 8004.
+# Run: docker ps   then stop/remove the old web container and: docker compose up -d --build
 #
 # Local-only bind:
 #   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
