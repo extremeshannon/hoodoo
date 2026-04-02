@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=4" />
+  <link rel="stylesheet" href="/styles.css?v=5" />
 </head>
 <body class="page-app page-auth page-auth-flow">
   <a class="skip-link" href="#auth-main">Skip to sign in</a>
@@ -41,6 +41,11 @@
       <p class="auth-hero-eyebrow">Hoodoo Alaska</p>
       <h1 id="signin-title" class="auth-hero-title">Welcome back</h1>
       <p class="auth-hero-lede">Sign in with your email or username and password.</p>
+
+      <p class="auth-login-hint">
+        If your server created a bootstrap staff user, try email <strong>admin@hoodooak.com</strong> or username <strong>admin</strong>.
+        The password is set on the server in <code>.env</code> as <code>BOOTSTRAP_STAFF_PASSWORD</code> (not shown here).
+      </p>
 
       <form id="login-form" class="auth-hero-form" novalidate>
         <label class="auth-field auth-field--sleek">
@@ -93,6 +98,7 @@
         e.preventDefault();
         var fb = document.getElementById("login-feedback");
         fb.textContent = "";
+        fb.classList.remove("auth-feedback--error");
         var loginId = document.getElementById("login-id").value.trim();
         var password = document.getElementById("login-password").value;
         var body = new URLSearchParams({ username: loginId, password: password, grant_type: "password" });
@@ -103,17 +109,28 @@
           credentials: "same-origin",
         })
           .then(function (r) {
-            return r.json().then(function (j) {
-              if (!r.ok) throw new Error(window.HoodooApi.parseDetail(j));
-              return j;
+            return r.text().then(function (text) {
+              return window.HoodooApi.parseResponse(r, text);
             });
           })
-          .then(function (tok) {
+          .then(function (result) {
+            if (!result.ok) {
+              fb.classList.add("auth-feedback--error");
+              fb.textContent = result.error || "Sign in failed";
+              return;
+            }
+            var tok = result.data;
+            if (!tok || !tok.access_token) {
+              fb.classList.add("auth-feedback--error");
+              fb.textContent = "Invalid response from server.";
+              return;
+            }
             window.HoodooApi.setToken(tok.access_token);
             location.href = next;
           })
           .catch(function (err) {
-            fb.textContent = err.message || "Sign in failed";
+            fb.classList.add("auth-feedback--error");
+            fb.textContent = (err && err.message) || "Network error — try again.";
           });
       });
     })();

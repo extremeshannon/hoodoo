@@ -4,9 +4,32 @@
   function parseDetail(data) {
     if (!data || typeof data !== "object") return "Request failed";
     var d = data.detail;
-    if (typeof d === "string") return d;
-    if (Array.isArray(d) && d[0] && d[0].msg) return d[0].msg;
+    if (typeof d === "string" && d.trim()) return d;
+    if (Array.isArray(d) && d.length) {
+      var first = d[0];
+      if (first && typeof first.msg === "string") return first.msg;
+      if (first && typeof first.message === "string") return first.message;
+    }
+    if (d && typeof d === "object" && typeof d.msg === "string") return d.msg;
     return "Request failed";
+  }
+
+  /** Parse fetch Response body (JSON or plain text) and surface API errors. */
+  function parseResponse(r, text) {
+    var j = null;
+    try {
+      j = text ? JSON.parse(text) : null;
+    } catch (e) {
+      j = null;
+    }
+    if (!r.ok) {
+      var msg = parseDetail(j);
+      if (!msg || msg === "Request failed") {
+        msg = (r.status ? r.status + " " : "") + (r.statusText || "Error");
+      }
+      return { ok: false, error: msg };
+    }
+    return { ok: true, data: j };
   }
 
   global.HoodooApi = {
@@ -28,6 +51,7 @@
       global.localStorage.removeItem(TOKEN_KEY);
     },
     parseDetail: parseDetail,
+    parseResponse: parseResponse,
     fetchJson: function (path, opts) {
       opts = opts || {};
       var headers = Object.assign({}, opts.headers || {});
