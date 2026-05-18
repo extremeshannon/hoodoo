@@ -71,7 +71,8 @@
     <details class="login-portal__devhint">
       <summary>Local development</summary>
       <p>
-        Staff user from <code>.env</code> on first DB start — see <code>.env.example</code>.
+        Bootstrap staff: email <strong>admin@hoodooak.com</strong> or username <strong>admin</strong>;
+        password from <code>BOOTSTRAP_STAFF_PASSWORD</code> in <code>.env</code> (see <code>.env.example</code>).
         Password reset without SMTP: check API logs for a one-time link after “Forgot password”.
         <a href="/admin.html">Staff admin</a> (role permitting).
       </p>
@@ -99,18 +100,28 @@
           credentials: "same-origin",
         })
           .then(function (r) {
-            return r.json().then(function (j) {
-              if (!r.ok) throw new Error(window.HoodooApi ? window.HoodooApi.parseDetail(j) : (j.detail || "Sign in failed"));
-              return j;
+            return r.text().then(function (text) {
+              return window.HoodooApi.parseResponse(r, text);
             });
           })
-          .then(function (tok) {
+          .then(function (result) {
+            if (!result.ok) {
+              fb.classList.add("login-portal__feedback--err");
+              fb.textContent = result.error || "Sign in failed";
+              return;
+            }
+            var tok = result.data;
+            if (!tok || !tok.access_token) {
+              fb.classList.add("login-portal__feedback--err");
+              fb.textContent = "Invalid response from server.";
+              return;
+            }
             window.HoodooApi.setToken(tok.access_token, remember);
             location.href = next;
           })
           .catch(function (err) {
-            fb.textContent = err.message || "Sign in failed";
             fb.classList.add("login-portal__feedback--err");
+            fb.textContent = (err && err.message) || "Network error — try again.";
           });
       });
     })();

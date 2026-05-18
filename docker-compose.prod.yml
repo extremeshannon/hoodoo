@@ -1,5 +1,9 @@
+# VPS: keep Postgres off the public internet; restart policies.
+
 services:
-  api:
-    restart: unless-stopped
   db:
+    restart: unless-stopped
+    ports: !override []
+
+  api:
     restart: unless-stopped

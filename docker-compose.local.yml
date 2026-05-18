@@ -1,4 +1,4 @@
-# Bind API to loopback only (no LAN/public access).
+# Bind API to loopback only (no public access on :8004).
 
 services:
   api:
