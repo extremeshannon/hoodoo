@@ -114,6 +114,10 @@ def _attach_static():
     def serve_forgot_password():
         return _html("forgot-password.html")
 
+    @app.get("/reset-password")
+    def serve_reset_password():
+        return _html("reset-password.html")
+
     # Explicit home page so we never use StaticFiles(html=True), which serves index.html
     # for *any* missing path (e.g. /api/health) if that mount handles the request first.
     @app.get("/")

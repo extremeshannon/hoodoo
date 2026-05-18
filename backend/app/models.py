@@ -239,3 +239,16 @@ class Garment3dAsset(Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
     product: Mapped[Product] = relationship()
+
+
+class PasswordResetToken(Base):
+    """One-time token for /reset-password; raw token is never stored (SHA-256 only)."""
+
+    __tablename__ = "password_reset_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    token_sha256: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

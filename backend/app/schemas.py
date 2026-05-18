@@ -75,6 +75,15 @@ class ForgotPasswordOut(BaseModel):
     message: str
 
 
+class ResetPasswordIn(BaseModel):
+    token: str = Field(..., min_length=16, max_length=512)
+    password: str = Field(..., min_length=8, max_length=128)
+
+
+class ResetPasswordOut(BaseModel):
+    message: str
+
+
 # --- Orders ---
 
 

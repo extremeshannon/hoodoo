@@ -39,6 +39,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://hoodoo:hoodoo@db:5432/hoodoo
       REPO_ROOT: /app
+      PUBLIC_BASE_URL: http://localhost:8004
     depends_on:
       db:
         condition: service_healthy

@@ -1,5 +1,6 @@
 (function (global) {
   var TOKEN_KEY = "hoodoo_access_token";
+  var TOKEN_SESSION_KEY = "hoodoo_access_token_session";
 
   function parseDetail(data) {
     if (!data || typeof data !== "object") return "Request failed";
@@ -18,14 +19,19 @@
       return this.base() + "/api" + path;
     },
     getToken: function () {
-      return global.localStorage.getItem(TOKEN_KEY);
+      return global.sessionStorage.getItem(TOKEN_SESSION_KEY) || global.localStorage.getItem(TOKEN_KEY);
     },
-    setToken: function (t) {
-      if (t) global.localStorage.setItem(TOKEN_KEY, t);
-      else global.localStorage.removeItem(TOKEN_KEY);
+    /** @param {boolean} [remember] If false, session-only (tab); default true = localStorage */
+    setToken: function (t, remember) {
+      global.sessionStorage.removeItem(TOKEN_SESSION_KEY);
+      global.localStorage.removeItem(TOKEN_KEY);
+      if (!t) return;
+      if (remember === false) global.sessionStorage.setItem(TOKEN_SESSION_KEY, t);
+      else global.localStorage.setItem(TOKEN_KEY, t);
     },
     clearToken: function () {
       global.localStorage.removeItem(TOKEN_KEY);
+      global.sessionStorage.removeItem(TOKEN_SESSION_KEY);
     },
     parseDetail: parseDetail,
     fetchJson: function (path, opts) {

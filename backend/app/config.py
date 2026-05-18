@@ -24,6 +24,17 @@ class Settings(BaseSettings):
     bootstrap_staff_password: str | None = None
     bootstrap_staff_role: str = "staff"  # staff | admin
 
+    # Password reset links: no trailing slash. Docker users often set http://localhost:8004
+    public_base_url: str = "http://localhost:8004"
+    password_reset_token_hours: int = 24
+
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str | None = None
+    smtp_use_tls: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:
