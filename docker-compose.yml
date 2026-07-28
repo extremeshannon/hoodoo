@@ -18,8 +18,10 @@ services:
       POSTGRES_DB: hoodoo
     volumes:
       - hoodoo_pg:/var/lib/postgresql/data
+    # Loopback only if published; prod override removes host ports entirely.
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5435:5432"
+    mem_limit: 512m
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U hoodoo -d hoodoo"]
       interval: 5s

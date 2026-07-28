@@ -1,8 +1,9 @@
-# VPS: keep Postgres off the public internet; restart policies.
+# VPS: keep Postgres off the public internet; restart policies; cap DB RAM.
 
 services:
   db:
     restart: unless-stopped
+    mem_limit: 512m
     ports: !override []
 
   api:
