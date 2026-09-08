@@ -52,4 +52,20 @@
 
   refreshCartBadge();
   window.HoodooRefreshCartBadge = refreshCartBadge;
+
+  var ul = document.querySelector(".nav-list");
+  if (ul) {
+    function ensureNav(href, label, beforeHref) {
+      if (ul.querySelector('a[href="' + href + '"]')) return;
+      var li = document.createElement("li");
+      li.innerHTML = '<a href="' + href + '">' + label + "</a>";
+      var before = beforeHref ? ul.querySelector('a[href="' + beforeHref + '"]') : null;
+      var beforeLi = before ? before.closest("li") : ul.querySelector("a.nav-cta") && ul.querySelector("a.nav-cta").closest("li");
+      if (beforeLi) ul.insertBefore(li, beforeLi);
+      else ul.appendChild(li);
+    }
+    ensureNav("/suit.html", "Jumpsuits", "/cart.html");
+    ensureNav("/pricing.html", "Pricing", "/cart.html");
+    ensureNav("/quote.html", "Get a quote");
+  }
 })();

@@ -1,0 +1,212 @@
+{
+  "notes": "Stock colors for the jumpsuit configurator. CLO names Taslan as Talsan. Add Spandex colors here when Shannon sends a chart — do not enable any-color pickers.",
+  "taslan": {
+    "id": "taslan",
+    "label": "Taslan",
+    "anyColor": false,
+    "colors": [
+      {
+        "id": "red",
+        "name": "Red",
+        "hex": "#ba1637"
+      },
+      {
+        "id": "charcoal",
+        "name": "Charcoal",
+        "hex": "#424242"
+      },
+      {
+        "id": "navy",
+        "name": "Navy",
+        "hex": "#2b3347"
+      },
+      {
+        "id": "white",
+        "name": "White",
+        "hex": "#FFFFFF"
+      },
+      {
+        "id": "royal",
+        "name": "Royal",
+        "hex": "#364490"
+      },
+      {
+        "id": "od-khaki",
+        "name": "OD-Khaki",
+        "hex": "#525344"
+      },
+      {
+        "id": "crimson",
+        "name": "Crimson",
+        "hex": "#852839"
+      },
+      {
+        "id": "khaki",
+        "name": "Khaki",
+        "hex": "#92795b"
+      },
+      {
+        "id": "chocolate",
+        "name": "Chocolate",
+        "hex": "#3d322c"
+      },
+      {
+        "id": "silver",
+        "name": "Silver",
+        "hex": "#9fa4a5"
+      },
+      {
+        "id": "raven",
+        "name": "Raven",
+        "hex": "#000000"
+      },
+      {
+        "id": "canary",
+        "name": "Canary",
+        "hex": "#ecd733"
+      },
+      {
+        "id": "blooming-pink",
+        "name": "Blooming Pink",
+        "hex": "#ff7bc6"
+      },
+      {
+        "id": "tangerine",
+        "name": "Tangerine",
+        "hex": "#d24628"
+      },
+      {
+        "id": "apple-green",
+        "name": "Apple Green",
+        "hex": "#00913c"
+      },
+      {
+        "id": "cobalt",
+        "name": "Cobalt",
+        "hex": "#2a4285"
+      },
+      {
+        "id": "turquoise",
+        "name": "Turquoise",
+        "hex": "#00aea7"
+      },
+      {
+        "id": "purple",
+        "name": "Purple",
+        "hex": "#534196"
+      }
+    ]
+  },
+  "spandex": {
+    "id": "spandex",
+    "label": "Spandex",
+    "anyColor": false,
+    "locked": true,
+    "note": "Black only until a Spandex color chart is provided.",
+    "colors": [
+      {
+        "id": "black",
+        "name": "Black",
+        "hex": "#000000"
+      }
+    ]
+  },
+  "stitch": {
+    "id": "stitch",
+    "label": "Stitch",
+    "anyColor": false,
+    "note": "Common thread colors matching Taslan names.",
+    "colors": [
+      {
+        "id": "raven",
+        "name": "Raven",
+        "hex": "#000000"
+      },
+      {
+        "id": "white",
+        "name": "White",
+        "hex": "#FFFFFF"
+      },
+      {
+        "id": "red",
+        "name": "Red",
+        "hex": "#ba1637"
+      },
+      {
+        "id": "navy",
+        "name": "Navy",
+        "hex": "#2b3347"
+      }
+    ]
+  },
+  "parts": {
+    "front": "taslan",
+    "back": "taslan",
+    "sleeves": "taslan",
+    "zipper": "taslan",
+    "collar": "spandex",
+    "waistband": "spandex",
+    "stitch": "stitch",
+    "legs": "taslan",
+    "booties": "taslan",
+    "cordura": "taslan",
+    "trim": "taslan",
+    "body": "body",
+    "embroidery": "embroidery",
+    "hand": "taslan",
+    "palm": "taslan",
+    "cuff": "spandex"
+  },
+  "body": {
+    "id": "body",
+    "label": "Body",
+    "anyColor": false,
+    "locked": true,
+    "note": "Black only for now.",
+    "colors": [
+      {
+        "id": "black",
+        "name": "Black",
+        "hex": "#000000"
+      }
+    ]
+  },
+  "embroidery": {
+    "id": "embroidery",
+    "label": "Embroidery",
+    "anyColor": false,
+    "note": "Thread color for the embroidered text.",
+    "colors": [
+      {
+        "id": "raven",
+        "name": "Raven",
+        "hex": "#000000"
+      },
+      {
+        "id": "white",
+        "name": "White",
+        "hex": "#FFFFFF"
+      },
+      {
+        "id": "red",
+        "name": "Red",
+        "hex": "#ba1637"
+      },
+      {
+        "id": "navy",
+        "name": "Navy",
+        "hex": "#2b3347"
+      },
+      {
+        "id": "royal",
+        "name": "Royal",
+        "hex": "#364490"
+      },
+      {
+        "id": "canary",
+        "name": "Canary",
+        "hex": "#ecd733"
+      }
+    ]
+  }
+}

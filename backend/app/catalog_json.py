@@ -22,7 +22,7 @@ def build_catalog_dict(db: Session, meta_override: dict | None = None) -> dict:
         "currencySymbol": "$",
         "priceDisclaimer": "Guide pricing for retail and small runs. Team, contract, and volume quotes available.",
         "lowStockThreshold": 10,
-        "contactEmail": "shannon@hoodooak.com",
+        "contactEmail": "shannnon@hoodooak.com",
         "lastUpdated": None,
     }
     if meta_override:

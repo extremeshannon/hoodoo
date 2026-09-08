@@ -161,9 +161,9 @@
     });
     lines.push("Subtotal (guide): $" + data.subtotal);
     lines.push("---");
-    lines.push("shannon@hoodooak.com · 907.202.5634 · Wasilla, AK");
+    lines.push("shannnon@hoodooak.com · 907.202.5634 · Wasilla, AK");
     var body = encodeURIComponent(lines.join("\n"));
-    window.location.href = "mailto:shannon@hoodooak.com?subject=" + encodeURIComponent("Hoodoo — cart quote") + "&body=" + body;
+    window.location.href = "mailto:shannnon@hoodooak.com?subject=" + encodeURIComponent("Hoodoo — cart quote") + "&body=" + body;
   }
 
   function saveOrderToAccount() {

@@ -1,9 +1,9 @@
-/* Hoodoo Alaska — brand: #40BFF0, charcoal, mountain geometry */
+/* Hoodoo Alaska — brand: #36B4E5, charcoal, mountain geometry */
 
 :root {
-  --brand: #40bff0;
+  --brand: #36b4e5;
   --brand-dim: #2a9bc7;
-  --brand-glow: rgba(64, 191, 240, 0.35);
+  --brand-glow: rgba(54, 180, 229, 0.35);
   --ink: #0a0b0d;
   --ink-soft: #12151a;
   --slate: #1c2229;
@@ -267,7 +267,7 @@ img {
   inset: 0;
   background:
     radial-gradient(ellipse 80% 60% at 70% 20%, var(--brand-glow), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(64, 191, 240, 0.12), transparent 50%),
+    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(54, 180, 229, 0.12), transparent 50%),
     linear-gradient(165deg, var(--ink) 0%, var(--ink-soft) 45%, var(--slate) 100%);
 }
 
@@ -353,14 +353,14 @@ img {
 }
 
 .btn-secondary {
-  background: rgba(64, 191, 240, 0.15);
+  background: rgba(54, 180, 229, 0.15);
   color: var(--paper);
-  border-color: rgba(64, 191, 240, 0.45);
+  border-color: rgba(54, 180, 229, 0.45);
 }
 
 .btn-secondary:hover,
 .btn-secondary:focus-visible {
-  background: rgba(64, 191, 240, 0.28);
+  background: rgba(54, 180, 229, 0.28);
   border-color: var(--brand);
   color: var(--white);
 }
@@ -442,8 +442,8 @@ img {
 }
 
 .service-card:hover {
-  border-color: rgba(64, 191, 240, 0.35);
-  box-shadow: 0 0 0 1px rgba(64, 191, 240, 0.15);
+  border-color: rgba(54, 180, 229, 0.35);
+  box-shadow: 0 0 0 1px rgba(54, 180, 229, 0.15);
 }
 
 .service-card-wide {
@@ -556,7 +556,7 @@ img {
 a.contact-card:hover,
 a.contact-card:focus-visible {
   border-color: var(--brand);
-  background: rgba(64, 191, 240, 0.08);
+  background: rgba(54, 180, 229, 0.08);
 }
 
 .contact-card-static {
@@ -827,9 +827,9 @@ a.contact-card:focus-visible {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 85% 50% at 50% 0%, rgba(64, 191, 240, 0.22), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 100% 30%, rgba(64, 191, 240, 0.12), transparent 50%),
-    radial-gradient(ellipse 50% 40% at 0% 80%, rgba(64, 191, 240, 0.08), transparent 48%);
+    radial-gradient(ellipse 85% 50% at 50% 0%, rgba(54, 180, 229, 0.22), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 100% 30%, rgba(54, 180, 229, 0.12), transparent 50%),
+    radial-gradient(ellipse 50% 40% at 0% 80%, rgba(54, 180, 229, 0.08), transparent 48%);
 }
 
 .login-portal__home {
@@ -868,9 +868,9 @@ a.contact-card:focus-visible {
   background: linear-gradient(165deg, rgba(28, 34, 42, 0.98) 0%, rgba(12, 14, 18, 0.99) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 0 0 1px rgba(64, 191, 240, 0.1),
+    0 0 0 1px rgba(54, 180, 229, 0.1),
     0 28px 56px -16px rgba(0, 0, 0, 0.75),
-    0 0 100px -30px rgba(64, 191, 240, 0.15);
+    0 0 100px -30px rgba(54, 180, 229, 0.15);
 }
 
 .login-portal__brand {
@@ -894,7 +894,7 @@ a.contact-card:focus-visible {
   letter-spacing: -0.04em;
   color: var(--white);
   background: linear-gradient(145deg, #5fd0ff 0%, var(--brand-dim) 45%, #1a6a8a 100%);
-  box-shadow: 0 4px 20px rgba(64, 191, 240, 0.35);
+  box-shadow: 0 4px 20px rgba(54, 180, 229, 0.35);
 }
 
 .login-portal__title {
@@ -952,7 +952,7 @@ a.contact-card:focus-visible {
 .login-portal__field input:focus {
   outline: none;
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(64, 191, 240, 0.22);
+  box-shadow: 0 0 0 3px rgba(54, 180, 229, 0.22);
 }
 
 .login-portal__row {
@@ -1005,12 +1005,12 @@ a.contact-card:focus-visible {
   background: var(--brand);
   cursor: pointer;
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 24px rgba(64, 191, 240, 0.35);
+  box-shadow: 0 4px 24px rgba(54, 180, 229, 0.35);
 }
 
 .login-portal__submit:hover {
   background: #5fd0ff;
-  box-shadow: 0 6px 28px rgba(64, 191, 240, 0.45);
+  box-shadow: 0 6px 28px rgba(54, 180, 229, 0.45);
 }
 
 .login-portal__submit:active {
@@ -1130,9 +1130,9 @@ a.contact-card:focus-visible {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(64, 191, 240, 0.18), transparent 52%),
-    radial-gradient(ellipse 50% 40% at 100% 0%, rgba(64, 191, 240, 0.08), transparent 45%),
-    radial-gradient(ellipse 45% 35% at 0% 100%, rgba(64, 191, 240, 0.06), transparent 50%);
+    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(54, 180, 229, 0.18), transparent 52%),
+    radial-gradient(ellipse 50% 40% at 100% 0%, rgba(54, 180, 229, 0.08), transparent 45%),
+    radial-gradient(ellipse 45% 35% at 0% 100%, rgba(54, 180, 229, 0.06), transparent 50%);
 }
 
 .page-auth-flow .site-header {
@@ -1220,9 +1220,9 @@ a.contact-card:focus-visible {
   );
   border: 1px solid rgba(255, 255, 255, 0.11);
   box-shadow:
-    0 0 0 1px rgba(64, 191, 240, 0.12),
+    0 0 0 1px rgba(54, 180, 229, 0.12),
     0 24px 48px -12px rgba(0, 0, 0, 0.65),
-    0 0 80px -20px rgba(64, 191, 240, 0.12);
+    0 0 80px -20px rgba(54, 180, 229, 0.12);
   backdrop-filter: blur(16px);
 }
 
@@ -1292,7 +1292,7 @@ a.contact-card:focus-visible {
 .auth-field--sleek input:focus {
   outline: none;
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(64, 191, 240, 0.2);
+  box-shadow: 0 0 0 3px rgba(54, 180, 229, 0.2);
 }
 
 .auth-hero-submit {
@@ -1430,7 +1430,7 @@ a.contact-card:focus-visible {
   );
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 0 0 1px rgba(64, 191, 240, 0.06),
+    0 0 0 1px rgba(54, 180, 229, 0.06),
     0 12px 36px rgba(0, 0, 0, 0.4);
 }
 
@@ -1454,7 +1454,7 @@ a.contact-card:focus-visible {
   font-size: 0.875rem;
   color: var(--ink);
   background: linear-gradient(135deg, var(--brand), #2a9bc7);
-  box-shadow: 0 4px 16px rgba(64, 191, 240, 0.25);
+  box-shadow: 0 4px 16px rgba(54, 180, 229, 0.25);
 }
 
 .auth-item-title {
@@ -1535,7 +1535,7 @@ a.contact-card:focus-visible {
 }
 
 .orders-row-link:hover {
-  background: rgba(64, 191, 240, 0.08);
+  background: rgba(54, 180, 229, 0.08);
 }
 
 .orders-row-date {
@@ -1673,7 +1673,7 @@ a.contact-card:focus-visible {
   display: flex;
   align-items: stretch;
   justify-content: center;
-  background: radial-gradient(ellipse at center, rgba(64, 191, 240, 0.06) 0%, transparent 60%);
+  background: radial-gradient(ellipse at center, rgba(54, 180, 229, 0.06) 0%, transparent 60%);
 }
 
 .viewer-canvas {

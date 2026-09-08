@@ -4,7 +4,7 @@
     "currencySymbol": "$",
     "priceDisclaimer": "Guide pricing for retail and small runs. Team, contract, and volume quotes available.",
     "lowStockThreshold": 10,
-    "contactEmail": "shannon@hoodooak.com",
+    "contactEmail": "shannnon@hoodooak.com",
     "lastUpdated": "2026-04-01"
   },
   "categories": [
@@ -13,8 +13,29 @@
       "name": "Ultimate Paw Covers",
       "subtitle": "Snowmachine gauntlets — made in Alaska",
       "featured": true,
-      "description": "Home of Ultimate Paw Covers: gauntlets built for real Alaska miles—wind, powder, and cold hands solved. Cut, sewn, and finished in Wasilla.",
+      "description": "Home of Ultimate Paw Covers: gauntlets built for real Alaska miles—wind, powder, and cold hands solved. Cut, sewn, and finished in Wasilla. Custom colors: Pattern → Ultimate Paw Covers on /suit.html.",
       "products": [
+        {
+          "id": "upc-custom",
+          "name": "Ultimate Paw Covers",
+          "sku": "UPC-CFG",
+          "summary": "Snowmachine gauntlets — configure Taslan colors at /suit.html. One unisex CLO model (UPC.glb).",
+          "pricingModel": "options",
+          "basePrice": 94,
+          "optionGroups": [
+            {
+              "id": "fit",
+              "label": "Fit",
+              "required": true,
+              "choices": [
+                { "id": "unisex", "label": "Unisex", "priceAdjust": 0, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "emb-name", "label": "Embroidered name or call sign", "price": 22, "inventory": 999 }
+          ]
+        },
         {
           "id": "upc-pro",
           "name": "Ultimate Paw Cover Pro",
@@ -325,6 +346,111 @@
           ],
           "addons": [
             { "id": "leather-patch", "label": "Leather deboss or laser patch", "price": 14, "inventory": 999 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jumpsuits",
+      "name": "Skydiving jumpsuits",
+      "subtitle": "Custom sew · dye-sub · CLO3D",
+      "featured": true,
+      "description": "Custom skydiving garments from the Wasilla sew shop. Freefly jacket, full jumpsuit, pants, and camera jacket — male, female, and youth (youth CLO files can be added later). Configure at /suit.html.",
+      "products": [
+        {
+          "id": "suit-freefly-jacket",
+          "name": "Freefly Jacket",
+          "sku": "JS-FFJ",
+          "summary": "Head-down / sit-fly jacket. Male and female CLO now; youth slot ready.",
+          "pricingModel": "options",
+          "basePrice": 420,
+          "optionGroups": [
+            {
+              "id": "fit",
+              "label": "Fit",
+              "required": true,
+              "choices": [
+                { "id": "male", "label": "Male", "priceAdjust": 0, "inventory": 999 },
+                { "id": "female", "label": "Female", "priceAdjust": 0, "inventory": 999 },
+                { "id": "youth", "label": "Youth (CLO later)", "priceAdjust": -40, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "dye-sub-panels", "label": "Dye-sub custom art panels", "price": 180, "inventory": 999 },
+            { "id": "name-embroider", "label": "Name embroidery", "price": 28, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "suit-jumpsuit",
+          "name": "Jumpsuit",
+          "sku": "JS-JMP",
+          "summary": "Full custom jumpsuit. Male and female CLO; youth slot ready.",
+          "pricingModel": "options",
+          "basePrice": 625,
+          "optionGroups": [
+            {
+              "id": "fit",
+              "label": "Fit",
+              "required": true,
+              "choices": [
+                { "id": "male", "label": "Male", "priceAdjust": 0, "inventory": 999 },
+                { "id": "female", "label": "Female", "priceAdjust": 0, "inventory": 999 },
+                { "id": "youth", "label": "Youth (CLO later)", "priceAdjust": -40, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "dye-sub-panels", "label": "Dye-sub custom art panels", "price": 180, "inventory": 999 },
+            { "id": "name-embroider", "label": "Name embroidery", "price": 28, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "suit-pants",
+          "name": "Pants",
+          "sku": "JS-PNT",
+          "summary": "Jumpsuit pants with optional booties and cordura.",
+          "pricingModel": "options",
+          "basePrice": 285,
+          "optionGroups": [
+            {
+              "id": "fit",
+              "label": "Fit",
+              "required": true,
+              "choices": [
+                { "id": "male", "label": "Male", "priceAdjust": 0, "inventory": 999 },
+                { "id": "female", "label": "Female", "priceAdjust": 0, "inventory": 999 },
+                { "id": "youth", "label": "Youth (CLO later)", "priceAdjust": -30, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "booties", "label": "Booties", "price": 85, "inventory": 999 },
+            { "id": "cordura-knees", "label": "Cordura knees", "price": 45, "inventory": 999 }
+          ]
+        },
+        {
+          "id": "suit-camera-jacket",
+          "name": "Camera Jacket",
+          "sku": "JS-CAM",
+          "summary": "Camera-flyer jacket. Extra cordura and trim as specified.",
+          "pricingModel": "options",
+          "basePrice": 445,
+          "optionGroups": [
+            {
+              "id": "fit",
+              "label": "Fit",
+              "required": true,
+              "choices": [
+                { "id": "male", "label": "Male", "priceAdjust": 0, "inventory": 999 },
+                { "id": "female", "label": "Female", "priceAdjust": 0, "inventory": 999 },
+                { "id": "youth", "label": "Youth (CLO later)", "priceAdjust": -40, "inventory": 999 }
+              ]
+            }
+          ],
+          "addons": [
+            { "id": "dye-sub-panels", "label": "Dye-sub custom art panels", "price": 180, "inventory": 999 },
+            { "id": "name-embroider", "label": "Name embroidery", "price": 28, "inventory": 999 }
           ]
         }
       ]

@@ -9,11 +9,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.bootstrap import bootstrap_staff_if_configured
 from app.config import get_settings
 from app.database import Base, SessionLocal, engine, ensure_legacy_schema
-from app.routers import admin, auth, cart, catalog, garment_3d, orders
+from app.routers import admin, admin_config, auth, cart, catalog, garment_3d, orders, production, shop_quote
 from app.seed import seed_if_empty
 
 
@@ -65,6 +66,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Hoodoo Alaska API", lifespan=lifespan)
 
+_settings = get_settings()
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=_settings.jwt_secret,
+    session_cookie="hoodoo_admin_session",
+    same_site="lax",
+    https_only=False,
+    max_age=60 * 60 * 24 * 7,
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -73,12 +83,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def no_cache_configurator(request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if (
+        path in ("/suit", "/suit.html", "/suit.css")
+        or path.startswith("/js/suit-configurator.js")
+        or path.startswith("/3d/clo/manifest.json")
+        or path.startswith("/data/materials.json")
+        or path.startswith("/admin/")
+        or path.startswith("/js/admin-configurator.js")
+    ):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return response
+
 app.include_router(catalog.router, prefix="/api")
 app.include_router(cart.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(orders.router, prefix="/api")
 app.include_router(garment_3d.router, prefix="/api")
+app.include_router(shop_quote.router, prefix="/api")
+app.include_router(production.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
+app.include_router(admin_config.router)
 
 
 @app.get("/api/health")
@@ -100,7 +129,7 @@ def _attach_static():
         path = root / name
         if not path.is_file():
             raise HTTPException(status_code=404, detail="Not found")
-        return FileResponse(path)
+        return FileResponse(path, headers={"Cache-Control": "no-cache"})
 
     @app.get("/login")
     def serve_login():
@@ -117,6 +146,22 @@ def _attach_static():
     @app.get("/reset-password")
     def serve_reset_password():
         return _html("reset-password.html")
+
+    @app.get("/quote")
+    def serve_quote():
+        return _html("quote.html")
+
+    @app.get("/pricing")
+    def serve_pricing():
+        return _html("pricing.html")
+
+    @app.get("/suit")
+    def serve_suit():
+        return _html("suit.html")
+
+    @app.get("/suit.html")
+    def serve_suit_html():
+        return _html("suit.html")
 
     # Explicit home page so we never use StaticFiles(html=True), which serves index.html
     # for *any* missing path (e.g. /api/health) if that mount handles the request first.

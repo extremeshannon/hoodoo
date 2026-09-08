@@ -42,6 +42,20 @@ services:
       DATABASE_URL: postgresql+psycopg://hoodoo:hoodoo@db:5432/hoodoo
       REPO_ROOT: /app
       PUBLIC_BASE_URL: http://localhost:8004
+    volumes:
+      - ./backend/app:/app/app
+      - ./data:/app/data
+      - ./js:/app/js
+      - ./3d:/app/3d
+      - ./assets:/app/assets
+      - ./index.html:/app/index.html
+      - ./quote.html:/app/quote.html
+      - ./quote.css:/app/quote.css
+      - ./pricing.html:/app/pricing.html
+      - ./suit.html:/app/suit.html
+      - ./suit.css:/app/suit.css
+      - ./configurator.html:/app/configurator.html
+      - ./main.js:/app/main.js
     depends_on:
       db:
         condition: service_healthy

@@ -226,7 +226,7 @@
     lines.push("Guide unit price: " + fmtMoney(unit));
     lines.push("Guide line total: " + fmtMoney(unit * qty));
     lines.push("---");
-    lines.push("Contact: shannon@hoodooak.com · 907.202.5634 · Wasilla, AK");
+    lines.push("Contact: shannnon@hoodooak.com · 907.202.5634 · Wasilla, AK");
 
     return lines.join("\n");
   }
@@ -595,7 +595,7 @@
   function init() {
     if (el.btnQuote) {
       el.btnQuote.addEventListener("click", function () {
-        var email = (meta && meta.contactEmail) || "shannon@hoodooak.com";
+        var email = (meta && meta.contactEmail) || "shannnon@hoodooak.com";
         var body = encodeURIComponent(buildSummary());
         var subject = encodeURIComponent("Hoodoo — product configuration");
         window.location.href = "mailto:" + email + "?subject=" + subject + "&body=" + body;

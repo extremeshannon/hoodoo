@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Instant Hoodoo Alaska quote — embroidery, screen print, and dye sublimation. Wasilla, AK." />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Instant quote | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/quote.css" />
+</head>
+<body class="page-quote">
+  <a class="skip-link" href="#quote-main">Skip to quote</a>
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/suit.html">Jumpsuits</a></li>
+          <li><a href="/pricing.html">Pricing</a></li>
+          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
+          <li><a class="nav-cta" href="/quote.html" aria-current="page">Get a quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="quote-main" class="quote-main">
+    <section class="quote-hero">
+      <p class="quote-eyebrow">Wasilla, Alaska · live estimate</p>
+      <h1>What do you want made?</h1>
+      <p class="quote-lede">Pick the garment, how many, and embroidery / screen print / dye-sub. The total updates like the big shops — then send it in for a real quote.</p>
+    </section>
+
+    <div class="quote-grid">
+      <form class="quote-form loft-card" id="quote-form">
+        <label class="quote-label">Garment
+          <select id="q-garment"></select>
+        </label>
+        <label class="quote-label">Quantity
+          <input type="number" id="q-qty" min="1" max="999" value="12" />
+        </label>
+        <fieldset class="quote-methods">
+          <legend>Decoration</legend>
+          <label><input type="radio" name="q-method" value="embroidery" checked /> Embroidery</label>
+          <label><input type="radio" name="q-method" value="screen" /> Screen print</label>
+          <label><input type="radio" name="q-method" value="dye-sub" /> Dye sublimation</label>
+        </fieldset>
+        <div id="q-emb-fields" class="quote-extra">
+          <label class="quote-label">Stitch count
+            <input type="number" id="q-stitches" min="1000" max="40000" step="500" value="5000" />
+          </label>
+          <p class="quote-hint">Don’t know stitches? Left chest is usually ~5k. Jacket back can be 8–12k.</p>
+        </div>
+        <div id="q-screen-fields" class="quote-extra" hidden>
+          <label class="quote-label">Ink colors
+            <input type="number" id="q-colors" min="1" max="8" value="1" />
+          </label>
+        </div>
+        <label class="quote-label">Print / stitch locations
+          <input type="number" id="q-locations" min="1" max="6" value="1" />
+        </label>
+      </form>
+
+      <aside class="quote-total" aria-live="polite">
+        <p class="quote-total-kicker">Rough total</p>
+        <p class="quote-total-num" id="q-subtotal">—</p>
+        <p class="quote-each" id="q-each"></p>
+        <ul class="quote-lines" id="q-lines"></ul>
+        <p class="quote-disclaimer" id="q-disclaimer"></p>
+        <a class="btn btn-primary" id="q-email" href="mailto:shannnon@hoodooak.com">Email this estimate</a>
+        <a class="btn btn-ghost" href="/pricing.html">See full matrices</a>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
+      <p class="footer-meta">7362 W Parks Hwy PMB 213 · Wasilla, AK 99623 · 907.202.5634</p>
+    </div>
+  </footer>
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/quote.js"></script>
+</body>
+</html>

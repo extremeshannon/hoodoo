@@ -1,0 +1,435 @@
+{
+  "fits": [
+    {
+      "id": "male",
+      "name": "Male"
+    },
+    {
+      "id": "female",
+      "name": "Female"
+    },
+    {
+      "id": "youth",
+      "name": "Youth",
+      "comingSoon": true
+    }
+  ],
+  "products": [
+    {
+      "id": "freefly-jacket",
+      "name": "Freefly Jacket",
+      "blurb": "Head-down / sit-fly top. Dye-sub + sew.",
+      "parts": [
+        "collar",
+        "front",
+        "back",
+        "sleeves",
+        "zipper",
+        "waistband",
+        "stitch"
+      ],
+      "glbByFit": {
+        "male": "/3d/clo/male-jacket/MaleJacket.glb",
+        "female": "/3d/clo/female-jacket/FemaleJacket.glb",
+        "youth": "/3d/clo/freefly-jacket-youth.glb"
+      }
+    },
+    {
+      "id": "pants",
+      "name": "Pants",
+      "blurb": "Jumpsuit pants — booties and cordura as you spec.",
+      "parts": [
+        "legs",
+        "booties",
+        "cordura",
+        "trim"
+      ],
+      "glbByFit": {
+        "male": "/3d/clo/male-pants/MalePant.glb",
+        "female": "/3d/clo/female-pants/FemalePants.glb",
+        "youth": "/3d/clo/pants-youth.glb"
+      }
+    },
+    {
+      "id": "camera-jacket",
+      "name": "Camera Jacket",
+      "blurb": "Camera-flyer top. Extra cordura and trim hits.",
+      "parts": [
+        "collar",
+        "front",
+        "back",
+        "sleeves",
+        "zipper",
+        "waistband",
+        "stitch"
+      ],
+      "glbByFit": {
+        "male": "/3d/clo/camera-jacket-male.glb",
+        "female": "/3d/clo/camera-jacket-female.glb",
+        "youth": "/3d/clo/camera-jacket-youth.glb"
+      }
+    },
+    {
+      "id": "jumpsuit",
+      "name": "Jumpsuit",
+      "blurb": "Full custom suit. Dye-sub + sew.",
+      "parts": [
+        "collar",
+        "frontTorso",
+        "backTorso",
+        "sleeves",
+        "frontLegs",
+        "backLegs",
+        "zipper",
+        "stitch"
+      ],
+      "meshMap": {
+        "collar": [
+          "Spandex_8607",
+          "Spandex_8301",
+          "Spandex_8601",
+          "collar",
+          "neck"
+        ],
+        "frontTorso": [
+          "Body_8601"
+        ],
+        "backTorso": [
+          "Body_8595"
+        ],
+        "sleeves": [
+          "Sleeves_8604",
+          "Sleeves_8304",
+          "Sleeves_8595",
+          "Sleeves_1303603",
+          "Sleeves",
+          "Sleeve"
+        ],
+        "frontLegs": [
+          "Pants Front"
+        ],
+        "backLegs": [
+          "Pants Back"
+        ],
+        "zipper": [
+          "TapeFabric",
+          "Zipper 1_Tape"
+        ],
+        "stitch": [
+          "Double Needle",
+          "DoubleNeedle",
+          "Topstitch",
+          "top stitch",
+          "topstitch",
+          "stitch",
+          "thread",
+          "bartack",
+          "overlock"
+        ]
+      },
+      "glbByFit": {
+        "male": "/3d/clo/male-jumpsuit/MaleJumpSuit.glb?v=20260907n",
+        "female": [
+          "/3d/clo/female-jumpsuit/FemaleJumpSuit.glb?v=20260907n",
+          "/3d/clo/female-jumpsuit/FamaleJumpSuit.glb?v=20260907n"
+        ],
+        "youth": "/3d/clo/jumpsuit-youth.glb?v=20260907n"
+      }
+    },
+    {
+      "id": "ultimate-paw-covers",
+      "name": "Ultimate Paw Covers",
+      "blurb": "Snowmachine gauntlets.",
+      "oneFit": true,
+      "fits": [
+        {
+          "id": "unisex",
+          "name": "Unisex"
+        }
+      ],
+      "parts": [
+        {
+          "id": "body",
+          "label": "Body",
+          "palette": "body"
+        },
+        {
+          "id": "trim",
+          "label": "Trim",
+          "palette": "taslan"
+        },
+        {
+          "id": "embroidery",
+          "label": "Embroidery",
+          "palette": "embroidery"
+        }
+      ],
+      "glb": "/3d/clo/upc/UPC.glb?v=20260907k",
+      "glbByFit": {
+        "unisex": "/3d/clo/upc/UPC.glb?v=20260907k"
+      },
+      "meshMap": {
+        "body": [
+          "Talsan",
+          "Taslan",
+          "Body",
+          "hand",
+          "dorsal",
+          "knuckle",
+          "backhand",
+          "palm",
+          "inner",
+          "grip",
+          "cuff",
+          "gauntlet",
+          "wrist"
+        ],
+        "trim": [
+          "trim",
+          "piping",
+          "binding",
+          "Tape"
+        ],
+        "embroidery": [
+          "embroider",
+          "embroidery",
+          "logo",
+          "graphic",
+          "letter",
+          "monogram"
+        ]
+      },
+      "category": "Snowmachine Gauntlets",
+      "embroideryText": true,
+      "partPalette": {
+        "body": "body",
+        "trim": "taslan",
+        "embroidery": "embroidery"
+      }
+    }
+  ],
+  "materialsUrl": "/data/materials.json",
+  "meshMap": {
+    "collar": [
+      "Spandex_8601",
+      "collar",
+      "neck"
+    ],
+    "front": [
+      "Body_8589",
+      "Front"
+    ],
+    "back": [
+      "Body_8592",
+      "Back"
+    ],
+    "sleeves": [
+      "Sleeves_8595",
+      "Sleeves_1303603",
+      "Sleeves",
+      "Sleeve"
+    ],
+    "zipper": [
+      "TapeFabric",
+      "Zipper 1_Tape"
+    ],
+    "waistband": [
+      "Spandex_8598",
+      "waistband",
+      "hem"
+    ],
+    "stitch": [
+      "Double Needle",
+      "DoubleNeedle",
+      "Topstitch",
+      "top stitch",
+      "topstitch",
+      "stitch",
+      "thread",
+      "bartack",
+      "overlock"
+    ],
+    "legs": [
+      "leg",
+      "thigh",
+      "pant",
+      "Leg",
+      "Thigh",
+      "Legs",
+      "Pant"
+    ],
+    "booties": [
+      "bootie",
+      "boot",
+      "foot"
+    ],
+    "cordura": [
+      "cordura",
+      "knee",
+      "seat"
+    ],
+    "trim": [
+      "TapeFabric",
+      "Tape",
+      "piping",
+      "binding"
+    ],
+    "body": [
+      "Talsan",
+      "Taslan",
+      "Body",
+      "hand",
+      "dorsal",
+      "knuckle",
+      "backhand",
+      "palm",
+      "inner",
+      "grip"
+    ],
+    "embroidery": [
+      "embroider",
+      "embroidery",
+      "logo",
+      "graphic",
+      "letter",
+      "monogram"
+    ],
+    "hand": [
+      "Talsan",
+      "Taslan",
+      "Body",
+      "hand",
+      "dorsal",
+      "knuckle",
+      "backhand"
+    ],
+    "palm": [
+      "palm",
+      "inner",
+      "grip"
+    ],
+    "cuff": [
+      "cuff",
+      "gauntlet",
+      "wrist",
+      "Spandex"
+    ]
+  },
+  "meshNotes": {
+    "male-freefly-jacket": {
+      "file": "3d/clo/male-jacket/MaleJacket.glb",
+      "structure": "Single Cloth_mesh (12 primitives) plus zipper hardware and topstitch. Front/Back share Talsan_1303597; Collar/Waist Band share Spandex_1303600 — materials are cloned per primitive and split by XYZ.",
+      "materials": [
+        "Sleeves_1303603",
+        "Talsan_1303597",
+        "Spandex_1303600",
+        "Zipper 1_TapeFabric_1303638",
+        "Zipper 1_Slider_1303656",
+        "Zipper 1_Puller_1303660",
+        "Zipper 1_TopStopper_1303664",
+        "Zipper 1_TopStopper_1303667",
+        "Zipper 1_BottomStopper_1303670",
+        "Zipper 1_BottomStopper_1303673",
+        "Zipper 1_Teeth_1303654",
+        "Double Needle_1303623",
+        "Double Needle_1303627"
+      ],
+      "map": {
+        "collar": "Spandex_1303600 primitives with high Y (neck)",
+        "front": "Talsan_1303597 primitives with +Z",
+        "back": "Talsan_1303597 primitives with −Z",
+        "sleeves": "Sleeves_1303603",
+        "zipper": "Zipper 1_TapeFabric_1303638 (tape only; slider/puller/teeth stay hardware)",
+        "waistband": "Spandex_1303600 primitives with low Y (hem)",
+        "stitch": "Double Needle_1303623 + Double Needle_1303627 on Topstitch_* meshes (thread albedo map × color; zipper teeth/slider/puller/stoppers stay hardware)"
+      }
+    },
+    "female-freefly-jacket": {
+      "file": "3d/clo/female-jacket/FemaleJacket.glb",
+      "structure": "Single Cloth_mesh (12 primitives / material slots) plus zipper hardware. Color by MATERIAL name.",
+      "materials": [
+        "Sleeves_8595",
+        "Body_8589",
+        "Body_8592",
+        "Zipper 1_TapeFabric_8605",
+        "Spandex_8598",
+        "Spandex_8601",
+        "Zipper 1_Slider_8623",
+        "Zipper 1_Puller_8627",
+        "Zipper 1_TopStopper_8631",
+        "Zipper 1_TopStopper_8634",
+        "Zipper 1_BottomStopper_8637",
+        "Zipper 1_BottomStopper_8640",
+        "Zipper 1_Teeth_8621"
+      ],
+      "map": {
+        "collar": "Spandex_8601 (neck band, high Y)",
+        "front": "Body_8589 (+Z)",
+        "back": "Body_8592 (−Z)",
+        "sleeves": "Sleeves_8595",
+        "zipper": "Zipper 1_TapeFabric_8605",
+        "waistband": "Spandex_8598 (hem / waist panels)",
+        "stitch": "No Double Needle / Topstitch in this export — Stitch swatch is stored for sew notes; re-export with topstitch to tint in 3D"
+      }
+    },
+    "male-jumpsuit": {
+      "file": "3d/clo/male-jumpsuit/MaleJumpSuit.glb",
+      "structure": "Cloth_mesh with 14 primitives. Front/Back torso share Talsan_8298 — cloned per primitive and split by Z. No waist-band material. Pants Front / Pants Back are separate CLO fabrics.",
+      "materials": [
+        "Sleeves_8304",
+        "Talsan_8298",
+        "Spandex_8301",
+        "Pants Front_8311",
+        "Pants Back_8314",
+        "Zipper 1_TapeFabric_8345",
+        "Double Needle_8330",
+        "Double Needle_8334"
+      ],
+      "map": {
+        "collar": "Spandex_8301 high Y (neck; prims 6–7)",
+        "frontTorso": "Talsan_8298 primitives with +Z (prims 3–4)",
+        "backTorso": "Talsan_8298 primitives with −Z (prims 2, 5)",
+        "sleeves": "Sleeves_8304 (prims 0–1)",
+        "frontLegs": "Pants Front_8311 (prims 8, 10)",
+        "backLegs": "Pants Back_8314 (prims 9, 11)",
+        "zipper": "Zipper 1_TapeFabric_8345 (prims 12–13); slider/puller/teeth stay hardware",
+        "stitch": "Double Needle_8330 + Double Needle_8334 on Topstitch_* meshes"
+      }
+    },
+    "female-jumpsuit": {
+      "file": "3d/clo/female-jumpsuit/FemaleJumpSuit.glb (FamaleJumpSuit.glb tried as fallback)",
+      "structure": "Cloth_mesh with 14 primitives plus avatar (Mara / hair / shoes — not colored). Front/Back torso are Body_8601 / Body_8595. Legs share FABRIC 1_8592 — cloned per primitive and split by Z. No waist-band material. No Double Needle in this export.",
+      "materials": [
+        "Sleeves_8604",
+        "Body_8601",
+        "Body_8595",
+        "Spandex_8607",
+        "FABRIC 1_8592",
+        "Zipper 1_TapeFabric_8611"
+      ],
+      "map": {
+        "collar": "Spandex_8607 high Y (neck; prims 6–7)",
+        "frontTorso": "Body_8601 (prims 1–2, +Z)",
+        "backTorso": "Body_8595 (prims 3–4, −Z)",
+        "sleeves": "Sleeves_8604 (prims 0, 5)",
+        "frontLegs": "FABRIC 1_8592 primitives with +Z (prims 8–9)",
+        "backLegs": "FABRIC 1_8592 primitives with −Z (prims 10–11)",
+        "zipper": "Zipper 1_TapeFabric_8611 (prims 12–13); slider/puller/teeth stay hardware",
+        "stitch": "Not in this export — Stitch swatch is stored for sew notes"
+      }
+    },
+    "ultimate-paw-covers": {
+      "file": "3d/clo/upc/UPC.glb",
+      "structure": "CLO 2026.1 export: one Cloth_mesh, 8 primitives, all materials named FABRIC 1_1741665 (same Taslan weave). No Tape/piping/binding/trim mesh. No embroidery mesh. Every primitive is Body (shell + cuff), forced black.",
+      "materials": [
+        "FABRIC 1_1741665 (×5 slots; primitives 0–7 use [0,1,2,3,4,2,2,2])"
+      ],
+      "map": {
+        "body": "All 8 primitives — large shells (0, 2, 4, 6 ~20k verts) and folded cuff protrusions (1, 3, 5, 7 ~2.9k verts). Forced black. Cuff is body, not trim.",
+        "trim": "Not in this export. Sidebar keeps Taslan 18 swatches ready. Name a CLO fabric Trim / Tape / piping / binding and re-export to tint in 3D.",
+        "embroidery": "No logo/text mesh in this export. UI stores embroideryText + thread hex/name in job.json."
+      }
+    }
+  },
+  "updatedAt": 1788852260
+}

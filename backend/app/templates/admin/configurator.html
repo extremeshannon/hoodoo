@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{csrf}}" />
+  <title>3D configurator | Hoodoo admin</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --brand:#36B4E5; --ink:#0a0b0d; --surf:#12151a; --line:rgba(255,255,255,.12); --paper:#e8ecf1; --muted:#8b95a5; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"DM Sans",system-ui,sans-serif; background:var(--ink); color:var(--paper); }
+    a { color: var(--brand); }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem 1.5rem; border-bottom:1px solid var(--line); background:var(--surf); }
+    .top h1 { font-family:Syne,sans-serif; font-size:1.15rem; margin:0; }
+    .top nav { display:flex; gap:.75rem; flex-wrap:wrap; font-size:.9rem; }
+    .wrap { display:grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 58px); }
+    .rail { border-right:1px solid var(--line); padding:1rem; background:#0e1116; }
+    .main { padding:1.25rem 1.5rem 3rem; }
+    button, .btn { font:inherit; cursor:pointer; }
+    .btn { display:inline-flex; align-items:center; gap:.4rem; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--paper); padding:.45rem .8rem; text-decoration:none; }
+    .btn-primary { background:var(--brand); color:var(--ink); border-color:var(--brand); font-weight:600; }
+    .gitem { display:block; width:100%; text-align:left; padding:.7rem .8rem; margin:0 0 .4rem; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--paper); }
+    .gitem.is-on { border-color:var(--brand); background:rgba(54,180,229,.12); }
+    .gitem small { display:block; color:var(--muted); }
+    label { display:flex; flex-direction:column; gap:.3rem; font-size:.85rem; color:var(--muted); margin:0 0 .75rem; }
+    input, select, textarea { font:inherit; color:var(--paper); background:#0a0b0d; border:1px solid var(--line); border-radius:8px; padding:.5rem .65rem; }
+    textarea { min-height:4.5rem; }
+    .row { display:flex; flex-wrap:wrap; gap:.75rem; }
+    .row label { flex:1; min-width:160px; }
+    .card { background:var(--surf); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin:0 0 1.1rem; position:relative; }
+    .card::before { content:""; position:absolute; left:0; right:0; top:0; height:6px; border-radius:12px 12px 0 0; background:linear-gradient(90deg,#e3262f,#fff 50%,#3c3b6e); }
+    .card h2 { font-family:Syne,sans-serif; font-size:1rem; margin:.4rem 0 1rem; }
+    .fits { display:flex; gap:.8rem; flex-wrap:wrap; color:var(--paper); font-size:.95rem; margin-bottom:1rem; }
+    .fits label { flex-direction:row; align-items:center; color:var(--paper); margin:0; }
+    table { width:100%; border-collapse:collapse; font-size:.9rem; }
+    th, td { text-align:left; padding:.45rem .4rem; border-bottom:1px solid var(--line); }
+    .status { min-height:1.3em; color:var(--brand); margin:0 0 1rem; }
+    .status.err { color:#ff8a8a; }
+    .muted { color:var(--muted); font-size:.85rem; }
+    @media (max-width: 860px) { .wrap { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <h1>3D configurator</h1>
+    <nav>
+      <span class="muted">{{user}}</span>
+      <a href="/suit.html">Public suit</a>
+      <a href="/admin.html">Inventory</a>
+      <a href="/admin/logout">Log out</a>
+    </nav>
+  </header>
+  <div class="wrap">
+    <aside class="rail">
+      <button type="button" class="btn btn-primary" id="btn-new" style="width:100%;margin-bottom:1rem;justify-content:center">+ Add garment</button>
+      <div id="garment-list"></div>
+    </aside>
+    <main class="main">
+      <p class="status" id="status" role="status"></p>
+      <section class="card" id="add-card" hidden>
+        <h2>New garment</h2>
+        <div class="row">
+          <label>Name <input id="new-name" placeholder="Ultimate Paw Covers" /></label>
+          <label>Category / kicker <input id="new-cat" placeholder="Snowmachine Gauntlets" /></label>
+          <label>Start from
+            <select id="new-tmpl">
+              <option value="jacket">Jacket</option>
+              <option value="jumpsuit">Jumpsuit</option>
+              <option value="pants">Pants</option>
+              <option value="gauntlets">Gauntlets / UPC</option>
+              <option value="blank">Blank</option>
+            </select>
+          </label>
+        </div>
+        <div class="fits" id="new-fits">
+          <label><input type="checkbox" value="male" checked /> Male</label>
+          <label><input type="checkbox" value="female" checked /> Female</label>
+          <label><input type="checkbox" value="unisex" /> Unisex</label>
+          <label><input type="checkbox" value="youth" /> Youth</label>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-create">Create garment</button>
+      </section>
+      <section class="card" id="edit-card" hidden>
+        <h2 id="edit-title">Garment</h2>
+        <div class="row">
+          <label>Name <input id="g-name" /></label>
+          <label>Category <input id="g-cat" /></label>
+          <label>Blurb <input id="g-blurb" /></label>
+        </div>
+        <div class="fits" id="g-fits"></div>
+        <label style="flex-direction:row;align-items:center;color:var(--paper)"><input type="checkbox" id="g-emb" /> Embroidery text field</label>
+        <label>Awaiting file (optional) <input id="g-await" placeholder="FamaleJumpSuit.glb" /></label>
+        <h3 class="muted">Parts</h3>
+        <table><thead><tr><th>Id</th><th>Label</th><th>Palette</th><th></th></tr></thead><tbody id="g-parts"></tbody></table>
+        <button type="button" class="btn" id="btn-add-part" style="margin:.6rem 0 1rem">Add part</button>
+        <h3 class="muted">GLB upload</h3>
+        <div id="g-glbs"></div>
+        <label>CLO mesh names (part → comma-separated) <textarea id="g-mesh" placeholder='{"body":"Taslan, Body"}'></textarea></label>
+        <button type="button" class="btn btn-primary" id="btn-save-g">Save garment</button>
+      </section>
+      <section class="card">
+        <h2>Color charts</h2>
+        <p class="muted">Taslan, Spandex, stitch, body black, embroidery. Saved to data/materials.json.</p>
+        <div id="palettes"></div>
+        <button type="button" class="btn btn-primary" id="btn-save-colors">Save colors</button>
+      </section>
+      <section class="card">
+        <h2>Global mesh map</h2>
+        <p class="muted">CLO material name hints used to tint parts. JSON object of part → list of names.</p>
+        <textarea id="global-mesh" style="min-height:10rem;width:100%"></textarea>
+        <button type="button" class="btn btn-primary" id="btn-save-maps" style="margin-top:.75rem">Save mesh map</button>
+      </section>
+    </main>
+  </div>
+  <script src="/js/admin-configurator.js"></script>
+</body>
+</html>

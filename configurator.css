@@ -30,7 +30,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(64, 191, 240, 0.2), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(54, 180, 229, 0.2), transparent 55%),
     linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
 }
 
@@ -194,17 +194,17 @@
 }
 
 .config-cat-btn:hover {
-  border-color: rgba(64, 191, 240, 0.35);
+  border-color: rgba(54, 180, 229, 0.35);
 }
 
 .config-cat-btn[aria-selected="true"] {
-  background: rgba(64, 191, 240, 0.12);
+  background: rgba(54, 180, 229, 0.12);
   border-color: var(--brand);
   color: var(--white);
 }
 
 .config-cat-btn-featured {
-  border-color: rgba(64, 191, 240, 0.25);
+  border-color: rgba(54, 180, 229, 0.25);
 }
 
 .config-cat-sub {
@@ -257,7 +257,7 @@
 
 .config-product-btn[aria-selected="true"] {
   border-color: var(--brand);
-  background: rgba(64, 191, 240, 0.08);
+  background: rgba(54, 180, 229, 0.08);
 }
 
 .config-product-btn-name {
@@ -360,9 +360,9 @@
 }
 
 .stock-ok {
-  background: rgba(64, 191, 240, 0.12);
+  background: rgba(54, 180, 229, 0.12);
   color: var(--brand);
-  border: 1px solid rgba(64, 191, 240, 0.3);
+  border: 1px solid rgba(54, 180, 229, 0.3);
 }
 
 .stock-low {
@@ -443,7 +443,7 @@
 
 .config-chip input:checked + span {
   border-color: var(--brand);
-  background: rgba(64, 191, 240, 0.15);
+  background: rgba(54, 180, 229, 0.15);
   color: var(--white);
 }
 
@@ -756,7 +756,7 @@ button.btn {
 }
 
 .config-table tbody tr:hover td {
-  background: rgba(64, 191, 240, 0.04);
+  background: rgba(54, 180, 229, 0.04);
 }
 
 .config-th-num {

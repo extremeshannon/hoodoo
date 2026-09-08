@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configurator login | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .cfg-err { color: #ff8a8a; margin: 0 0 1rem; min-height: 1.2em; }
+  </style>
+</head>
+<body class="login-portal">
+  <div class="login-portal__glow" aria-hidden="true"></div>
+  <a class="login-portal__home" href="/">← Hoodoo Alaska</a>
+  <main class="login-portal__main">
+    <article class="login-portal__card">
+      <div class="login-portal__brand">
+        <div class="login-portal__logo" aria-hidden="true">HA</div>
+        <div class="login-portal__brand-text">
+          <h1 class="login-portal__title">3D configurator admin</h1>
+          <p class="login-portal__subtitle">Staff only. Add garments, upload GLBs, edit colors.</p>
+        </div>
+      </div>
+      <p class="cfg-err" role="status">{{error}}</p>
+      <form class="login-portal__form" method="post" action="/admin/login">
+        <input type="hidden" name="csrf" value="{{csrf}}" />
+        <input type="hidden" name="next" value="{{next}}" />
+        <label class="login-portal__field">
+          <span class="login-portal__label">Username</span>
+          <input type="text" name="username" autocomplete="username" required placeholder="admin" />
+        </label>
+        <label class="login-portal__field">
+          <span class="login-portal__label">Password</span>
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit" class="login-portal__submit">Log in</button>
+      </form>
+    </article>
+  </main>
+</body>
+</html>

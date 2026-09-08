@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     bootstrap_staff_password: str | None = None
     bootstrap_staff_role: str = "staff"  # staff | admin
 
+    # Aliases for the same staff bootstrap (Shannon / configurator admin).
+    hoodoo_admin_user: str | None = None
+    hoodoo_admin_password: str | None = None
+
     # Password reset links: no trailing slash. Docker users often set http://localhost:8004
     public_base_url: str = "http://localhost:8004"
     password_reset_token_hours: int = 24

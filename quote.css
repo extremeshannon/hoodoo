@@ -1,0 +1,89 @@
+.page-quote .quote-main {
+  padding: calc(var(--header-anchor) + 1.5rem) 1.25rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.quote-eyebrow {
+  color: var(--brand);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.quote-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  margin: 0.35rem 0 0.5rem;
+}
+.quote-lede { color: var(--muted); max-width: 42rem; }
+.quote-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  align-items: start;
+}
+.quote-form {
+  background: var(--ink-soft);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+.quote-label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.quote-label select,
+.quote-label input,
+.quote-form input[type="number"] {
+  background: var(--slate);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+}
+.quote-methods {
+  border: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+.quote-methods legend { font-weight: 700; margin-bottom: 0.4rem; }
+.quote-hint { color: var(--muted); font-size: 0.85rem; margin: 0; }
+.quote-total {
+  background: var(--ink-soft);
+  border: 1px solid rgba(54,180,229,0.35);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: sticky;
+  top: calc(var(--header-anchor) + 0.5rem);
+}
+.quote-total-kicker { color: var(--brand); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; margin: 0; }
+.quote-total-num {
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  margin: 0.2rem 0;
+  color: var(--white);
+}
+.quote-each { color: var(--muted); margin: 0 0 1rem; }
+.quote-lines { list-style: none; padding: 0; margin: 0 0 1rem; }
+.quote-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0.45rem 0;
+  font-size: 0.92rem;
+}
+.quote-disclaimer { color: var(--muted); font-size: 0.85rem; }
+.quote-total .btn { display: block; text-align: center; margin-top: 0.6rem; }
+@media (max-width: 800px) {
+  .quote-grid { grid-template-columns: 1fr; }
+  .quote-total { position: static; }
+}

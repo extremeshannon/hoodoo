@@ -48,7 +48,7 @@ function ensureContext() {
   var key = new THREE.DirectionalLight(0xffffff, 1.1);
   key.position.set(3, 6, 4);
   scene.add(key);
-  var fill = new THREE.DirectionalLight(0x40bff0, 0.35);
+  var fill = new THREE.DirectionalLight(0x36b4e5, 0.35);
   fill.position.set(-4, 2, -2);
   scene.add(fill);
 

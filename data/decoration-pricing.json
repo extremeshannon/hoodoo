@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "currency": "USD",
+    "disclaimer": "Guide / rough estimate only — not a final invoice. Digitizing, art, fabric, and rush can change the number. Submit the estimate and we confirm before production.",
+    "contactEmail": "shannnon@hoodooak.com",
+    "contactPhone": "907.202.5634",
+    "qtyTiers": [1, 6, 12, 24, 48, 72, 144]
+  },
+  "garments": [
+    { "id": "tee", "name": "T-shirt", "blank": 12 },
+    { "id": "heavy-tee", "name": "Heavyweight tee", "blank": 16 },
+    { "id": "hoodie", "name": "Pullover hoodie", "blank": 28 },
+    { "id": "crew", "name": "Crewneck", "blank": 24 },
+    { "id": "hat", "name": "Hat / beanie", "blank": 14 },
+    { "id": "jersey", "name": "Jersey", "blank": 38 },
+    { "id": "gauntlet", "name": "Ultimate Paw Cover (pair)", "blank": 94 },
+    { "id": "jumpsuit", "name": "Custom jumpsuit (base sew)", "blank": 625 }
+  ],
+  "embroidery": {
+    "digitizingFirst": 45,
+    "digitizingAdditional": 25,
+    "minStitchesBilled": 5000,
+    "extraLocationFactor": 0.85,
+    "stitchBands": [
+      { "id": "5k", "label": "Up to 5,000 stitches", "maxStitches": 5000 },
+      { "id": "8k", "label": "5,001–8,000 stitches", "maxStitches": 8000 },
+      { "id": "12k", "label": "8,001–12,000 stitches", "maxStitches": 12000 },
+      { "id": "15k", "label": "12,001+ stitches", "maxStitches": 999999 }
+    ],
+    "perPiece": {
+      "5k":  { "1": 18.00, "6": 12.00, "12": 9.00, "24": 7.00, "48": 5.50, "72": 4.75, "144": 4.00 },
+      "8k":  { "1": 22.00, "6": 15.00, "12": 11.00, "24": 8.50, "48": 6.50, "72": 5.50, "144": 4.50 },
+      "12k": { "1": 28.00, "6": 18.00, "12": 14.00, "24": 10.00, "48": 8.00, "72": 6.75, "144": 5.50 },
+      "15k": { "1": 34.00, "6": 22.00, "12": 16.00, "24": 12.00, "48": 9.50, "72": 8.00, "144": 6.50 }
+    }
+  },
+  "screenPrint": {
+    "screenFeePerColor": 25,
+    "screenFeeWaivedAtQty": 72,
+    "extraLocationFactor": 0.8,
+    "colorBands": [
+      { "id": "1c", "label": "1 color", "colors": 1 },
+      { "id": "2c", "label": "2 colors", "colors": 2 },
+      { "id": "3c", "label": "3 colors", "colors": 3 },
+      { "id": "4c", "label": "4+ colors", "colors": 4 }
+    ],
+    "perPiece": {
+      "1c": { "1": 12.00, "6": 6.00, "12": 3.75, "24": 2.50, "48": 1.85, "72": 1.50, "144": 1.15 },
+      "2c": { "1": 16.00, "6": 8.00, "12": 5.00, "24": 3.25, "48": 2.35, "72": 1.90, "144": 1.45 },
+      "3c": { "1": 20.00, "6": 10.00, "12": 6.25, "24": 4.00, "48": 2.85, "72": 2.25, "144": 1.75 },
+      "4c": { "1": 26.00, "6": 13.00, "12": 8.00, "24": 5.00, "48": 3.50, "72": 2.75, "144": 2.15 }
+    }
+  },
+  "dyeSub": {
+    "setup": 40,
+    "perPiece": { "1": 28.00, "6": 18.00, "12": 14.00, "24": 11.00, "48": 8.50, "72": 7.00, "144": 5.50 }
+  },
+  "jumpsuit": {
+    "patterns": [
+      { "id": "freefly-jacket", "name": "Freefly Jacket", "base": 420 },
+      { "id": "jumpsuit", "name": "Jumpsuit", "base": 625 },
+      { "id": "pants", "name": "Pants", "base": 285 },
+      { "id": "camera-jacket", "name": "Camera Jacket", "base": 445 },
+      { "id": "ultimate-paw-covers", "name": "Ultimate Paw Covers", "base": 94 }
+    ],
+    "addons": [
+      { "id": "booties", "name": "Booties", "price": 85 },
+      { "id": "cordura-knees", "name": "Cordura knees", "price": 45 },
+      { "id": "cordura-seat", "name": "Cordura seat", "price": 40 },
+      { "id": "grip-shoulders", "name": "Shoulder grip", "price": 35 },
+      { "id": "grip-legs", "name": "Leg grip", "price": 30 },
+      { "id": "dye-sub-panels", "name": "Dye-sub custom art panels", "price": 180 },
+      { "id": "name-embroider", "name": "Name embroidery", "price": 28 },
+      { "id": "extra-zip", "name": "Extra zipper", "price": 22 }
+    ]
+  }
+}
