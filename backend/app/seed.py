@@ -109,6 +109,7 @@ def seed_from_catalog_json(db: Session, path: Path) -> None:
 def seed_if_empty(db: Session, catalog_path: Path) -> bool:
     n = db.scalar(select(func.count()).select_from(Category))
     if n and n > 0:
+        sync_catalog_layout(db, catalog_path)
         ensure_missing_categories(db, catalog_path)
         return False
     if not catalog_path.is_file():
@@ -215,4 +216,65 @@ def ensure_missing_categories(db: Session, catalog_path: Path) -> None:
                 continue
             _insert_product(db, db_cat.id, p, pi)
             existing_products.add(p["id"])
+    db.commit()
+
+
+def sync_catalog_layout(db: Session, catalog_path: Path) -> None:
+    """Match live categories to catalog.json: Apparel, UPC, Skydiving jumpsuits."""
+    if not catalog_path.is_file():
+        return
+    data = json.loads(catalog_path.read_text(encoding="utf-8"))
+    desired = data.get("categories") or []
+    if not desired:
+        return
+
+    cats = {c.slug: c for c in db.scalars(select(Category)).all()}
+
+    if "ultimate-paw" in cats and "upc" not in cats:
+        row = cats["ultimate-paw"]
+        row.slug = "upc"
+        db.flush()
+        cats = {c.slug: c for c in db.scalars(select(Category)).all()}
+
+    for i, cat in enumerate(desired):
+        row = cats.get(cat["id"])
+        if not row:
+            row = Category(
+                slug=cat["id"],
+                name=cat["name"],
+                subtitle=cat.get("subtitle") or None,
+                description=cat.get("description") or None,
+                featured=bool(cat.get("featured")),
+                sort_order=i,
+            )
+            db.add(row)
+            db.flush()
+            cats[row.slug] = row
+        else:
+            row.name = cat["name"]
+            row.subtitle = cat.get("subtitle") or None
+            row.description = cat.get("description") or None
+            row.featured = bool(cat.get("featured"))
+            row.sort_order = i
+
+    products = {p.slug: p for p in db.scalars(select(Product)).all()}
+    for cat in desired:
+        db_cat = cats.get(cat["id"])
+        if not db_cat:
+            continue
+        for pi, pjson in enumerate(cat.get("products") or []):
+            prod = products.get(pjson.get("id"))
+            if not prod:
+                continue
+            prod.category_id = db_cat.id
+            prod.sort_order = pi
+
+    db.flush()
+    keep = {c["id"] for c in desired}
+    for row in list(db.scalars(select(Category)).all()):
+        if row.slug in keep:
+            continue
+        leftover = db.scalar(select(func.count()).select_from(Product).where(Product.category_id == row.id)) or 0
+        if leftover == 0:
+            db.delete(row)
     db.commit()

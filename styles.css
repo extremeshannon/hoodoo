@@ -13,10 +13,11 @@
   --font-display: "Syne", system-ui, sans-serif;
   --font-body: "DM Sans", system-ui, sans-serif;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  /* Slim bar; logo is larger and hangs below (and above) the bar */
+  /* Slim bar; logo sits in the header without covering the page */
   --header-h: 4rem;
-  --header-logo-hang: 3.35rem;
+  --header-logo-hang: 0.85rem;
   --header-anchor: calc(var(--header-h) + var(--header-logo-hang));
+  --page-width: 1100px;
 }
 
 *,
@@ -90,9 +91,10 @@ img {
 
 .header-inner {
   position: relative;
-  max-width: 1200px;
+  width: 100%;
+  max-width: var(--page-width);
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
   height: 100%;
   min-height: 0;
   display: flex;
@@ -100,16 +102,15 @@ img {
   justify-content: flex-end;
   gap: 1rem;
   overflow: visible;
-  /* Keep nav clear of the bust-out logo (width + gutter) */
-  padding-left: clamp(10.5rem, 40vw, 17rem);
+  /* Keep nav clear of the logo */
+  padding-left: clamp(7.25rem, 22vw, 9.5rem);
 }
 
 .brand {
   position: absolute;
-  left: 1.25rem;
+  left: 1.5rem;
   bottom: 0;
-  /* Straddle the bar: mountain peeks above, wordmark hangs into the page */
-  transform: translateY(40%);
+  transform: translateY(18%);
   z-index: 102;
   display: flex;
   align-items: flex-end;
@@ -119,28 +120,28 @@ img {
 
 .brand-logo {
   display: block;
-  width: clamp(175px, 32vw, 248px);
+  width: clamp(72px, 12vw, 104px);
   height: auto;
   max-width: none;
   object-fit: contain;
   object-position: left bottom;
-  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.4));
 }
 
 @media (max-width: 768px) {
   .header-inner {
     justify-content: flex-end;
-    padding-left: clamp(6.75rem, 50vw, 10.75rem);
+    padding-left: clamp(5.5rem, 38vw, 7.5rem);
     padding-right: 1.25rem;
   }
 
   .brand {
     left: 1rem;
-    transform: translateY(38%);
+    transform: translateY(16%);
   }
 
   .brand-logo {
-    width: clamp(132px, 46vw, 188px);
+    width: clamp(64px, 22vw, 88px);
   }
 }
 
@@ -185,29 +186,39 @@ img {
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 0.25rem 1.75rem;
+  flex-wrap: nowrap;
+  gap: 0.15rem 1rem;
 }
 
-.nav-list a {
+.nav-list > li {
+  flex: 0 0 auto;
+}
+
+.nav-list a,
+.nav-list .nav-logout {
   color: var(--paper);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9375rem;
   letter-spacing: 0.02em;
+  white-space: nowrap;
   transition: color 0.2s;
 }
 
 .nav-list a:hover,
-.nav-list a:focus-visible {
+.nav-list a:focus-visible,
+.nav-list .nav-logout:hover,
+.nav-list .nav-logout:focus-visible {
   color: var(--brand);
 }
 
 .nav-cta {
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 0.9rem;
   background: var(--brand);
   color: var(--ink) !important;
   border-radius: 4px;
   font-weight: 600 !important;
+  white-space: nowrap;
 }
 
 .nav-cta:hover,
@@ -216,7 +227,7 @@ img {
   color: var(--ink) !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
   .nav-toggle {
     display: flex;
     margin-left: auto;
@@ -242,11 +253,13 @@ img {
 
   .nav-list {
     flex-direction: column;
+    flex-wrap: wrap;
     align-items: flex-start;
     gap: 1.25rem;
   }
 
-  .nav-list a {
+  .nav-list a,
+  .nav-list .nav-logout {
     font-size: 1.125rem;
   }
 }
@@ -308,12 +321,33 @@ img {
 }
 
 .hero-lede {
-  margin: 0 0 2rem;
+  margin: 0 0 1.25rem;
   font-size: 1.125rem;
   color: var(--muted);
   max-width: 38em;
   margin-left: auto;
   margin-right: auto;
+}
+
+.hero-wip {
+  margin: 0 auto 2rem;
+  max-width: 36em;
+  color: var(--paper);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.js-staff-shop {
+  display: none !important;
+}
+
+body.is-hoodoo-staff li.js-staff-shop {
+  display: list-item !important;
+}
+
+body.is-hoodoo-staff a.js-staff-shop,
+body.is-hoodoo-staff .btn.js-staff-shop {
+  display: inline-flex !important;
 }
 
 .hero-actions {
@@ -394,7 +428,7 @@ img {
 }
 
 .section-inner {
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
 }
 
@@ -586,7 +620,7 @@ a.contact-card:focus-visible {
 }
 
 .footer-inner {
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
   text-align: center;
 }
@@ -616,7 +650,7 @@ a.contact-card:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem 2rem;
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
 }
 
@@ -1563,6 +1597,12 @@ a.contact-card:focus-visible {
   font-size: 0.9375rem;
 }
 
+.order-fulfill {
+  margin: 0 0 0.5rem;
+  color: var(--paper);
+  font-size: 0.9375rem;
+}
+
 .order-total {
   margin: 0;
   font-size: 1.25rem;
@@ -1596,15 +1636,14 @@ a.contact-card:focus-visible {
   color: var(--paper);
   background: none;
   border: none;
-  border-bottom: 1px solid transparent;
   padding: 0;
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav-logout:hover {
   color: var(--brand);
-  border-bottom-color: var(--brand);
 }
 
 .nav-auth-sep {

@@ -23,6 +23,10 @@
     panelTitle: document.getElementById("panel-title"),
     panelSku: document.getElementById("panel-sku"),
     panelSummary: document.getElementById("panel-summary"),
+    panelPhoto: document.getElementById("panel-photo"),
+    panelPhotoImg: document.getElementById("panel-photo-img"),
+    panelPhotoHint: document.getElementById("panel-photo-hint"),
+    panel3dLink: document.getElementById("panel-3d-link"),
     panelStock: document.getElementById("panel-stock"),
     panelOptions: document.getElementById("panel-options"),
     panelAddonsWrap: document.getElementById("panel-addons-wrap"),
@@ -73,12 +77,182 @@
     return "In stock · " + qty + " on hand";
   }
 
+  function isCustom(product) {
+    return !!(product && product.madeToOrder);
+  }
+
+  var CLO_BY_SLUG = {
+    "suit-freefly-jacket": "freefly-jacket",
+    "suit-camera-jacket": "camera-jacket",
+    "suit-jumpsuit": "jumpsuit",
+    "suit-freefly": "jumpsuit",
+    "suit-rw": "jumpsuit",
+    "suit-pants": "pants",
+    "upc-custom": "ultimate-paw-covers",
+    "upc-pro": "ultimate-paw-covers",
+    "upc-trail": "ultimate-paw-covers",
+    "upc-lite": "ultimate-paw-covers",
+    "jersey-pro-sub": "male-jersey-blunt-collar",
+    "jersey-mesh": "male-jersey-blunt-collar",
+  };
+
+  function cloIdFor(product) {
+    if (product && product.preview && product.preview.cloId) return product.preview.cloId;
+    var slug = (product && product.id) || "";
+    if (CLO_BY_SLUG[slug]) return CLO_BY_SLUG[slug];
+    var n = ((product && product.name) || "").toLowerCase();
+    if (n.indexOf("paw") >= 0 || n.indexOf("gauntlet") >= 0) return "ultimate-paw-covers";
+    if (n.indexOf("camera") >= 0) return "camera-jacket";
+    if (n.indexOf("freefly") >= 0 && n.indexOf("jacket") >= 0) return "freefly-jacket";
+    if (n.indexOf("pant") >= 0) return "pants";
+    if (n.indexOf("jumpsuit") >= 0 || n.indexOf("jump suit") >= 0) return "jumpsuit";
+    return "";
+  }
+
+  function selectedFit(product) {
+    var fit = selectedOptionIds.fit || selectedOptionIds.size || "";
+    var byFit = product && product.preview && product.preview.glbByFit;
+    if (fit && byFit && byFit[fit]) return fit;
+    if (byFit && byFit.unisex) return "unisex";
+    return fit;
+  }
+
+  function builderUrlFor(product) {
+    var clo = cloIdFor(product);
+    if (!clo) return "/suit.html";
+    var params = new URLSearchParams();
+    params.set("product", clo);
+    var fit = selectedFit(product);
+    if (fit) params.set("fit", fit);
+    params.set("step", "2");
+    return "/suit.html?" + params.toString();
+  }
+
+  function update3dLink(product) {
+    if (!el.panel3dLink) return;
+    var a = el.panel3dLink.querySelector("a");
+    var clo = cloIdFor(product);
+    var show = isCustom(product) && !!clo;
+    el.panel3dLink.hidden = !show;
+    if (!a || !show) return;
+    a.href = builderUrlFor(product);
+    var fit = selectedFit(product);
+    var fitLabel = "";
+    if (fit && fit !== "unisex") {
+      fitLabel = fit.charAt(0).toUpperCase() + fit.slice(1) + " ";
+    }
+    a.textContent = "Open " + fitLabel + (product.name || "garment") + " in 3D →";
+  }
+
+  function previewGlbFor(product) {
+    var preview = product && product.preview;
+    if (!preview) return "";
+    var byFit = preview.glbByFit || {};
+    var fit = selectedOptionIds.fit || selectedOptionIds.size || "";
+    if (fit && byFit[fit]) return byFit[fit];
+    return preview.glb || byFit.male || byFit.unisex || byFit.female || "";
+  }
+
+  function setPreviewGlb(url) {
+    if (!el.panelPhoto) return;
+    if (url) el.panelPhoto.setAttribute("data-glb", url);
+    else el.panelPhoto.removeAttribute("data-glb");
+    if (window.HoodooConfigPreview) {
+      if (url) window.HoodooConfigPreview.show(url);
+      else window.HoodooConfigPreview.hide();
+    }
+    el.panelPhoto.dispatchEvent(new Event("hoodoo-preview"));
+  }
+
   function getVariant(product) {
     if (!product || product.pricingModel !== "variants" || !product.variants) return null;
     var v = product.variants.find(function (x) {
       return x.id === selectedVariantId;
     });
     return v || product.variants[0] || null;
+  }
+
+  function colorwayKey(variantId) {
+    if (!variantId) return "";
+    var i = variantId.lastIndexOf("-");
+    return i >= 0 ? variantId.slice(i + 1) : variantId;
+  }
+
+  function photoCandidates(product) {
+    var urls = [];
+    var v = getVariant(product);
+    if (v && v.image) urls.push(v.image);
+    if (product && product.image) urls.push(product.image);
+    if (product && v) {
+      var pid = product.id;
+      urls.push("/assets/products/" + pid + "/" + v.id + ".jpg");
+      var cw = colorwayKey(v.id);
+      if (cw) urls.push("/assets/products/" + pid + "/" + cw + ".jpg");
+      urls.push("/assets/products/" + pid + ".jpg");
+    } else if (product) {
+      urls.push("/assets/products/" + product.id + ".jpg");
+    }
+    var seen = {};
+    return urls.filter(function (u) {
+      if (!u || seen[u]) return false;
+      seen[u] = true;
+      return true;
+    });
+  }
+
+  function showPhotoPlaceholder(product) {
+    if (!el.panelPhoto || !el.panelPhotoImg) return;
+    el.panelPhoto.classList.remove("has-image");
+    el.panelPhotoImg.removeAttribute("src");
+    el.panelPhotoImg.alt = "";
+    if (el.panelPhotoHint) {
+      var v = getVariant(product);
+      el.panelPhotoHint.textContent = v
+        ? v.label.replace(/\s*·\s*/g, " · ")
+        : product && product.name
+          ? product.name
+          : "Photo coming soon";
+    }
+  }
+
+  var photoGen = 0;
+
+  function updateVariantPhoto(product) {
+    if (!el.panelPhoto || !product) return;
+    var glb = previewGlbFor(product);
+    update3dLink(product);
+    if (glb) {
+      showPhotoPlaceholder(product);
+      if (el.panelPhotoHint) el.panelPhotoHint.textContent = "3D preview";
+      setPreviewGlb(glb);
+      return;
+    }
+    setPreviewGlb("");
+    if (!el.panelPhotoImg) return;
+    var gen = ++photoGen;
+    var urls = photoCandidates(product);
+    var idx = 0;
+    var img = el.panelPhotoImg;
+
+    function tryNext() {
+      if (gen !== photoGen) return;
+      if (idx >= urls.length) {
+        showPhotoPlaceholder(product);
+        return;
+      }
+      var url = urls[idx++];
+      img.onload = function () {
+        if (gen !== photoGen) return;
+        el.panelPhoto.classList.add("has-image");
+        var v = getVariant(product);
+        img.alt = v ? product.name + " — " + v.label : product.name || "";
+      };
+      img.onerror = tryNext;
+      img.src = url;
+    }
+
+    showPhotoPlaceholder(product);
+    tryNext();
   }
 
   function ensureOptionDefaults(product) {
@@ -151,10 +325,15 @@
     return null;
   }
 
+  function productAddons(product) {
+    return ((product && product.addons) || []).filter(function (a) {
+      return a.id !== "pair-draw";
+    });
+  }
+
   function computeAddonTotalPerUnit(product) {
     var sum = 0;
-    if (!product || !product.addons) return sum;
-    product.addons.forEach(function (a) {
+    productAddons(product).forEach(function (a) {
       if (addonState[a.id]) sum += a.price || 0;
     });
     return sum;
@@ -180,7 +359,10 @@
 
     var sq = computeStockQty(product);
     el.panelStock.className = "config-panel-stock";
-    if (sq === null) {
+    if (isCustom(product)) {
+      el.panelStock.classList.add("stock-custom");
+      el.panelStock.textContent = "Custom · made to order";
+    } else if (sq === null) {
       el.panelStock.classList.add("stock-pending");
       el.panelStock.textContent = "Select all options to see inventory";
     } else {
@@ -215,7 +397,7 @@
     }
 
     var adds = [];
-    (product.addons || []).forEach(function (a) {
+    productAddons(product).forEach(function (a) {
       if (addonState[a.id]) adds.push(a.label + " (" + fmtMoney(a.price) + ")");
     });
     if (adds.length) lines.push("Add-ons: " + adds.join(", "));
@@ -235,7 +417,7 @@
     var product = currentProduct();
     if (!product) return null;
     var addons = [];
-    (product.addons || []).forEach(function (a) {
+    productAddons(product).forEach(function (a) {
       if (addonState[a.id]) addons.push(a.id);
     });
     if (product.pricingModel === "variants") {
@@ -365,12 +547,13 @@
   function renderAddons(product) {
     if (!el.panelAddons || !el.panelAddonsWrap) return;
     el.panelAddons.innerHTML = "";
-    if (!product.addons || !product.addons.length) {
+    var addons = productAddons(product);
+    if (!addons.length) {
       el.panelAddonsWrap.hidden = true;
       return;
     }
     el.panelAddonsWrap.hidden = false;
-    product.addons.forEach(function (a) {
+    addons.forEach(function (a) {
       var label = document.createElement("label");
       label.className = "config-addon";
       var input = document.createElement("input");
@@ -417,6 +600,7 @@
       selectedVariantId = sel.value;
       sel.addEventListener("change", function () {
         selectedVariantId = sel.value;
+        updateVariantPhoto(product);
         refreshTotals();
       });
       fieldset.appendChild(sel);
@@ -444,6 +628,7 @@
           input.checked = selectedOptionIds[g.id] === ch.id;
           input.addEventListener("change", function () {
             selectedOptionIds[g.id] = ch.id;
+            updateVariantPhoto(product);
             refreshTotals();
           });
           var span = document.createElement("span");
@@ -469,7 +654,7 @@
     ensureVariantDefault(product);
     ensureOptionDefaults(product);
     addonState = {};
-    (product.addons || []).forEach(function (a) {
+    productAddons(product).forEach(function (a) {
       addonState[a.id] = false;
     });
     if (el.qty) el.qty.value = "1";
@@ -485,6 +670,7 @@
 
     renderOptions(product);
     renderAddons(product);
+    updateVariantPhoto(product);
     refreshTotals();
 
     if (el.copyFeedback) el.copyFeedback.textContent = "";
@@ -560,7 +746,7 @@
             range.min === range.max
               ? fmtMoney(range.min)
               : fmtMoney(range.min) + " – " + fmtMoney(range.max);
-          var qtyApprox = optionProductApproxQty(p);
+          var qtyApprox = isCustom(p) ? "Custom" : optionProductApproxQty(p);
           var tr = document.createElement("tr");
           tr.innerHTML =
             "<td>" +
@@ -572,8 +758,8 @@
             "</td><td class=\"config-td-num\">" +
             priceCell +
             "</td><td class=\"config-td-qty\">" +
-            qtyApprox +
-            " est.</td>";
+            (isCustom(p) ? "Made to order" : qtyApprox + " est.") +
+            "</td>";
           el.inventoryTbody.appendChild(tr);
         }
       });

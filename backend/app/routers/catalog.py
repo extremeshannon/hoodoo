@@ -6,9 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.catalog_json import build_catalog_dict
 from app.database import get_db
+from app.deps import require_staff
 from app.models import Category
 
-router = APIRouter(prefix="/catalog", tags=["catalog"])
+router = APIRouter(prefix="/catalog", tags=["catalog"], dependencies=[Depends(require_staff)])
 
 
 @router.get("")

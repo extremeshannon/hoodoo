@@ -88,8 +88,25 @@
 .suit-fit-row button.is-on { background: #36B4E5; color: #0a0b0d; }
 .suit-fit-row button.is-soon { opacity: 0.95; }
 .suit-youth-note { color: #334; font-size: 0.9rem; margin: 0 0 1rem; }
+.suit-pattern-group { margin: 1.6rem 0 0; }
+.suit-pattern-group:first-child { margin-top: 0.35rem; }
+.suit-pattern-group__title {
+  font-family: Syne, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1a1d22;
+  margin: 0 0 0.7rem;
+}
+.suit-pattern-empty {
+  color: #5c6570;
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0.1rem 0 0.2rem;
+}
 .suit-pattern-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.25rem;
 }
 .suit-pattern-card .suit-card-meta { margin-top: 0.65rem; font-size: 0.8rem; color: #36B4E5; }
@@ -137,6 +154,63 @@
 }
 .suit-stage { position: relative; background: #d5d8dc; min-height: 0; overflow: hidden; }
 #suit-canvas { width: 100%; height: 100%; display: block; }
+.suit-logo-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.15rem;
+  background: radial-gradient(ellipse 68% 58% at 50% 46%, #1c2229 0%, #0a0b0d 74%);
+}
+.suit-logo-loader[hidden] { display: none !important; }
+.suit-logo-loader__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.suit-logo-loader__glow {
+  position: absolute;
+  width: 12.5rem;
+  height: 12.5rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(54, 180, 229, 0.42) 0%, rgba(54, 180, 229, 0.1) 40%, transparent 70%);
+  animation: suit-logo-glow 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.suit-logo-loader img {
+  position: relative;
+  height: 8.75rem;
+  width: auto;
+  max-width: min(70vw, 280px);
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(54, 180, 229, 0.38));
+  animation: suit-logo-breathe 2.8s ease-in-out infinite;
+}
+.suit-logo-loader__msg {
+  margin: 0;
+  max-width: 22rem;
+  padding: 0 1.25rem;
+  text-align: center;
+  font: 600 0.72rem/1.5 "DM Sans", sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+@keyframes suit-logo-breathe {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(54, 180, 229, 0.28)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 28px rgba(54, 180, 229, 0.72)); }
+}
+@keyframes suit-logo-glow {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .suit-logo-loader__glow,
+  .suit-logo-loader img { animation: none; }
+}
 .suit-watermark {
   position: absolute; left: 1rem; bottom: 1rem; margin: 0;
   font: 800 1.4rem Syne, sans-serif; color: #36B4E5; letter-spacing: 0.2em;
@@ -148,6 +222,7 @@
   border-radius: 4px; font-size: 0.75rem;
   z-index: 3;
 }
+.suit-clo-note:empty { display: none; }
 .suit-palette {
   position: static;
   display: block;
@@ -248,36 +323,71 @@
 .suit-palette .btn { white-space: nowrap; display: block; width: 100%; margin-top: 0.4rem; text-align: center; }
 .suit-sizing {
   display: grid;
-  grid-template-columns: 1fr 1.1fr 1fr;
+  grid-template-columns: 1fr 1.15fr 1fr;
   gap: 1rem;
   padding: 1.25rem;
-  background: #f4f6f8;
+  background: #e8eaed;
   min-height: 0;
   overflow: auto;
-  color: #122;
+  color: #1a1d22;
 }
-.size-col { background: #fff; padding: 1.25rem; border-radius: 8px; }
-.size-figure {
-  height: 280px; background: radial-gradient(circle at 50% 80%, #36B4E533, transparent 60%),
-    repeating-linear-gradient(0deg, #cfe8f4 0 2px, transparent 2px 18px),
-    repeating-linear-gradient(90deg, #cfe8f4 0 2px, transparent 2px 18px);
+.size-col {
+  background: #fff;
+  padding: 1.25rem 1.35rem;
   border-radius: 8px;
+  color: #1a1d22;
+  box-shadow: 0 1px 0 rgba(16, 24, 32, 0.06);
 }
-.size-360 { text-align: center; font-weight: 700; color: #36B4E5; }
-.size-gender { display: flex; justify-content: center; gap: 0.5rem; }
-.size-gender button { background: none; border: 0; cursor: pointer; font-weight: 700; color: #668; }
+.size-col h2 { color: #111; font-family: Syne, sans-serif; margin: 0 0 0.6rem; font-size: 1.35rem; }
+.size-col-guide h2 { color: #36B4E5; }
+.size-col-guide p { color: #3a424c; line-height: 1.5; font-size: 0.92rem; }
+.size-sub { color: #5c6570; font-size: 0.85rem; }
+.size-figure {
+  height: 420px;
+  min-height: 360px;
+  background: radial-gradient(ellipse at 50% 72%, #d7eef7 0%, #f7f8fa 58%, #eef0f3 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+  position: relative;
+}
+.size-figure canvas,
+.size-guide-art canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+}
+.size-360 { text-align: center; font-weight: 700; color: #36B4E5; cursor: pointer; margin: 0.35rem 0 0.5rem; }
+.size-gender { display: flex; justify-content: center; gap: 0.85rem; }
+.size-gender button { background: none; border: 0; cursor: pointer; font-weight: 700; color: #8b95a5; padding: 0; }
 .size-gender button.is-on { color: #36B4E5; }
-.size-col-form label { display: grid; gap: 0.25rem; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.55rem; }
+.size-col-form label { display: grid; gap: 0.25rem; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.55rem; color: #3a424c; }
 .size-col-form input, .size-col-form select {
-  padding: 0.5rem; border: 1px solid #ccd; border-radius: 4px; font: inherit;
+  padding: 0.5rem 0.6rem; border: 1px solid #cfd3d8; border-radius: 4px; font: inherit;
+  background: #fff; color: #111;
+}
+.size-col-form input:focus, .size-col-form select:focus {
+  outline: 2px solid rgba(54, 180, 229, 0.45);
+  border-color: #36B4E5;
 }
 .size-actions { display: grid; gap: 0.5rem; margin-top: 1rem; }
+.suit-sizing .btn-ghost {
+  color: #1a1d22;
+  border-color: #c5ccd3;
+}
+.suit-sizing .btn-ghost:hover,
+.suit-sizing .btn-ghost:focus-visible { color: #36B4E5; border-color: #36B4E5; }
 .size-guide-art {
-  height: 200px;
-  background: linear-gradient(#fff, #e8f4fa);
-  border: 1px dashed #36B4E5;
+  height: 360px;
+  min-height: 360px;
+  background: radial-gradient(ellipse at 50% 40%, #d7eef7 0%, #f7f8fa 70%);
+  border: 1px solid #d5d8dc;
   border-radius: 8px;
   margin-bottom: 1rem;
+  overflow: hidden;
 }
 @media (max-width: 900px) {
   .suit-app { height: auto; max-height: none; overflow: auto; }

@@ -24,7 +24,7 @@
         <div class="login-portal__brand-text">
           <h1 id="login-title" class="login-portal__title">Hoodoo Alaska Login</h1>
           <p class="login-portal__subtitle">
-            Sign in to manage your account, orders, and custom gear for Hoodoo Alaska.
+            Staff sign-in. The online shop and configurator are in progress and not open to the public.
           </p>
         </div>
       </div>
@@ -53,37 +53,23 @@
       <p id="login-feedback" class="login-portal__feedback" role="status" aria-live="polite"></p>
 
       <p class="login-portal__disclaimer">
-        Hoodoo Alaska access is for customers and staff. Contact the shop for account changes:
+        For custom jumpsuits, apparel, and branding, contact the shop:
         <a href="mailto:shannnon@hoodooak.com">shannnon@hoodooak.com</a>
+        · <a href="tel:+19072025634">907.202.5634</a>
       </p>
 
       <nav class="login-portal__footer-nav" aria-label="Site shortcuts">
         <a href="/">Home</a>
-        <span class="login-portal__sep" aria-hidden="true">•</span>
-        <a href="/configurator.html">Configurator</a>
-        <span class="login-portal__sep" aria-hidden="true">•</span>
-        <a href="/cart.html">Cart</a>
-        <span class="login-portal__sep" aria-hidden="true">•</span>
-        <a href="/register">Create account</a>
       </nav>
     </article>
-
-    <details class="login-portal__devhint">
-      <summary>Local development</summary>
-      <p>
-        Bootstrap staff: email <strong>admin@hoodooak.com</strong> or username <strong>admin</strong>;
-        password from <code>BOOTSTRAP_STAFF_PASSWORD</code> in <code>.env</code> (see <code>.env.example</code>).
-        Password reset without SMTP: check API logs for a one-time link after “Forgot password”.
-        <a href="/admin.html">Staff admin</a> (role permitting).
-      </p>
-    </details>
   </main>
 
   <script src="/js/api.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(location.search);
-      var next = params.get("next") || "/account.html";
+      var next = params.get("next") || "/configurator.html";
+      if (next.charAt(0) !== "/" || next.indexOf("//") === 0) next = "/configurator.html";
       document.getElementById("login-form").addEventListener("submit", function (e) {
         e.preventDefault();
         var fb = document.getElementById("login-feedback");
@@ -117,7 +103,14 @@
               return;
             }
             window.HoodooApi.setToken(tok.access_token, remember);
-            location.href = next;
+            window.HoodooApi.fetchJson("/auth/me")
+              .then(function (u) {
+                var isStaff = u && (u.role === "staff" || u.role === "admin");
+                location.href = isStaff ? next : "/";
+              })
+              .catch(function () {
+                location.href = "/";
+              });
           })
           .catch(function (err) {
             fb.classList.add("login-portal__feedback--err");

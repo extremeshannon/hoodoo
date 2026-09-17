@@ -5,15 +5,57 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const JACKET_PART_IDS = ["collar", "front", "back", "sleeves", "zipper", "waistband", "stitch"];
 const JUMPSUIT_PART_IDS = ["collar", "frontTorso", "backTorso", "sleeves", "frontLegs", "backLegs", "zipper", "stitch"];
 const UPC_PART_IDS = ["body", "trim", "embroidery"];
-const CACHE_V = "20260907n";
+const CACHE_V = "20260910c";
+
+/* Hoodoo Colors — teal torso, gray raglan sleeves, black collar/waist (Taslan stock hex). */
+const HOODOO_TURQUOISE = { hex: "#00aea7", name: "Turquoise" };
+const HOODOO_SILVER = { hex: "#9fa4a5", name: "Silver" };
+const HOODOO_RAVEN = { hex: "#000000", name: "Raven" };
+const HOODOO_BLACK = { hex: "#000000", name: "Black" };
+const JACKET_DEFAULT_COLORS = {
+  collar: HOODOO_BLACK,
+  front: HOODOO_TURQUOISE,
+  back: HOODOO_TURQUOISE,
+  sleeves: HOODOO_SILVER,
+  zipper: HOODOO_SILVER,
+  waistband: HOODOO_BLACK,
+  stitch: HOODOO_RAVEN,
+};
+const PANTS_DEFAULT_COLORS = {
+  legs: HOODOO_TURQUOISE,
+  booties: HOODOO_BLACK,
+  cordura: HOODOO_SILVER,
+  trim: HOODOO_TURQUOISE,
+};
+
+const STITCH_MESH_KEYS = [
+  "Double Needle",
+  "DoubleNeedle",
+  "Topstitch",
+  "top stitch",
+  "topstitch",
+  "stitch",
+  "thread",
+  "bartack",
+  "overlock",
+  "Coverstitch",
+  "BindedTrim",
+];
 
 const PARTS = [
   { id: "collar", label: "Collar" },
+  { id: "yoke", label: "Yoke" },
   { id: "front", label: "Front" },
   { id: "back", label: "Back" },
   { id: "frontTorso", label: "Front Torso" },
   { id: "backTorso", label: "Back Torso" },
   { id: "sleeves", label: "Sleeves" },
+  { id: "sleeveStripe1", label: "Sleeve stripe 1" },
+  { id: "sleeveStripe2", label: "Sleeve stripe 2" },
+  { id: "sleeveStripe3", label: "Sleeve stripe 3" },
+  { id: "hemStripe1", label: "Hem stripe 1" },
+  { id: "hemStripe2", label: "Hem stripe 2" },
+  { id: "hemStripe3", label: "Hem stripe 3" },
   { id: "zipper", label: "Zipper" },
   { id: "waistband", label: "Waist Band" },
   { id: "stitch", label: "Stitch" },
@@ -31,14 +73,14 @@ const PARTS = [
 ];
 
 const JUMPSUIT_DEFAULT_COLORS = {
-  collar: { hex: "#000000", name: "Black" },
-  frontTorso: { hex: "#FFFFFF", name: "White" },
-  backTorso: { hex: "#9fa4a5", name: "Silver" },
-  sleeves: { hex: "#00aea7", name: "Turquoise" },
-  frontLegs: { hex: "#FFFFFF", name: "White" },
-  backLegs: { hex: "#9fa4a5", name: "Silver" },
-  zipper: { hex: "#FFFFFF", name: "White" },
-  stitch: { hex: "#FFFFFF", name: "White" },
+  collar: HOODOO_BLACK,
+  frontTorso: HOODOO_TURQUOISE,
+  backTorso: HOODOO_TURQUOISE,
+  sleeves: HOODOO_SILVER,
+  frontLegs: HOODOO_TURQUOISE,
+  backLegs: HOODOO_TURQUOISE,
+  zipper: HOODOO_SILVER,
+  stitch: HOODOO_RAVEN,
 };
 
 const JUMPSUIT_MESH_MAP = {
@@ -49,17 +91,7 @@ const JUMPSUIT_MESH_MAP = {
   frontLegs: ["Pants Front"],
   backLegs: ["Pants Back"],
   zipper: ["TapeFabric", "Zipper 1_Tape"],
-  stitch: [
-    "Double Needle",
-    "DoubleNeedle",
-    "Topstitch",
-    "top stitch",
-    "topstitch",
-    "stitch",
-    "thread",
-    "bartack",
-    "overlock",
-  ],
+  stitch: STITCH_MESH_KEYS.slice(),
 };
 
 const MATERIALS_URL = "/data/materials.json?v=" + CACHE_V;
@@ -133,6 +165,13 @@ const FALLBACK_MATERIALS = {
     booties: "taslan",
     cordura: "taslan",
     trim: "taslan",
+    yoke: "taslan",
+    sleeveStripe1: "taslan",
+    sleeveStripe2: "taslan",
+    sleeveStripe3: "taslan",
+    hemStripe1: "taslan",
+    hemStripe2: "taslan",
+    hemStripe3: "taslan",
     body: "body",
     embroidery: "embroidery",
     hand: "taslan",
@@ -157,22 +196,37 @@ const FALLBACK_MATERIALS = {
 };
 
 const MEASURES = {
-  inseam: "Stand straight, no shoes. Start the tape high in the crotch and measure straight down to the floor.",
-  chest: "Tape around the fullest part of the chest, level, not tight.",
-  waist: "Natural waist, relaxed. Don’t suck in.",
-  torso: "From the hollow of the neck down the front to the crotch seam line.",
-  arm: "Shoulder point to wrist bone with the arm slightly bent.",
-  height: "No shoes, against a wall. Heel, hips, and shoulders touching.",
-  weight: "Morning weight in street clothes or as you jump.",
+  height: "No shoes, stand against a wall. Heels, hips, and shoulders touching. Measure from the floor to the top of the head.",
+  weight: "Morning weight in street clothes, or as you typically jump. Used with height to sanity-check the other numbers.",
+  chest: "This is the standard measurement around the chest over the nipples. For women do one additional measurement above the breast.",
+  waist: "While standing erect, measure your waist over your navel. Measure over any appropriate clothing and pull tape measure snug before taking measurement.",
+  torso: "Stand straight. One point is the hollow at the base of the neck — follow the collarbones to the dip below the Adam’s apple. The other is the top of the hip bone slightly forward of center, where it flares. Measure diagonally across the front from the neck hollow to that hip point.",
+  leg: "Place the end of the tape measure on the curve of the hipbone that you previously located for the torso measurement. Thread the tape measure around the top of the thigh, across the buttocks and back to the starting point. Imagine this is a leg pad and adjust accordingly.",
+  inseam: "Stand up straight when taking this measurement and don't wear shoes. Having your feet shoulder-width apart, start the tape high in the crotch and measure straight down to the floor. Don't use the middle seam of the pants as reference, since some pants are looser than others. Be sure to start the tape measure high in the crotch. This measurement is important: The accuracy of the inseam measurement determines the proper fit of your harness.",
+  arm: "Shoulder point (the bony tip) to the wrist bone with the arm slightly bent, as if reaching for a toggle.",
 };
 
+const DEFAULT_GROUPS = [
+  { id: "hoodoo-suits", name: "Hoodoo Suits" },
+  { id: "apparel", name: "Apparel" },
+  { id: "ultimate-dog", name: "Ultimate Dog" },
+];
 const DEFAULT_PRODUCTS = [
-  { id: "freefly-jacket", name: "Freefly Jacket", blurb: "Head-down / sit-fly top.", parts: JACKET_PART_IDS.slice() },
+  {
+    id: "freefly-jacket",
+    name: "Freefly Jacket",
+    blurb: "Head-down / sit-fly top.",
+    groupId: "hoodoo-suits",
+    parts: JACKET_PART_IDS.slice(),
+    defaultColors: Object.assign({}, JACKET_DEFAULT_COLORS),
+  },
   {
     id: "jumpsuit",
     name: "Jumpsuit",
     blurb: "Full custom suit.",
+    groupId: "hoodoo-suits",
     parts: JUMPSUIT_PART_IDS.slice(),
+    defaultColors: Object.assign({}, JUMPSUIT_DEFAULT_COLORS),
     meshMap: Object.assign({}, JUMPSUIT_MESH_MAP),
     glbByFit: {
       male: "/3d/clo/male-jumpsuit/MaleJumpSuit.glb?v=" + CACHE_V,
@@ -183,17 +237,149 @@ const DEFAULT_PRODUCTS = [
       youth: "/3d/clo/jumpsuit-youth.glb?v=" + CACHE_V,
     },
   },
-  { id: "pants", name: "Pants", blurb: "Jumpsuit pants.", parts: ["legs", "booties", "cordura", "trim"] },
-  { id: "camera-jacket", name: "Camera Jacket", blurb: "Camera-flyer top.", parts: JACKET_PART_IDS.slice() },
+  {
+    id: "pants",
+    name: "Pants",
+    blurb: "Jumpsuit pants.",
+    groupId: "hoodoo-suits",
+    parts: ["legs", "booties", "cordura", "trim"],
+    defaultColors: Object.assign({}, PANTS_DEFAULT_COLORS),
+  },
+  {
+    id: "camera-jacket",
+    name: "Camera Jacket",
+    blurb: "Camera-flyer top.",
+    groupId: "hoodoo-suits",
+    parts: JACKET_PART_IDS.slice(),
+    defaultColors: Object.assign({}, JACKET_DEFAULT_COLORS),
+  },
   {
     id: "ultimate-paw-covers",
     name: "Ultimate Paw Covers",
     blurb: "Snowmachine gauntlets.",
+    groupId: "ultimate-dog",
     oneFit: true,
     fits: [{ id: "unisex", name: "Unisex" }],
     parts: UPC_PART_IDS.slice(),
-    glb: "/3d/clo/upc/UPC.glb?v=20260907k",
-    glbByFit: { unisex: "/3d/clo/upc/UPC.glb?v=20260907k" },
+    glb: "/3d/clo/upc/UPC.glb?v=" + CACHE_V,
+    glbByFit: { unisex: "/3d/clo/upc/UPC.glb?v=" + CACHE_V },
+    meshMap: {
+      body: ["Talsan", "Taslan", "Body", "FABRIC", "Cloth", "cuff", "gauntlet", "wrist"],
+      trim: ["piping", "binding", "tape"],
+      embroidery: ["embroider", "embroidery", "logo", "graphic", "letter", "monogram"],
+    },
+  },
+  {
+    id: "male-jersey-blunt-collar",
+    name: "Male Jersey (Blunt Collar)",
+    blurb: "Cut & sew jersey. Blunt collar.",
+    groupId: "apparel",
+    active: true,
+    oneFit: true,
+    solidRecolor: true,
+    fits: [{ id: "male", name: "Male" }],
+    parts: [
+      { id: "collar", label: "Collar", palette: "taslan" },
+      { id: "front", label: "Front", palette: "taslan" },
+      { id: "back", label: "Back", palette: "taslan" },
+      { id: "sleeves", label: "Sleeves", palette: "taslan" },
+      { id: "waistband", label: "Hem", palette: "taslan" },
+      { id: "stitch", label: "Stitch", palette: "stitch" },
+    ],
+    defaultColors: {
+      collar: { hex: "#424242", name: "Charcoal" },
+      front: { hex: "#FFFFFF", name: "White" },
+      back: { hex: "#9fa4a5", name: "Silver" },
+      sleeves: { hex: "#9fa4a5", name: "Silver" },
+      waistband: { hex: "#9fa4a5", name: "Silver" },
+      stitch: { hex: "#000000", name: "Raven" },
+    },
+    meshMap: {
+      collar: ["Collar"],
+      front: ["Front"],
+      back: ["Back"],
+      sleeves: ["Sleeves"],
+      waistband: ["Hem", "Waistband", "waistband"],
+      stitch: STITCH_MESH_KEYS.slice(),
+    },
+    partPalette: {
+      collar: "taslan",
+      front: "taslan",
+      back: "taslan",
+      sleeves: "taslan",
+      waistband: "taslan",
+      stitch: "stitch",
+    },
+    glb: "/3d/clo/male-jersey-blunt-collar/MaleJersey-BluntCollar.glb?v=" + CACHE_V,
+    glbByFit: { male: "/3d/clo/male-jersey-blunt-collar/MaleJersey-BluntCollar.glb?v=" + CACHE_V },
+  },
+  {
+    id: "hockey",
+    name: "Hockey",
+    blurb: "Hockey jersey.",
+    groupId: "apparel",
+    active: true,
+    oneFit: true,
+    solidRecolor: true,
+    fits: [{ id: "unisex", name: "Unisex" }],
+    parts: [
+      { id: "collar", label: "Collar", palette: "taslan" },
+      { id: "yoke", label: "Yoke", palette: "taslan" },
+      { id: "front", label: "Front", palette: "taslan" },
+      { id: "back", label: "Back", palette: "taslan" },
+      { id: "sleeves", label: "Sleeves", palette: "taslan" },
+      { id: "sleeveStripe1", label: "Sleeve stripe 1", palette: "taslan" },
+      { id: "sleeveStripe2", label: "Sleeve stripe 2", palette: "taslan" },
+      { id: "sleeveStripe3", label: "Sleeve stripe 3", palette: "taslan" },
+      { id: "hemStripe1", label: "Hem stripe 1", palette: "taslan" },
+      { id: "hemStripe2", label: "Hem stripe 2", palette: "taslan" },
+      { id: "hemStripe3", label: "Hem stripe 3", palette: "taslan" },
+      { id: "stitch", label: "Stitch", palette: "stitch" },
+    ],
+    defaultColors: {
+      collar: { hex: "#424242", name: "Charcoal" },
+      yoke: { hex: "#9fa4a5", name: "Silver" },
+      front: { hex: "#FFFFFF", name: "White" },
+      back: { hex: "#9fa4a5", name: "Silver" },
+      sleeves: { hex: "#9fa4a5", name: "Silver" },
+      sleeveStripe1: { hex: "#424242", name: "Charcoal" },
+      sleeveStripe2: { hex: "#9fa4a5", name: "Silver" },
+      sleeveStripe3: { hex: "#FFFFFF", name: "White" },
+      hemStripe1: { hex: "#424242", name: "Charcoal" },
+      hemStripe2: { hex: "#9fa4a5", name: "Silver" },
+      hemStripe3: { hex: "#FFFFFF", name: "White" },
+      stitch: { hex: "#000000", name: "Raven" },
+    },
+    meshMap: {
+      collar: ["HockeyBasic_477649"],
+      yoke: ["HockeyBasic_477593", "HockeyBasic_477621"],
+      front: ["HockeyBasic_477565"],
+      back: ["HockeyBasic_477985"],
+      sleeves: ["HockeyBasic_477789", "HockeyBasic_477677"],
+      sleeveStripe1: ["HockeyBasic_477817", "HockeyBasic_477733"],
+      sleeveStripe2: ["HockeyBasic_477845", "HockeyBasic_477705"],
+      sleeveStripe3: ["HockeyBasic_477873", "HockeyBasic_477761"],
+      hemStripe1: ["HockeyBasic_477901", "HockeyBasic_478013"],
+      hemStripe2: ["HockeyBasic_477929", "HockeyBasic_478041"],
+      hemStripe3: ["HockeyBasic_477957", "HockeyBasic_478069"],
+      stitch: STITCH_MESH_KEYS.slice(),
+    },
+    partPalette: {
+      collar: "taslan",
+      yoke: "taslan",
+      front: "taslan",
+      back: "taslan",
+      sleeves: "taslan",
+      sleeveStripe1: "taslan",
+      sleeveStripe2: "taslan",
+      sleeveStripe3: "taslan",
+      hemStripe1: "taslan",
+      hemStripe2: "taslan",
+      hemStripe3: "taslan",
+      stitch: "stitch",
+    },
+    glb: "/3d/clo/hockey/Hockey.glb?v=" + CACHE_V,
+    glbByFit: { unisex: "/3d/clo/hockey/Hockey.glb?v=" + CACHE_V },
   },
 ];
 const DEFAULT_FITS = [
@@ -211,43 +397,57 @@ const state = {
   part: "front",
   colors: {
     collar: "#000000",
-    front: "#2b3347",
-    back: "#000000",
-    sleeves: "#000000",
-    zipper: "#000000",
+    front: "#00aea7",
+    back: "#00aea7",
+    sleeves: "#9fa4a5",
+    zipper: "#9fa4a5",
     waistband: "#000000",
     stitch: "#000000",
-    frontTorso: "#FFFFFF",
-    backTorso: "#9fa4a5",
-    frontLegs: "#FFFFFF",
-    backLegs: "#9fa4a5",
-    legs: "#000000",
-    booties: "#2b3347",
-    cordura: "#424242",
-    trim: "#2b3347",
+    frontTorso: "#00aea7",
+    backTorso: "#00aea7",
+    frontLegs: "#00aea7",
+    backLegs: "#00aea7",
+    legs: "#00aea7",
+    booties: "#000000",
+    cordura: "#9fa4a5",
+    trim: "#00aea7",
     body: "#000000",
     embroidery: "#FFFFFF",
     hand: "#2b3347",
     palm: "#424242",
     cuff: "#000000",
+    yoke: "#9fa4a5",
+    sleeveStripe1: "#424242",
+    sleeveStripe2: "#9fa4a5",
+    sleeveStripe3: "#FFFFFF",
+    hemStripe1: "#424242",
+    hemStripe2: "#9fa4a5",
+    hemStripe3: "#FFFFFF",
   },
   embroideryText: "",
   colorNames: {
     collar: "Black",
-    front: "Navy",
-    back: "Raven",
-    sleeves: "Raven",
-    zipper: "Raven",
+    front: "Turquoise",
+    back: "Turquoise",
+    sleeves: "Silver",
+    zipper: "Silver",
     waistband: "Black",
     stitch: "Raven",
-    frontTorso: "White",
-    backTorso: "Silver",
-    frontLegs: "White",
-    backLegs: "Silver",
-    legs: "Raven",
-    booties: "Navy",
-    cordura: "Charcoal",
-    trim: "Navy",
+    yoke: "Silver",
+    sleeveStripe1: "Charcoal",
+    sleeveStripe2: "Silver",
+    sleeveStripe3: "White",
+    hemStripe1: "Charcoal",
+    hemStripe2: "Silver",
+    hemStripe3: "White",
+    frontTorso: "Turquoise",
+    backTorso: "Turquoise",
+    frontLegs: "Turquoise",
+    backLegs: "Turquoise",
+    legs: "Turquoise",
+    booties: "Black",
+    cordura: "Silver",
+    trim: "Turquoise",
     body: "Black",
     embroidery: "White",
     hand: "Navy",
@@ -299,6 +499,9 @@ window.__hoodooConfigurator = true;
 
 function products() {
   return manifest.products && manifest.products.length ? manifest.products : DEFAULT_PRODUCTS;
+}
+function groups() {
+  return manifest.groups && manifest.groups.length ? manifest.groups : DEFAULT_GROUPS;
 }
 function fits() {
   return manifest.fits && manifest.fits.length ? manifest.fits : DEFAULT_FITS;
@@ -394,9 +597,24 @@ function currentParts() {
     return { id: id, label: d.label || fb.label, palette: d.palette };
   });
 }
+function isApparelProduct() {
+  var p = currentProduct();
+  if (!p) return false;
+  if (p.groupId === "apparel") return true;
+  return p.id === "hockey" || p.id === "male-jersey-blunt-collar";
+}
+function isBluntCollarJersey() {
+  var p = currentProduct();
+  return !!(p && p.id === "male-jersey-blunt-collar");
+}
+function isHockeyProduct() {
+  var p = currentProduct();
+  return !!(p && p.id === "hockey");
+}
 function isJacketProduct() {
   var p = currentProduct();
   if (!p || p.id === "jumpsuit") return false;
+  if (isApparelProduct()) return false;
   if (partIdList(p).indexOf("front") !== -1) return true;
   return String(p.id || "").indexOf("jacket") !== -1;
 }
@@ -420,6 +638,38 @@ function applyJumpsuitColorway(force) {
   });
   state._jumpsuitColorway = true;
 }
+function fallbackHoodooSuitColors(p) {
+  if (!p || p.groupId !== "hoodoo-suits") return null;
+  if (p.id === "pants") return PANTS_DEFAULT_COLORS;
+  if (String(p.id || "").indexOf("jacket") !== -1) return JACKET_DEFAULT_COLORS;
+  return null;
+}
+function applyProductColorway(force) {
+  var p = currentProduct();
+  if (isJumpsuitProduct()) {
+    applyJumpsuitColorway(force);
+    return;
+  }
+  state._jumpsuitColorway = false;
+  var colors = (p && p.defaultColors) || fallbackHoodooSuitColors(p);
+  if (!colors) {
+    state._colorwayProduct = p ? p.id : "";
+    return;
+  }
+  if (!force && state._colorwayProduct === p.id) return;
+  Object.keys(colors).forEach(function (id) {
+    var c = colors[id];
+    if (!c) return;
+    if (typeof c === "string") {
+      state.colors[id] = c;
+      state.colorNames[id] = nameForPartColor(id, c);
+    } else {
+      state.colors[id] = c.hex;
+      state.colorNames[id] = c.name || nameForPartColor(id, c.hex);
+    }
+  });
+  state._colorwayProduct = p.id;
+}
 function isUpcProduct() {
   var p = currentProduct();
   return !!(p && p.id === "ultimate-paw-covers");
@@ -427,11 +677,17 @@ function isUpcProduct() {
 function activeMeshMap() {
   var p = currentProduct();
   var base = state.meshMap || {};
-  var merged = (p && p.meshMap) ? Object.assign({}, base, p.meshMap) : Object.assign({}, base);
-  if (isJumpsuitProduct()) merged = Object.assign(merged, JUMPSUIT_MESH_MAP, (p && p.meshMap) || {});
-  return merged;
+  if (isJumpsuitProduct()) {
+    return Object.assign({}, base, JUMPSUIT_MESH_MAP, (p && p.meshMap) || {});
+  }
+  if (isApparelProduct() && p && p.meshMap) {
+    return Object.assign({}, p.meshMap);
+  }
+  return (p && p.meshMap) ? Object.assign({}, base, p.meshMap) : Object.assign({}, base);
 }
 function partLabel(id) {
+  var cur = currentParts().find(function (x) { return x.id === id; });
+  if (cur && cur.label) return cur.label;
   var p = PARTS.find(function (x) { return x.id === id; });
   return p ? p.label : id;
 }
@@ -526,6 +782,7 @@ function setFit(id) {
   });
   var note = document.getElementById("youth-note");
   if (note) note.hidden = id !== "youth";
+  if (window.hoodooSizeFit) window.hoodooSizeFit(id);
 }
 
 function go(step) {
@@ -537,7 +794,7 @@ function go(step) {
     b.classList.toggle("is-active", Number(b.dataset.step) === step);
   });
   if (step === 2) requestAnimationFrame(function () {
-    applyJumpsuitColorway();
+    applyProductColorway();
     buildParts();
     loadStyle();
     syncPalette();
@@ -545,6 +802,7 @@ function go(step) {
   if (step === 3) {
     buildSizeFit();
     setFit(state.fit);
+    if (window.hoodooSizingShow) window.hoodooSizingShow();
   }
 }
 
@@ -577,26 +835,48 @@ function buildPatternCards() {
   setFit(state.fit);
 
   var grid = document.getElementById("pattern-grid");
-  grid.innerHTML = products()
-    .map(function (s) {
-      return (
-        '<button type="button" class="suit-pattern-card' +
-        (s.id === state.product ? " is-on" : "") +
-        '" data-id="' +
-        s.id +
-        '"><h2>' +
-        s.name +
-        "</h2><p>" +
-        (s.blurb || "CLO3D · dye-sub + sew") +
-        '</p><p class="suit-card-meta" data-meta></p></button>'
-      );
-    })
-    .join("");
-  grid.querySelectorAll("button").forEach(function (b) {
+  function productCardHtml(s) {
+    return (
+      '<button type="button" class="suit-pattern-card' +
+      (s.id === state.product ? " is-on" : "") +
+      '" data-id="' +
+      s.id +
+      '"><h2>' +
+      s.name +
+      "</h2><p>" +
+      (s.blurb || "CLO3D · dye-sub + sew") +
+      '</p><p class="suit-card-meta" data-meta></p></button>'
+    );
+  }
+  function groupBlockHtml(g, items) {
+    var inner = items.length
+      ? '<div class="suit-pattern-grid">' + items.map(productCardHtml).join("") + "</div>"
+      : '<p class="suit-pattern-empty">No items yet</p>';
+    return (
+      '<section class="suit-pattern-group">' +
+      '<h2 class="suit-pattern-group__title">' +
+      g.name +
+      "</h2>" +
+      inner +
+      "</section>"
+    );
+  }
+  var html = "";
+  var used = {};
+  groups().forEach(function (g) {
+    var items = products().filter(function (p) { return p.groupId === g.id; });
+    items.forEach(function (p) { used[p.id] = true; });
+    html += groupBlockHtml(g, items);
+  });
+  var leftover = products().filter(function (p) { return !used[p.id]; });
+  if (leftover.length) html += groupBlockHtml({ id: "other", name: "Other" }, leftover);
+  if (!html) html = '<div class="suit-pattern-grid">' + products().map(productCardHtml).join("") + "</div>";
+  grid.innerHTML = html;
+  grid.querySelectorAll(".suit-pattern-card").forEach(function (b) {
     b.addEventListener("click", function () {
       state.product = b.dataset.id;
       syncProductFit();
-      applyJumpsuitColorway(true);
+      applyProductColorway(true);
       highlightProducts();
       buildParts();
       go(2);
@@ -829,9 +1109,10 @@ function swatchButtonHtml(c, locked) {
   var name = c.name || hex;
   var light = hexLuminance(hex) > 0.82 ? " is-light" : "";
   var lock = locked ? " is-locked" : "";
+  var on = sameHex(hex, state.colors[state.part]) ? " is-on" : "";
   return (
     '<div class="suit-swatch-cell">' +
-      '<button type="button" class="suit-swatch' + light + lock + '" data-c="' + hex + '" data-name="' + name + '" style="background:' + hex + '" title="' + name + '" aria-label="' + name + '"></button>' +
+      '<button type="button" class="suit-swatch' + light + lock + on + '" data-c="' + hex + '" data-name="' + name + '" style="background:' + hex + '" title="' + name + '" aria-label="' + name + '"></button>' +
       '<span class="suit-swatch-name">' + name + "</span>" +
     "</div>"
   );
@@ -1002,7 +1283,6 @@ function ensure3d() {
     }
   });
   ctx = { renderer: renderer, scene: scene, camera: camera, root: root, canvas: canvas, controls: controls };
-  proceduralSuit(root);
   return ctx;
 }
 
@@ -1091,6 +1371,34 @@ function cloneOneMaterial(mat) {
   return c;
 }
 
+function uniquifyMeshMaterials(obj) {
+  var groups = obj.geometry && obj.geometry.groups;
+  // UPC: 8 primitives share 5 FABRIC slots (indices [0,1,2,3,4,2,2,2]).
+  // Clone per group. Prims 1,3,5,7 are folded CUFF (body black), not trim.
+  if (isUpcProduct() && groups && groups.length > 1) {
+    var mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+    obj.material = groups.map(function (gr) {
+      var src = mats[Math.min(gr.materialIndex || 0, mats.length - 1)] || mats[0];
+      return cloneOneMaterial(src);
+    });
+    groups.forEach(function (gr, i) { gr.materialIndex = i; });
+    return;
+  }
+  if (groups && groups.length > 1 && !Array.isArray(obj.material)) {
+    obj.material = groups.map(function () {
+      return cloneOneMaterial(obj.material);
+    });
+    return;
+  }
+  if (Array.isArray(obj.material)) {
+    obj.material = obj.material.map(function (m) {
+      return cloneOneMaterial(m);
+    });
+    return;
+  }
+  obj.material = cloneOneMaterial(obj.material);
+}
+
 function primitiveCentroid(mesh, materialIndex) {
   var geo = mesh.geometry;
   if (!geo || !geo.attributes || !geo.attributes.position) return null;
@@ -1166,7 +1474,7 @@ function needsJumpsuitGeoSplit(mat, assigned) {
   return false;
 }
 
-var UPC_TRIM_NAME_RE = /piping|binding|\btrim\b|welting|edgetape|edge[\s_-]*tape|tapefabric|(^|[\s_\-])tape([\s_\-]|$)/i;
+var UPC_TRIM_NAME_RE = /tape|binding|piping/i;
 var UPC_EMB_NAME_RE = /embroider|\blogo\b|monogram|lettering/i;
 
 function upcNameBlob(obj, mat) {
@@ -1181,6 +1489,8 @@ function assignUpcPart(id, obj, mat) {
   if (!isUpcProduct()) return id;
   var blob = upcNameBlob(obj, mat);
   if (id === "embroidery" || UPC_EMB_NAME_RE.test(blob)) return "embroidery";
+  // Trim only if the name is tape / binding / piping. All current Cloth_mesh
+  // prims — shells 0,2,4,6 and folded cuff 1,3,5,7 — are Body (black).
   if (UPC_TRIM_NAME_RE.test(blob)) return "trim";
   return "body";
 }
@@ -1219,6 +1529,19 @@ function partFromCentroid(mesh, materialIndex, mat, yInfo) {
   return null;
 }
 
+function partFromJerseyCentroid(mesh, materialIndex, yInfo) {
+  if (!isBluntCollarJersey()) return null;
+  var c = primitiveCentroid(mesh, materialIndex);
+  if (!c) return null;
+  var minY = (yInfo && yInfo.minY != null) ? yInfo.minY : 0;
+  var maxY = (yInfo && yInfo.maxY != null) ? yInfo.maxY : 2.2;
+  var span = Math.max(maxY - minY, 0.01);
+  var collarY = minY + span * 0.82;
+  if (Math.abs(c.x) > 0.22) return "sleeves";
+  if (c.y >= collarY) return "collar";
+  return c.z >= 0 ? "front" : "back";
+}
+
 function assignMeshParts(obj, yInfo) {
   if (isJumpsuitProduct() && isAvatarMesh(obj)) {
     obj.userData.partId = null;
@@ -1228,6 +1551,7 @@ function assignMeshParts(obj, yInfo) {
   if (Array.isArray(obj.material)) {
     obj.userData.partIds = obj.material.map(function (m, i) {
       var id = partForMaterial(obj, m);
+      if (isBluntCollarJersey()) id = partFromJerseyCentroid(obj, i, yInfo) || id;
       if (needsJumpsuitGeoSplit(m, id)) id = partFromCentroid(obj, i, m, yInfo) || id;
       if (needsJacketGeoSplit(m, id)) id = partFromCentroid(obj, i, m, yInfo) || id;
       id = assignUpcPart(id, obj, m);
@@ -1238,6 +1562,9 @@ function assignMeshParts(obj, yInfo) {
     return;
   }
   var id = partForObject(obj);
+  if (isBluntCollarJersey()) {
+    id = partFromJerseyCentroid(obj, null, yInfo) || id;
+  }
   if (needsJumpsuitGeoSplit(obj.material, id)) {
     id = partFromCentroid(obj, null, obj.material, yInfo) || id;
   }
@@ -1253,11 +1580,7 @@ function prepareGarment(root) {
   var yInfo = garmentYInfo(root);
   root.traverse(function (obj) {
     if (!obj.isMesh || !obj.material) return;
-    if (Array.isArray(obj.material)) {
-      obj.material = obj.material.map(cloneOneMaterial);
-    } else {
-      obj.material = cloneOneMaterial(obj.material);
-    }
+    uniquifyMeshMaterials(obj);
     assignMeshParts(obj, yInfo);
     obj.userData.uvBounds = uvBoundsOf(obj);
     obj.castShadow = false;
@@ -1282,18 +1605,37 @@ function fitTextureToUv(tex, bounds, repeatMul, offX, offY) {
   tex.needsUpdate = true;
 }
 
+function shouldSolidRecolor(partId) {
+  if (!partId || partId === "stitch") return false;
+  var p = currentProduct();
+  return !!(p && p.solidRecolor);
+}
+
 function tintMaterial(mesh, m, partId) {
   if (!m) return;
-  if (isUpcProduct() && partId !== "embroidery" && partId !== "trim") partId = "body";
+  if (isUpcProduct()) {
+    var blob = upcNameBlob(mesh, m);
+    if (partId === "embroidery" || UPC_EMB_NAME_RE.test(blob)) partId = "embroidery";
+    else if (UPC_TRIM_NAME_RE.test(blob)) partId = "trim";
+    else partId = "body";
+  }
   if (!partId) return;
   var hex = partId === "body" ? "#000000" : state.colors[partId];
   var art = state.art[partId];
   if (hex && m.color) m.color.set(hex);
-  if (art && art.texture) {
+  var upcBody = isUpcProduct() && partId === "body";
+  if (art && art.texture && !upcBody) {
     var t = art.texture.clone();
     t.needsUpdate = true;
     fitTextureToUv(t, mesh.userData.uvBounds, art.repeat || 1, art.offsetX || 0, art.offsetY || 0);
     m.map = t;
+  } else if (upcBody || shouldSolidRecolor(partId)) {
+    // Drop the purple CLO Taslan jpeg so cuff + shell are solid black.
+    m.map = null;
+    if (m.alphaMap) m.alphaMap = null;
+    m.transparent = false;
+    m.opacity = 1;
+    if (m.alphaTest) m.alphaTest = 0;
   } else if (m.userData && m.userData.baseMap) {
     m.map = m.userData.baseMap;
   } else {
@@ -1392,13 +1734,22 @@ function proceduralUpc(scene) {
   return g;
 }
 
+function showLogoLoader(msg) {
+  var el = document.getElementById("suit-logo-loader");
+  var p = document.getElementById("suit-logo-loader-msg");
+  if (p) p.textContent = msg || "Loading garment…";
+  if (el) el.hidden = false;
+}
+
+function hideLogoLoader() {
+  var el = document.getElementById("suit-logo-loader");
+  if (el) el.hidden = true;
+}
+
 function showStandIn(note, msg) {
   clearRoot();
-  if (isUpcProduct()) proceduralUpc(ctx.root);
-  else proceduralSuit(ctx.root);
-  prepareGarment(ctx.root);
-  applyColors();
-  if (note) note.textContent = msg;
+  if (note) note.textContent = "";
+  showLogoLoader(msg);
 }
 
 function frameRoot() {
@@ -1419,19 +1770,19 @@ function frameRoot() {
 }
 
 function loadStyle() {
-  applyJumpsuitColorway();
+  applyProductColorway();
   var note = document.getElementById("clo-note");
   var style = currentProduct();
   var urls = currentGlbCandidates().filter(function (u) { return !isDuckOrMissing(u); });
-  var url = urls[0] || "";
   ensure3d();
   var label = (style ? style.name : "Garment") + " · " + (currentFit() ? currentFit().name : "");
   if (!urls.length) {
-    showStandIn(note, label + " · " + waitingNote(style, url));
-    frameRoot();
+    showStandIn(note, "This 3D file isn’t ready yet.");
     return;
   }
-  note.textContent = "Loading CLO3D…";
+  showLogoLoader("Loading garment…");
+  if (note) note.textContent = "";
+  clearRoot();
   var loader = new GLTFLoader();
   var attempt = 0;
   var loadGen = (loadStyle._gen = (loadStyle._gen || 0) + 1);
@@ -1439,8 +1790,7 @@ function loadStyle() {
     if (loadGen !== loadStyle._gen) return;
     if (style) style.awaitingGlb = true;
     highlightProducts();
-    showStandIn(note, label + " · " + waitingNote(style, urls[urls.length - 1]));
-    frameRoot();
+    showStandIn(note, "Couldn’t load the 3D file.");
   }
   function onLoaded(gltf, thisUrl) {
     if (loadGen !== loadStyle._gen) return;
@@ -1449,6 +1799,7 @@ function loadStyle() {
     prepareGarment(ctx.root);
     applyColors();
     frameRoot();
+    hideLogoLoader();
     var mapped = [];
     ctx.root.traverse(function (obj) {
       if (!obj.isMesh) return;
@@ -1491,7 +1842,7 @@ function loadStyle() {
 
 function jobPayload() {
   var sizing = {};
-  ["height", "weight", "chest", "waist", "torso", "inseam", "arm"].forEach(function (k) {
+  ["height", "weight", "chest", "waist", "torso", "leg", "inseam", "arm"].forEach(function (k) {
     var el = document.getElementById("sz-" + k);
     if (el) sizing[k] = el.value;
   });
@@ -1582,12 +1933,14 @@ document.getElementById("to-sizing").addEventListener("click", function () { go(
 document.getElementById("btn-pack").addEventListener("click", downloadPack);
 document.getElementById("btn-suit-email").addEventListener("click", emailBuild);
 buildSizeFit();
-["sz-height", "sz-weight", "sz-chest", "sz-waist", "sz-torso", "sz-inseam", "sz-arm"].forEach(function (id) {
+["sz-height", "sz-weight", "sz-chest", "sz-waist", "sz-torso", "sz-leg", "sz-inseam", "sz-arm"].forEach(function (id) {
   var el = document.getElementById(id);
+  if (!el) return;
   var key = id.replace("sz-", "");
   el.addEventListener("focus", function () {
     document.getElementById("measure-title").textContent = key.charAt(0).toUpperCase() + key.slice(1);
     document.getElementById("measure-copy").textContent = MEASURES[key] || "";
+    if (window.hoodooSizeMeasure) window.hoodooSizeMeasure(key);
   });
 });
 
@@ -1623,6 +1976,20 @@ fetch(MATERIALS_URL)
     applyMaterialsData(FALLBACK_MATERIALS);
   });
 
+function applyDeepLink() {
+  var params = new URLSearchParams(window.location.search);
+  var pid = (params.get("product") || params.get("garment") || "").trim();
+  var fit = (params.get("fit") || "").trim();
+  var found = pid && products().some(function (p) { return p.id === pid; });
+  if (found) state.product = pid;
+  syncProductFit();
+  if (fit && productFits().some(function (f) { return f.id === fit; })) {
+    setFit(fit);
+  }
+  highlightProducts();
+  if (found || params.get("step") === "2") go(2);
+}
+
 fetch("/3d/clo/manifest.json?v=" + CACHE_V, { cache: "no-store" })
   .then(function (r) { return r.json(); })
   .then(function (m) {
@@ -1635,7 +2002,9 @@ fetch("/3d/clo/manifest.json?v=" + CACHE_V, { cache: "no-store" })
         .catch(function () {});
     }
     buildPatternCards();
+    applyDeepLink();
   })
   .catch(function () {
     buildPatternCards();
+    applyDeepLink();
   });

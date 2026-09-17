@@ -32,12 +32,43 @@
         "male": "/3d/clo/male-jacket/MaleJacket.glb",
         "female": "/3d/clo/female-jacket/FemaleJacket.glb",
         "youth": "/3d/clo/freefly-jacket-youth.glb"
+      },
+      "groupId": "hoodoo-suits",
+      "defaultColors": {
+        "collar": {
+          "hex": "#000000",
+          "name": "Black"
+        },
+        "front": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "back": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "sleeves": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "zipper": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "waistband": {
+          "hex": "#000000",
+          "name": "Black"
+        },
+        "stitch": {
+          "hex": "#000000",
+          "name": "Raven"
+        }
       }
     },
     {
       "id": "pants",
       "name": "Pants",
-      "blurb": "Jumpsuit pants — booties and cordura as you spec.",
+      "blurb": "Jumpsuit pants \u2014 booties and cordura as you spec.",
       "parts": [
         "legs",
         "booties",
@@ -48,6 +79,25 @@
         "male": "/3d/clo/male-pants/MalePant.glb",
         "female": "/3d/clo/female-pants/FemalePants.glb",
         "youth": "/3d/clo/pants-youth.glb"
+      },
+      "groupId": "hoodoo-suits",
+      "defaultColors": {
+        "legs": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "booties": {
+          "hex": "#000000",
+          "name": "Black"
+        },
+        "cordura": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "trim": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        }
       }
     },
     {
@@ -67,6 +117,37 @@
         "male": "/3d/clo/camera-jacket-male.glb",
         "female": "/3d/clo/camera-jacket-female.glb",
         "youth": "/3d/clo/camera-jacket-youth.glb"
+      },
+      "groupId": "hoodoo-suits",
+      "defaultColors": {
+        "collar": {
+          "hex": "#000000",
+          "name": "Black"
+        },
+        "front": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "back": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "sleeves": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "zipper": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "waistband": {
+          "hex": "#000000",
+          "name": "Black"
+        },
+        "stitch": {
+          "hex": "#000000",
+          "name": "Raven"
+        }
       }
     },
     {
@@ -134,6 +215,41 @@
           "/3d/clo/female-jumpsuit/FamaleJumpSuit.glb?v=20260907n"
         ],
         "youth": "/3d/clo/jumpsuit-youth.glb?v=20260907n"
+      },
+      "groupId": "hoodoo-suits",
+      "defaultColors": {
+        "collar": {
+          "hex": "#000000",
+          "name": "Black"
+        },
+        "frontTorso": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "backTorso": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "sleeves": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "frontLegs": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "backLegs": {
+          "hex": "#00aea7",
+          "name": "Turquoise"
+        },
+        "zipper": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "stitch": {
+          "hex": "#000000",
+          "name": "Raven"
+        }
       }
     },
     {
@@ -164,9 +280,9 @@
           "palette": "embroidery"
         }
       ],
-      "glb": "/3d/clo/upc/UPC.glb?v=20260907k",
+      "glb": "/3d/clo/upc/UPC.glb?v=20260908a",
       "glbByFit": {
-        "unisex": "/3d/clo/upc/UPC.glb?v=20260907k"
+        "unisex": "/3d/clo/upc/UPC.glb?v=20260908a"
       },
       "meshMap": {
         "body": [
@@ -185,9 +301,9 @@
           "wrist"
         ],
         "trim": [
-          "trim",
           "piping",
           "binding",
+          "TapeFabric",
           "Tape"
         ],
         "embroidery": [
@@ -205,6 +321,327 @@
         "body": "body",
         "trim": "taslan",
         "embroidery": "embroidery"
+      },
+      "groupId": "ultimate-dog"
+    },
+    {
+      "id": "male-jersey-blunt-collar",
+      "name": "Male Jersey (Blunt Collar)",
+      "blurb": "Cut & sew jersey. Blunt collar. Dye-sub + sew.",
+      "oneFit": true,
+      "fits": [
+        {
+          "id": "male",
+          "name": "Male"
+        }
+      ],
+      "solidRecolor": true,
+      "parts": [
+        {
+          "id": "collar",
+          "label": "Collar",
+          "palette": "taslan"
+        },
+        {
+          "id": "front",
+          "label": "Front",
+          "palette": "taslan"
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "palette": "taslan"
+        },
+        {
+          "id": "sleeves",
+          "label": "Sleeves",
+          "palette": "taslan"
+        },
+        {
+          "id": "waistband",
+          "label": "Hem",
+          "palette": "taslan"
+        },
+        {
+          "id": "stitch",
+          "label": "Stitch",
+          "palette": "stitch"
+        }
+      ],
+      "defaultColors": {
+        "collar": {
+          "hex": "#424242",
+          "name": "Charcoal"
+        },
+        "front": {
+          "hex": "#FFFFFF",
+          "name": "White"
+        },
+        "back": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "sleeves": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "waistband": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "stitch": {
+          "hex": "#000000",
+          "name": "Raven"
+        }
+      },
+      "glb": "/3d/clo/male-jersey-blunt-collar/MaleJersey-BluntCollar.glb?v=20260907s",
+      "glbByFit": {
+        "male": "/3d/clo/male-jersey-blunt-collar/MaleJersey-BluntCollar.glb?v=20260907s"
+      },
+      "meshMap": {
+        "collar": [
+          "Collar"
+        ],
+        "front": [
+          "Front"
+        ],
+        "back": [
+          "Back"
+        ],
+        "sleeves": [
+          "Sleeves"
+        ],
+        "waistband": [
+          "Hem",
+          "Waistband",
+          "waistband"
+        ],
+        "stitch": [
+          "Double Needle",
+          "DoubleNeedle",
+          "Topstitch",
+          "top stitch",
+          "topstitch",
+          "stitch",
+          "thread",
+          "bartack",
+          "overlock",
+          "Coverstitch",
+          "BindedTrim"
+        ]
+      },
+      "partPalette": {
+        "collar": "taslan",
+        "front": "taslan",
+        "back": "taslan",
+        "sleeves": "taslan",
+        "waistband": "taslan",
+        "stitch": "stitch"
+      },
+      "groupId": "apparel",
+      "active": true,
+      "category": "Apparel"
+    },
+    {
+      "id": "hockey",
+      "name": "Hockey",
+      "blurb": "Hockey jersey. Dye-sub + sew.",
+      "oneFit": true,
+      "fits": [
+        {
+          "id": "unisex",
+          "name": "Unisex"
+        }
+      ],
+      "parts": [
+        {
+          "id": "collar",
+          "label": "Collar",
+          "palette": "taslan"
+        },
+        {
+          "id": "yoke",
+          "label": "Yoke",
+          "palette": "taslan"
+        },
+        {
+          "id": "front",
+          "label": "Front",
+          "palette": "taslan"
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "palette": "taslan"
+        },
+        {
+          "id": "sleeves",
+          "label": "Sleeves",
+          "palette": "taslan"
+        },
+        {
+          "id": "sleeveStripe1",
+          "label": "Sleeve stripe 1",
+          "palette": "taslan"
+        },
+        {
+          "id": "sleeveStripe2",
+          "label": "Sleeve stripe 2",
+          "palette": "taslan"
+        },
+        {
+          "id": "sleeveStripe3",
+          "label": "Sleeve stripe 3",
+          "palette": "taslan"
+        },
+        {
+          "id": "hemStripe1",
+          "label": "Hem stripe 1",
+          "palette": "taslan"
+        },
+        {
+          "id": "hemStripe2",
+          "label": "Hem stripe 2",
+          "palette": "taslan"
+        },
+        {
+          "id": "hemStripe3",
+          "label": "Hem stripe 3",
+          "palette": "taslan"
+        },
+        {
+          "id": "stitch",
+          "label": "Stitch",
+          "palette": "stitch"
+        }
+      ],
+      "glb": "/3d/clo/hockey/Hockey.glb?v=20260907s",
+      "glbByFit": {
+        "unisex": "/3d/clo/hockey/Hockey.glb?v=20260907s"
+      },
+      "meshMap": {
+        "collar": [
+          "HockeyBasic_477649"
+        ],
+        "yoke": [
+          "HockeyBasic_477593",
+          "HockeyBasic_477621"
+        ],
+        "front": [
+          "HockeyBasic_477565"
+        ],
+        "back": [
+          "HockeyBasic_477985"
+        ],
+        "sleeves": [
+          "HockeyBasic_477789",
+          "HockeyBasic_477677"
+        ],
+        "sleeveStripe1": [
+          "HockeyBasic_477817",
+          "HockeyBasic_477733"
+        ],
+        "sleeveStripe2": [
+          "HockeyBasic_477845",
+          "HockeyBasic_477705"
+        ],
+        "sleeveStripe3": [
+          "HockeyBasic_477873",
+          "HockeyBasic_477761"
+        ],
+        "hemStripe1": [
+          "HockeyBasic_477901",
+          "HockeyBasic_478013"
+        ],
+        "hemStripe2": [
+          "HockeyBasic_477929",
+          "HockeyBasic_478041"
+        ],
+        "hemStripe3": [
+          "HockeyBasic_477957",
+          "HockeyBasic_478069"
+        ],
+        "stitch": [
+          "Double Needle",
+          "DoubleNeedle",
+          "Topstitch",
+          "top stitch",
+          "topstitch",
+          "stitch",
+          "thread",
+          "bartack",
+          "overlock",
+          "Coverstitch",
+          "BindedTrim"
+        ]
+      },
+      "partPalette": {
+        "collar": "taslan",
+        "yoke": "taslan",
+        "front": "taslan",
+        "back": "taslan",
+        "sleeves": "taslan",
+        "sleeveStripe1": "taslan",
+        "sleeveStripe2": "taslan",
+        "sleeveStripe3": "taslan",
+        "hemStripe1": "taslan",
+        "hemStripe2": "taslan",
+        "hemStripe3": "taslan",
+        "stitch": "stitch"
+      },
+      "groupId": "apparel",
+      "active": true,
+      "category": "Apparel",
+      "solidRecolor": true,
+      "defaultColors": {
+        "collar": {
+          "hex": "#424242",
+          "name": "Charcoal"
+        },
+        "yoke": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "front": {
+          "hex": "#FFFFFF",
+          "name": "White"
+        },
+        "back": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "sleeves": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "sleeveStripe1": {
+          "hex": "#424242",
+          "name": "Charcoal"
+        },
+        "sleeveStripe2": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "sleeveStripe3": {
+          "hex": "#FFFFFF",
+          "name": "White"
+        },
+        "hemStripe1": {
+          "hex": "#424242",
+          "name": "Charcoal"
+        },
+        "hemStripe2": {
+          "hex": "#9fa4a5",
+          "name": "Silver"
+        },
+        "hemStripe3": {
+          "hex": "#FFFFFF",
+          "name": "White"
+        },
+        "stitch": {
+          "hex": "#000000",
+          "name": "Raven"
+        }
       }
     }
   ],
@@ -318,7 +755,7 @@
   "meshNotes": {
     "male-freefly-jacket": {
       "file": "3d/clo/male-jacket/MaleJacket.glb",
-      "structure": "Single Cloth_mesh (12 primitives) plus zipper hardware and topstitch. Front/Back share Talsan_1303597; Collar/Waist Band share Spandex_1303600 — materials are cloned per primitive and split by XYZ.",
+      "structure": "Single Cloth_mesh (12 primitives) plus zipper hardware and topstitch. Front/Back share Talsan_1303597; Collar/Waist Band share Spandex_1303600 \u2014 materials are cloned per primitive and split by XYZ.",
       "materials": [
         "Sleeves_1303603",
         "Talsan_1303597",
@@ -337,11 +774,11 @@
       "map": {
         "collar": "Spandex_1303600 primitives with high Y (neck)",
         "front": "Talsan_1303597 primitives with +Z",
-        "back": "Talsan_1303597 primitives with −Z",
+        "back": "Talsan_1303597 primitives with \u2212Z",
         "sleeves": "Sleeves_1303603",
         "zipper": "Zipper 1_TapeFabric_1303638 (tape only; slider/puller/teeth stay hardware)",
         "waistband": "Spandex_1303600 primitives with low Y (hem)",
-        "stitch": "Double Needle_1303623 + Double Needle_1303627 on Topstitch_* meshes (thread albedo map × color; zipper teeth/slider/puller/stoppers stay hardware)"
+        "stitch": "Double Needle_1303623 + Double Needle_1303627 on Topstitch_* meshes (thread albedo map \u00d7 color; zipper teeth/slider/puller/stoppers stay hardware)"
       }
     },
     "female-freefly-jacket": {
@@ -365,16 +802,16 @@
       "map": {
         "collar": "Spandex_8601 (neck band, high Y)",
         "front": "Body_8589 (+Z)",
-        "back": "Body_8592 (−Z)",
+        "back": "Body_8592 (\u2212Z)",
         "sleeves": "Sleeves_8595",
         "zipper": "Zipper 1_TapeFabric_8605",
         "waistband": "Spandex_8598 (hem / waist panels)",
-        "stitch": "No Double Needle / Topstitch in this export — Stitch swatch is stored for sew notes; re-export with topstitch to tint in 3D"
+        "stitch": "No Double Needle / Topstitch in this export \u2014 Stitch swatch is stored for sew notes; re-export with topstitch to tint in 3D"
       }
     },
     "male-jumpsuit": {
       "file": "3d/clo/male-jumpsuit/MaleJumpSuit.glb",
-      "structure": "Cloth_mesh with 14 primitives. Front/Back torso share Talsan_8298 — cloned per primitive and split by Z. No waist-band material. Pants Front / Pants Back are separate CLO fabrics.",
+      "structure": "Cloth_mesh with 14 primitives. Front/Back torso share Talsan_8298 \u2014 cloned per primitive and split by Z. No waist-band material. Pants Front / Pants Back are separate CLO fabrics.",
       "materials": [
         "Sleeves_8304",
         "Talsan_8298",
@@ -386,19 +823,19 @@
         "Double Needle_8334"
       ],
       "map": {
-        "collar": "Spandex_8301 high Y (neck; prims 6–7)",
-        "frontTorso": "Talsan_8298 primitives with +Z (prims 3–4)",
-        "backTorso": "Talsan_8298 primitives with −Z (prims 2, 5)",
-        "sleeves": "Sleeves_8304 (prims 0–1)",
+        "collar": "Spandex_8301 high Y (neck; prims 6\u20137)",
+        "frontTorso": "Talsan_8298 primitives with +Z (prims 3\u20134)",
+        "backTorso": "Talsan_8298 primitives with \u2212Z (prims 2, 5)",
+        "sleeves": "Sleeves_8304 (prims 0\u20131)",
         "frontLegs": "Pants Front_8311 (prims 8, 10)",
         "backLegs": "Pants Back_8314 (prims 9, 11)",
-        "zipper": "Zipper 1_TapeFabric_8345 (prims 12–13); slider/puller/teeth stay hardware",
+        "zipper": "Zipper 1_TapeFabric_8345 (prims 12\u201313); slider/puller/teeth stay hardware",
         "stitch": "Double Needle_8330 + Double Needle_8334 on Topstitch_* meshes"
       }
     },
     "female-jumpsuit": {
       "file": "3d/clo/female-jumpsuit/FemaleJumpSuit.glb (FamaleJumpSuit.glb tried as fallback)",
-      "structure": "Cloth_mesh with 14 primitives plus avatar (Mara / hair / shoes — not colored). Front/Back torso are Body_8601 / Body_8595. Legs share FABRIC 1_8592 — cloned per primitive and split by Z. No waist-band material. No Double Needle in this export.",
+      "structure": "Cloth_mesh with 14 primitives plus avatar (Mara / hair / shoes \u2014 not colored). Front/Back torso are Body_8601 / Body_8595. Legs share FABRIC 1_8592 \u2014 cloned per primitive and split by Z. No waist-band material. No Double Needle in this export.",
       "materials": [
         "Sleeves_8604",
         "Body_8601",
@@ -408,28 +845,94 @@
         "Zipper 1_TapeFabric_8611"
       ],
       "map": {
-        "collar": "Spandex_8607 high Y (neck; prims 6–7)",
-        "frontTorso": "Body_8601 (prims 1–2, +Z)",
-        "backTorso": "Body_8595 (prims 3–4, −Z)",
+        "collar": "Spandex_8607 high Y (neck; prims 6\u20137)",
+        "frontTorso": "Body_8601 (prims 1\u20132, +Z)",
+        "backTorso": "Body_8595 (prims 3\u20134, \u2212Z)",
         "sleeves": "Sleeves_8604 (prims 0, 5)",
-        "frontLegs": "FABRIC 1_8592 primitives with +Z (prims 8–9)",
-        "backLegs": "FABRIC 1_8592 primitives with −Z (prims 10–11)",
-        "zipper": "Zipper 1_TapeFabric_8611 (prims 12–13); slider/puller/teeth stay hardware",
-        "stitch": "Not in this export — Stitch swatch is stored for sew notes"
+        "frontLegs": "FABRIC 1_8592 primitives with +Z (prims 8\u20139)",
+        "backLegs": "FABRIC 1_8592 primitives with \u2212Z (prims 10\u201311)",
+        "zipper": "Zipper 1_TapeFabric_8611 (prims 12\u201313); slider/puller/teeth stay hardware",
+        "stitch": "Not in this export \u2014 Stitch swatch is stored for sew notes"
       }
     },
     "ultimate-paw-covers": {
       "file": "3d/clo/upc/UPC.glb",
       "structure": "CLO 2026.1 export: one Cloth_mesh, 8 primitives, all materials named FABRIC 1_1741665 (same Taslan weave). No Tape/piping/binding/trim mesh. No embroidery mesh. Every primitive is Body (shell + cuff), forced black.",
       "materials": [
-        "FABRIC 1_1741665 (×5 slots; primitives 0–7 use [0,1,2,3,4,2,2,2])"
+        "FABRIC 1_1741665 (\u00d75 slots; primitives 0\u20137 use [0,1,2,3,4,2,2,2])"
       ],
       "map": {
-        "body": "All 8 primitives — large shells (0, 2, 4, 6 ~20k verts) and folded cuff protrusions (1, 3, 5, 7 ~2.9k verts). Forced black. Cuff is body, not trim.",
+        "body": "All 8 primitives \u2014 large shells (0, 2, 4, 6 ~20k verts) and folded cuff protrusions (1, 3, 5, 7 ~2.9k verts). Forced black. Cuff is body, not trim.",
         "trim": "Not in this export. Sidebar keeps Taslan 18 swatches ready. Name a CLO fabric Trim / Tape / piping / binding and re-export to tint in 3D.",
         "embroidery": "No logo/text mesh in this export. UI stores embroideryText + thread hex/name in job.json."
       }
+    },
+    "male-jersey-blunt-collar": {
+      "file": "3d/clo/male-jersey-blunt-collar/MaleJersey-BluntCollar.glb",
+      "structure": "CLO exported one material (Reight Sleeve) on 6 Cloth_mesh primitives. Materials were cloned per primitive so each sidebar part tints independently.",
+      "materials": [
+        "Back",
+        "Sleeves",
+        "Sleeves Right",
+        "Front",
+        "Collar Inner",
+        "Collar"
+      ],
+      "map": {
+        "collar": "Collar + Collar Inner (prims 4\u20135, high Y)",
+        "front": "Front (prim 3, +Z)",
+        "back": "Back (prim 0, \u2212Z)",
+        "sleeves": "Sleeves + Sleeves Right (prims 1\u20132, |X| high)",
+        "waistband": "Hem \u2014 not a separate primitive in this export (hem is cut into Front/Back)",
+        "stitch": "No Topstitch in this export"
+      }
+    },
+    "hockey": {
+      "file": "3d/clo/hockey/Hockey.glb",
+      "structure": "Cloth_mesh 38 primitives: FABRIC 1 lining (uncolored) paired with HockeyBasic_* outers. Coverstitch on BindedTrim/Topstitch. Stripes are independent materials, not one Trim.",
+      "materials": [
+        "HockeyBasic_477649 collar",
+        "HockeyBasic_477593 / 477621 yoke L/R",
+        "HockeyBasic_477565 front",
+        "HockeyBasic_477985 back",
+        "HockeyBasic_477789 / 477677 sleeves",
+        "HockeyBasic_477817 / 477733 sleeve stripe 1",
+        "HockeyBasic_477845 / 477705 sleeve stripe 2",
+        "HockeyBasic_477873 / 477761 sleeve stripe 3",
+        "HockeyBasic_477901 / 478013 hem stripe 1",
+        "HockeyBasic_477929 / 478041 hem stripe 2",
+        "HockeyBasic_477957 / 478069 hem stripe 3",
+        "Coverstitch_478152 / 478154 stitch"
+      ],
+      "map": {
+        "collar": "HockeyBasic_477649",
+        "yoke": "HockeyBasic_477593 + 477621",
+        "front": "HockeyBasic_477565",
+        "back": "HockeyBasic_477985",
+        "sleeves": "HockeyBasic_477789 + 477677",
+        "sleeveStripe1": "HockeyBasic_477817 + 477733",
+        "sleeveStripe2": "HockeyBasic_477845 + 477705",
+        "sleeveStripe3": "HockeyBasic_477873 + 477761",
+        "hemStripe1": "HockeyBasic_477901 + 478013",
+        "hemStripe2": "HockeyBasic_477929 + 478041",
+        "hemStripe3": "HockeyBasic_477957 + 478069",
+        "stitch": "Coverstitch / Topstitch / BindedTrim"
+      }
     }
   },
-  "updatedAt": 1788852260
+  "updatedAt": 1788854052,
+  "groups": [
+    {
+      "id": "hoodoo-suits",
+      "name": "Hoodoo Suits"
+    },
+    {
+      "id": "apparel",
+      "name": "Apparel"
+    },
+    {
+      "id": "ultimate-dog",
+      "name": "Ultimate Dog"
+    }
+  ]
 }

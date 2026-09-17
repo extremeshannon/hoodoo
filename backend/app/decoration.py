@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 from decimal import Decimal, ROUND_HALF_UP
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
+
+_pricing_mtime: float | None = None
+_pricing_cache: dict[str, Any] | None = None
 
 
 def _money(n: Decimal | float | int) -> Decimal:
@@ -26,10 +28,18 @@ def _repo_root() -> Path:
     return pkg.parent.parent
 
 
-@lru_cache(maxsize=1)
+def _pricing_path() -> Path:
+    return _repo_root() / "data" / "decoration-pricing.json"
+
+
 def load_pricing() -> dict[str, Any]:
-    path = _repo_root() / "data" / "decoration-pricing.json"
-    return json.loads(path.read_text(encoding="utf-8"))
+    global _pricing_mtime, _pricing_cache
+    path = _pricing_path()
+    mtime = path.stat().st_mtime
+    if _pricing_cache is None or _pricing_mtime != mtime:
+        _pricing_cache = json.loads(path.read_text(encoding="utf-8"))
+        _pricing_mtime = mtime
+    return _pricing_cache
 
 
 def qty_tier(qty: int, tiers: list[int]) -> int:
@@ -44,6 +54,9 @@ def qty_tier(qty: int, tiers: list[int]) -> int:
 def _band_for_stitches(emb: dict, stitches: int) -> dict:
     s = max(int(stitches), int(emb.get("minStitchesBilled") or 0))
     bands = emb["stitchBands"]
+    ceiling = int(emb.get("oversizedQuoteAt") or 0)
+    if ceiling and s >= ceiling:
+        return bands[-1]
     for b in bands:
         if s <= int(b["maxStitches"]):
             return b
@@ -88,16 +101,24 @@ def estimate(payload: dict[str, Any]) -> dict[str, Any]:
     setup = Decimal("0")
     deco_unit = Decimal("0")
     extra = Decimal("0")
+    notes: list[str] = []
 
     if method == "embroidery":
         emb = data["embroidery"]
         stitches = int(payload.get("stitches") or 5000)
-        band = _band_for_stitches(emb, stitches)
+        billed = max(stitches, int(emb.get("minStitchesBilled") or 0))
+        band = _band_for_stitches(emb, billed)
         deco_unit = _lookup_piece(emb["perPiece"], band["id"], tier)
         deco_total = deco_unit * qty
         extra_loc = max(0, locations - 1)
         extra = _money(deco_unit * Decimal(str(emb["extraLocationFactor"])) * extra_loc * qty)
-        setup = _money(emb["digitizingFirst"]) + _money(emb["digitizingAdditional"]) * extra_loc
+        has_dst = bool(payload.get("hasDst"))
+        if has_dst:
+            setup = Decimal("0.00")
+        else:
+            text_only = bool(payload.get("textOnly"))
+            first = _money(emb["digitizingTextOnly"] if text_only else emb["digitizingFirst"])
+            setup = first + _money(emb["digitizingAdditional"]) * extra_loc
         lines.append(
             {
                 "label": f"Embroidery · {band['label']} · {tier}+ rate × {qty}",
@@ -106,8 +127,29 @@ def estimate(payload: dict[str, Any]) -> dict[str, Any]:
         )
         if extra:
             lines.append({"label": f"Additional locations ({extra_loc})", "amount": float(extra)})
-        lines.append({"label": "Digitizing / setup", "amount": float(setup)})
+        if g.get("hatHoop"):
+            hoop = _money(emb["hatHoop"][str(tier)]) * qty
+            lines.append({"label": f"Hat hoop surcharge × {qty}", "amount": float(hoop)})
+            deco_total = deco_total + hoop
+        names = max(0, int(payload.get("names") or 0))
+        if names:
+            name_unit = _money(emb["individualName"][str(tier)])
+            name_total = name_unit * names
+            lines.append(
+                {
+                    "label": f"Individual names × {names}",
+                    "amount": float(name_total),
+                }
+            )
+            deco_total = deco_total + name_total
+        if setup:
+            lines.append({"label": "Digitizing / setup", "amount": float(setup)})
+        elif has_dst:
+            notes.append("Digitizing waived — stitch file on file.")
         deco_total = deco_total + extra
+        oversized_at = int(emb.get("oversizedQuoteAt") or 0)
+        if oversized_at and billed >= oversized_at:
+            notes.append("Over 15,000 stitches — this is a starting number; we’ll confirm the run.")
     elif method == "screen":
         scr = data["screenPrint"]
         colors = int(payload.get("colors") or 1)
@@ -152,6 +194,7 @@ def estimate(payload: dict[str, Any]) -> dict[str, Any]:
         "each": float(each),
         "subtotal": float(_money(subtotal)),
         "lines": lines,
+        "notes": notes,
         "disclaimer": meta["disclaimer"],
         "contactEmail": meta["contactEmail"],
         "contactPhone": meta["contactPhone"],

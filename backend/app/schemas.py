@@ -35,11 +35,39 @@ class CartItemOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class FulfillmentOut(BaseModel):
+    method: str
+    rate_id: str | None = None
+    rate_label: str
+    shipping_amount: str
+    quoted: bool = False
+    needs_address: bool = False
+    detail: str = ""
+    pickup: dict[str, Any] | None = None
+    destination: dict[str, Any] | None = None
+    zone_id: str | None = None
+
+
+class CartFulfillmentIn(BaseModel):
+    method: str = Field("pickup", max_length=20)
+    name: str | None = Field(None, max_length=120)
+    line1: str | None = Field(None, max_length=120)
+    line2: str | None = Field(None, max_length=120)
+    city: str | None = Field(None, max_length=80)
+    region: str | None = Field(None, max_length=40)
+    postal: str | None = Field(None, max_length=20)
+    country: str | None = Field("US", max_length=2)
+    phone: str | None = Field(None, max_length=40)
+
+
 class CartOut(BaseModel):
     cart_id: UUID | None = None
     items: list[CartItemOut]
     subtotal: str
+    shipping: str = "0.00"
+    total: str = "0.00"
     item_count: int  # sum of line quantities
+    fulfillment: FulfillmentOut | None = None
 
 
 # --- Auth & users ---
@@ -96,6 +124,7 @@ class OrderCreateLineIn(BaseModel):
 class OrderCreateIn(BaseModel):
     lines: list[OrderCreateLineIn] = Field(..., min_length=1)
     customer_note: str | None = Field(None, max_length=2000)
+    fulfillment: CartFulfillmentIn | None = None
 
 
 class OrderLineOut(BaseModel):
@@ -115,6 +144,10 @@ class OrderOut(BaseModel):
     id: UUID
     status: str
     subtotal: str
+    shipping: str = "0.00"
+    total: str = "0.00"
+    fulfillment: FulfillmentOut | None = None
+    fulfillment_label: str = ""
     customer_note: str | None
     created_at: datetime
     lines: list[OrderLineOut]

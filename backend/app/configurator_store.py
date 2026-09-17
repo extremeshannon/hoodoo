@@ -117,7 +117,37 @@ def product_index(manifest: dict[str, Any], pid: str) -> int:
     raise StoreError(f"Garment not found: {pid}")
 
 
-def apply_fields(product: dict[str, Any], body: dict[str, Any]) -> dict[str, Any]:
+def groups_list(manifest: dict[str, Any]) -> list[dict[str, str]]:
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for g in manifest.get("groups") or []:
+        if not isinstance(g, dict):
+            continue
+        name = str(g.get("name") or "").strip()[:80]
+        gid = slugify(str(g.get("id") or name))
+        if not gid or gid in seen:
+            continue
+        seen.add(gid)
+        out.append({"id": gid, "name": name or gid.replace("-", " ").title()})
+    return out
+
+
+def apply_group_id(product: dict[str, Any], raw: Any, groups: list[dict[str, str]]) -> None:
+    gid = slugify(str(raw or ""))
+    if not gid:
+        product.pop("groupId", None)
+        return
+    valid = {g["id"] for g in groups}
+    if gid not in valid:
+        raise StoreError("Unknown group")
+    product["groupId"] = gid
+
+
+def apply_fields(
+    product: dict[str, Any],
+    body: dict[str, Any],
+    groups: list[dict[str, str]] | None = None,
+) -> dict[str, Any]:
     out = deepcopy(product)
     if body.get("name") is not None:
         name = str(body["name"]).strip()
@@ -160,6 +190,8 @@ def apply_fields(product: dict[str, Any], body: dict[str, Any]) -> dict[str, Any
             out["meshMap"] = cleaned
         else:
             out.pop("meshMap", None)
+    if "groupId" in body:
+        apply_group_id(out, body.get("groupId"), groups or [])
     return out
 
 
@@ -197,11 +229,15 @@ def add_garment(root: Path, body: dict[str, Any]) -> dict[str, Any]:
         product["glb"] = next(iter(glb_by_fit.values()))
     with _LOCK:
         manifest = load_manifest(root)
+        groups = groups_list(manifest)
+        if "groupId" in body or body.get("groupId"):
+            apply_group_id(product, body.get("groupId"), groups)
         products = list(manifest.get("products") or [])
         if any(isinstance(p, dict) and p.get("id") == slug for p in products):
             raise StoreError(f"Garment '{slug}' already exists")
         products.append(product)
         manifest["products"] = products
+        manifest["groups"] = groups
         manifest["updatedAt"] = int(time.time())
         _write_json(manifest_path(root), manifest)
     return product
@@ -211,11 +247,74 @@ def update_garment(root: Path, pid: str, body: dict[str, Any]) -> dict[str, Any]
     with _LOCK:
         manifest = load_manifest(root)
         idx = product_index(manifest, pid)
-        updated = apply_fields(manifest["products"][idx], body)
+        updated = apply_fields(manifest["products"][idx], body, groups_list(manifest))
         manifest["products"][idx] = updated
         manifest["updatedAt"] = int(time.time())
         _write_json(manifest_path(root), manifest)
     return updated
+
+
+def add_group(root: Path, body: dict[str, Any]) -> dict[str, str]:
+    name = str(body.get("name") or "").strip()
+    if not name:
+        raise StoreError("Group name is required")
+    with _LOCK:
+        manifest = load_manifest(root)
+        groups = groups_list(manifest)
+        gid = slugify(str(body.get("id") or name))
+        if not gid or not SLUG_RE.fullmatch(gid):
+            raise StoreError("Could not make an id from that name")
+        existing = {g["id"] for g in groups}
+        if gid in existing:
+            n = 2
+            while f"{gid}-{n}" in existing:
+                n += 1
+            gid = f"{gid}-{n}"
+        group = {"id": gid, "name": name[:80]}
+        groups.append(group)
+        manifest["groups"] = groups
+        manifest["updatedAt"] = int(time.time())
+        _write_json(manifest_path(root), manifest)
+    return group
+
+
+def rename_group(root: Path, gid: str, body: dict[str, Any]) -> dict[str, str]:
+    name = str(body.get("name") or "").strip()
+    if not name:
+        raise StoreError("Group name is required")
+    gid = slugify(gid)
+    with _LOCK:
+        manifest = load_manifest(root)
+        groups = groups_list(manifest)
+        idx = next((i for i, g in enumerate(groups) if g["id"] == gid), None)
+        if idx is None:
+            raise StoreError(f"Group not found: {gid}")
+        groups[idx] = {"id": gid, "name": name[:80]}
+        manifest["groups"] = groups
+        manifest["updatedAt"] = int(time.time())
+        _write_json(manifest_path(root), manifest)
+    return groups[idx]
+
+
+def delete_group(root: Path, gid: str) -> dict[str, Any]:
+    gid = slugify(gid)
+    with _LOCK:
+        manifest = load_manifest(root)
+        groups = groups_list(manifest)
+        if not any(g["id"] == gid for g in groups):
+            raise StoreError(f"Group not found: {gid}")
+        groups = [g for g in groups if g["id"] != gid]
+        products = []
+        for p in manifest.get("products") or []:
+            if isinstance(p, dict) and p.get("groupId") == gid:
+                p = dict(p)
+                p.pop("groupId", None)
+            products.append(p)
+        manifest["groups"] = groups
+        manifest["products"] = products
+        manifest["updatedAt"] = int(time.time())
+        _write_json(manifest_path(root), manifest)
+    return {"ok": True, "groups": groups}
 
 
 def set_glb(root: Path, pid: str, fit: str, url: str) -> dict[str, Any]:
@@ -308,6 +407,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         products.append(p)
     return {
         "products": products,
+        "groups": groups_list(manifest),
         "materials": load_materials(root),
         "meshMap": manifest.get("meshMap") or {},
         "meshNotes": manifest.get("meshNotes") or {},

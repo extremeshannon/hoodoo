@@ -8,18 +8,19 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import require_staff
 from app.models import Order, OrderLine, User
 from app.orders_format import order_to_out
 from app.pricing import PricingError, compute_line, load_product_for_pricing
 from app.schemas import OrderCreateIn, OrderOut
+from app.shipping import quote
 
-router = APIRouter(prefix="/orders", tags=["orders"])
+router = APIRouter(prefix="/orders", tags=["orders"], dependencies=[Depends(require_staff)])
 
 
 @router.get("", response_model=list[OrderOut])
 def list_my_orders(
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_staff),
     db: Session = Depends(get_db),
 ):
     q = (
@@ -35,7 +36,7 @@ def list_my_orders(
 @router.get("/{order_id}", response_model=OrderOut)
 def get_order(
     order_id: UUID,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_staff),
     db: Session = Depends(get_db),
 ):
     o = db.scalar(select(Order).where(Order.id == order_id).options(selectinload(Order.lines)))
@@ -49,7 +50,7 @@ def get_order(
 @router.post("", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
 def create_order(
     body: OrderCreateIn,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_staff),
     db: Session = Depends(get_db),
 ):
     """
@@ -73,10 +74,32 @@ def create_order(
         subtotal += line_total
         pending.append((product, line.quantity, line.configuration, unit, line_total, label))
 
+    item_count = sum(p[1] for p in pending)
+    dest = None
+    method = "pickup"
+    if body.fulfillment:
+        method = body.fulfillment.method
+        dest = {
+            "name": body.fulfillment.name or "",
+            "line1": body.fulfillment.line1 or "",
+            "line2": body.fulfillment.line2 or "",
+            "city": body.fulfillment.city or "",
+            "region": body.fulfillment.region or "",
+            "postal": body.fulfillment.postal or "",
+            "country": body.fulfillment.country or "US",
+            "phone": body.fulfillment.phone or "",
+        }
+    ful = quote(method, dest, item_count or 1)
+    ship = Decimal(ful.get("shipping_amount") or "0")
+    total = subtotal + ship
+
     order = Order(
         user_id=user.id,
         status="submitted",
         subtotal=subtotal,
+        shipping_amount=ship,
+        total=total,
+        fulfillment=ful,
         customer_note=body.customer_note,
     )
     db.add(order)

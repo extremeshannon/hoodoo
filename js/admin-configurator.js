@@ -1,6 +1,6 @@
 (function () {
   var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || "";
-  var state = { products: [], materials: {}, meshMap: {}, selected: null };
+  var state = { products: [], groups: [], materials: {}, meshMap: {}, selected: null };
   var statusEl = document.getElementById("status");
 
   function msg(t, err) {
@@ -37,14 +37,107 @@
     return Array.prototype.slice.call(el.querySelectorAll("input[type=checkbox]:checked")).map(function (i) { return i.value; });
   }
 
+  function groupName(id) {
+    var g = (state.groups || []).find(function (x) { return x.id === id; });
+    return g ? g.name : "";
+  }
+  function fillGroupSelect(sel, current) {
+    if (!sel) return;
+    var cur = current || "";
+    sel.innerHTML = '<option value="">None</option>' + (state.groups || []).map(function (g) {
+      return '<option value="' + esc(g.id) + '"' + (g.id === cur ? " selected" : "") + ">" + esc(g.name) + "</option>";
+    }).join("");
+  }
+  function garmentButton(p) {
+    var sub = groupName(p.groupId) || p.category || p.blurb || p.id;
+    return '<button type="button" class="gitem' + (state.selected === p.id ? " is-on" : "") + '" data-id="' + esc(p.id) + '">' +
+      esc(p.name) + "<small>" + esc(sub) + "</small></button>";
+  }
+  function productsInGroup(gid) {
+    return (state.products || []).filter(function (p) { return p.groupId === gid; });
+  }
+  function ungroupedProducts() {
+    var ids = (state.groups || []).map(function (g) { return g.id; });
+    return (state.products || []).filter(function (p) { return !p.groupId || ids.indexOf(p.groupId) === -1; });
+  }
+
   function renderList() {
     var box = document.getElementById("garment-list");
-    box.innerHTML = state.products.map(function (p) {
-      return '<button type="button" class="gitem' + (state.selected === p.id ? " is-on" : "") + '" data-id="' + esc(p.id) + '">' +
-        esc(p.name) + "<small>" + esc(p.category || p.blurb || p.id) + "</small></button>";
-    }).join("");
+    var html = "";
+    (state.groups || []).forEach(function (g) {
+      var items = productsInGroup(g.id);
+      html += '<div class="rail-group"><p class="rail-group__title">' + esc(g.name) + "</p>";
+      html += items.length ? items.map(garmentButton).join("") : '<p class="muted">No items yet</p>';
+      html += "</div>";
+    });
+    var other = ungroupedProducts();
+    if (other.length) {
+      html += '<div class="rail-group"><p class="rail-group__title">Ungrouped</p>' + other.map(garmentButton).join("") + "</div>";
+    }
+    if (!html) html = '<p class="muted">No garments yet</p>';
+    box.innerHTML = html;
     box.querySelectorAll(".gitem").forEach(function (b) {
       b.addEventListener("click", function () { select(b.getAttribute("data-id")); });
+    });
+  }
+
+  function renderGroups() {
+    var box = document.getElementById("group-list");
+    if (!box) return;
+    var groups = state.groups || [];
+    box.innerHTML = groups.map(function (g) {
+      return '<div class="row group-row" data-id="' + esc(g.id) + '">' +
+        '<label>Name <input data-gname value="' + esc(g.name) + '" /></label>' +
+        '<button type="button" class="btn" data-rename>Save name</button>' +
+        '<button type="button" class="btn" data-del>Delete</button></div>';
+    }).join("") || '<p class="muted">No groups yet.</p>';
+    box.querySelectorAll("[data-rename]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var row = b.closest(".group-row");
+        var id = row.getAttribute("data-id");
+        var name = (row.querySelector("[data-gname]") || {}).value;
+        msg("Saving group…");
+        api("/admin/config/groups/" + encodeURIComponent(id), { method: "PATCH", body: JSON.stringify({ name: name }) })
+          .then(function () { msg("Group saved."); return load(); })
+          .catch(function (e) { msg(e.message, true); });
+      });
+    });
+    box.querySelectorAll("[data-del]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var row = b.closest(".group-row");
+        var id = row.getAttribute("data-id");
+        var name = (row.querySelector("[data-gname]") || {}).value || id;
+        if (!confirm('Delete group "' + name + '"? Garments stay; they just won’t be in a group.')) return;
+        msg("Deleting group…");
+        api("/admin/config/groups/" + encodeURIComponent(id), { method: "DELETE" })
+          .then(function () { msg("Group deleted."); return load(); })
+          .catch(function (e) { msg(e.message, true); });
+      });
+    });
+    fillGroupSelect(document.getElementById("new-group"), (document.getElementById("new-group") || {}).value);
+    if (state.selected) fillGroupSelect(document.getElementById("g-group"), (product(state.selected) || {}).groupId);
+    else fillGroupSelect(document.getElementById("g-group"), "");
+  }
+
+  function renderAssign() {
+    var tb = document.getElementById("group-assign");
+    if (!tb) return;
+    tb.innerHTML = (state.products || []).map(function (p) {
+      return "<tr><td>" + esc(p.name) + "</td><td><select data-assign=\"" + esc(p.id) + "\">" +
+        '<option value="">None</option>' +
+        (state.groups || []).map(function (g) {
+          return "<option value=\"" + esc(g.id) + "\"" + (p.groupId === g.id ? " selected" : "") + ">" + esc(g.name) + "</option>";
+        }).join("") +
+        "</select></td></tr>";
+    }).join("") || '<tr><td colspan="2" class="muted">Add a garment first.</td></tr>';
+    tb.querySelectorAll("[data-assign]").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        var id = sel.getAttribute("data-assign");
+        msg("Saving group…");
+        api("/admin/config/garments/" + encodeURIComponent(id), { method: "PATCH", body: JSON.stringify({ groupId: sel.value }) })
+          .then(function () { msg("Group assigned."); return load(); })
+          .catch(function (e) { msg(e.message, true); });
+      });
     });
   }
 
@@ -62,6 +155,7 @@
     document.getElementById("edit-title").textContent = p.name + " · " + p.id;
     document.getElementById("g-name").value = p.name || "";
     document.getElementById("g-cat").value = p.category || "";
+    fillGroupSelect(document.getElementById("g-group"), p.groupId || "");
     document.getElementById("g-blurb").value = p.blurb || "";
     document.getElementById("g-emb").checked = p.embroideryText !== false && ((p.parts || []).some(function (x) { return x.id === "embroidery"; }) || p.embroideryText === true);
     document.getElementById("g-await").value = p.awaitingFile || "";
@@ -209,6 +303,7 @@
     var body = {
       name: document.getElementById("new-name").value,
       category: document.getElementById("new-cat").value,
+      groupId: document.getElementById("new-group").value,
       template: document.getElementById("new-tmpl").value,
       fits: fitsOf(document.getElementById("new-fits")),
     };
@@ -230,6 +325,7 @@
     var body = {
       name: document.getElementById("g-name").value,
       category: document.getElementById("g-cat").value,
+      groupId: document.getElementById("g-group").value,
       blurb: document.getElementById("g-blurb").value,
       embroideryText: document.getElementById("g-emb").checked,
       awaitingFile: document.getElementById("g-await").value,
@@ -258,14 +354,31 @@
       .then(function () { msg("Mesh map saved."); })
       .catch(function (e) { msg(e.message, true); });
   });
+  document.getElementById("btn-add-group").addEventListener("click", function () {
+    var name = document.getElementById("new-group-name").value;
+    msg("Adding group…");
+    api("/admin/config/groups", { method: "POST", body: JSON.stringify({ name: name }) })
+      .then(function (g) {
+        document.getElementById("new-group-name").value = "";
+        msg("Added " + g.name);
+        return load();
+      })
+      .catch(function (e) { msg(e.message, true); });
+  });
+  document.getElementById("new-group-name").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("btn-add-group").click();
+  });
 
   function load() {
     return api("/admin/config/state").then(function (data) {
       state.products = data.products || [];
+      state.groups = data.groups || [];
       state.materials = data.materials || {};
       state.meshMap = data.meshMap || {};
       state.meshNotes = data.meshNotes || {};
       renderList();
+      renderGroups();
+      renderAssign();
       renderColors();
       document.getElementById("global-mesh").value = JSON.stringify(state.meshMap, null, 2);
       if (state.selected) {

@@ -36,13 +36,13 @@
   function refreshCartBadge() {
     var el = document.getElementById("cart-nav-count");
     if (!el) return;
-    fetch((window.HOODOO_API_BASE || "") + "/api/cart", { credentials: "same-origin" })
-      .then(function (r) {
-        if (!r.ok) throw new Error();
-        return r.json();
-      })
+    if (!window.HoodooApi || !window.HoodooApi.getToken()) {
+      el.textContent = "";
+      return;
+    }
+    window.HoodooApi.fetchJson("/cart")
       .then(function (data) {
-        var n = typeof data.item_count === "number" ? data.item_count : 0;
+        var n = data && typeof data.item_count === "number" ? data.item_count : 0;
         el.textContent = n > 0 ? "(" + n + ")" : "";
       })
       .catch(function () {
@@ -52,20 +52,4 @@
 
   refreshCartBadge();
   window.HoodooRefreshCartBadge = refreshCartBadge;
-
-  var ul = document.querySelector(".nav-list");
-  if (ul) {
-    function ensureNav(href, label, beforeHref) {
-      if (ul.querySelector('a[href="' + href + '"]')) return;
-      var li = document.createElement("li");
-      li.innerHTML = '<a href="' + href + '">' + label + "</a>";
-      var before = beforeHref ? ul.querySelector('a[href="' + beforeHref + '"]') : null;
-      var beforeLi = before ? before.closest("li") : ul.querySelector("a.nav-cta") && ul.querySelector("a.nav-cta").closest("li");
-      if (beforeLi) ul.insertBefore(li, beforeLi);
-      else ul.appendChild(li);
-    }
-    ensureNav("/suit.html", "Jumpsuits", "/cart.html");
-    ensureNav("/pricing.html", "Pricing", "/cart.html");
-    ensureNav("/quote.html", "Get a quote");
-  }
 })();

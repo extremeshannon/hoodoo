@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=20260917f" />
   <link rel="stylesheet" href="/quote.css" />
 </head>
 <body class="page-quote">
@@ -32,7 +32,7 @@
           <li><a href="/suit.html">Jumpsuits</a></li>
           <li><a href="/pricing.html">Pricing</a></li>
           <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
-          <li><a class="nav-cta" href="/quote.html" aria-current="page">Get a quote</a></li>
+          <li><a class="nav-cta" href="/quote.html" aria-current="page">Quote</a></li>
         </ul>
       </nav>
     </div>
@@ -42,7 +42,7 @@
     <section class="quote-hero">
       <p class="quote-eyebrow">Wasilla, Alaska · live estimate</p>
       <h1>What do you want made?</h1>
-      <p class="quote-lede">Pick the garment, how many, and embroidery / screen print / dye-sub. The total updates like the big shops — then send it in for a real quote.</p>
+      <p class="quote-lede">Pick the garment, how many, and embroidery / screen print / dye-sub. Embroidery follows typical Alaska shop math: stitch count × quantity breaks. The total updates live — then send it in for a real quote.</p>
     </section>
 
     <div class="quote-grid">
@@ -60,10 +60,24 @@
           <label><input type="radio" name="q-method" value="dye-sub" /> Dye sublimation</label>
         </fieldset>
         <div id="q-emb-fields" class="quote-extra">
+          <label class="quote-label">Typical size
+            <select id="q-stitch-preset">
+              <option value="5000">Left chest / name (~5,000 stitches)</option>
+              <option value="6000">Hat front (~6,000 stitches)</option>
+              <option value="8000">Detailed chest (~8,000 stitches)</option>
+              <option value="12000">Jacket / hoodie back (~12,000 stitches)</option>
+              <option value="15000">Large back (~15,000 stitches)</option>
+            </select>
+          </label>
           <label class="quote-label">Stitch count
             <input type="number" id="q-stitches" min="1000" max="40000" step="500" value="5000" />
           </label>
-          <p class="quote-hint">Don’t know stitches? Left chest is usually ~5k. Jacket back can be 8–12k.</p>
+          <p class="quote-hint">Don’t know stitches? Left chest is usually billed at the 5,000 minimum. Jacket backs run 8–12k.</p>
+          <label class="quote-check"><input type="checkbox" id="q-dst" /> I have a DST / EMB stitch file (waives digitizing)</label>
+          <label class="quote-check"><input type="checkbox" id="q-text-only" /> Name / text only (cheaper digitize)</label>
+          <label class="quote-label">Individual names (optional)
+            <input type="number" id="q-names" min="0" max="999" value="0" />
+          </label>
         </div>
         <div id="q-screen-fields" class="quote-extra" hidden>
           <label class="quote-label">Ink colors
@@ -94,6 +108,7 @@
     </div>
   </footer>
   <script src="/js/api.js"></script>
+  <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
   <script src="/js/auth-nav.js"></script>
   <script src="/js/quote.js"></script>

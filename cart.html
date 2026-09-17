@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="/configurator.css" />
+  <link rel="stylesheet" href="/styles.css?v=20260917f" />
+  <link rel="stylesheet" href="/configurator.css?v=20260917f" />
 </head>
 <body class="page-cart">
   <a class="skip-link" href="#cart-main">Skip to cart</a>
@@ -29,12 +29,10 @@
       <nav class="site-nav" id="site-nav" aria-label="Primary">
         <ul class="nav-list">
           <li><a href="/index.html">Home</a></li>
-          <li><a href="/index.html#services">Services</a></li>
           <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/suit.html">Jumpsuits</a></li>
           <li><a href="/cart.html" aria-current="page">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
-          <li><a href="/viewer.html">3D viewer</a></li>
-          <li><a href="/index.html#contact">Contact</a></li>
-          <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
+          <li><a class="nav-cta" href="/quote.html">Quote</a></li>
         </ul>
       </nav>
     </div>
@@ -43,7 +41,7 @@
   <main id="cart-main" class="cart-main">
     <div class="cart-page-head">
       <h1 class="cart-page-title">Your cart</h1>
-      <p class="cart-page-lede">Guide pricing. Adjust quantities or remove lines, then email the shop for a formal quote.</p>
+      <p class="cart-page-lede">Choose pickup in Wasilla or shipping. Guide pricing — a payment gateway is next.</p>
     </div>
 
     <div class="cart-panel">
@@ -51,11 +49,75 @@
       <div id="cart-empty" class="cart-empty" hidden>Your cart is empty. <a href="/configurator.html">Open the configurator</a> to add items.</div>
       <div id="cart-content" hidden>
         <div class="cart-lines" id="cart-lines"></div>
+
+        <section class="cart-fulfillment" id="cart-fulfillment" aria-labelledby="fulfillment-heading">
+          <h2 id="fulfillment-heading" class="cart-fulfillment-title">Pickup or shipping</h2>
+          <div class="cart-fulfill-methods" role="group" aria-label="Fulfillment method">
+            <button type="button" class="cart-fulfill-pill" id="method-pickup" data-method="pickup" aria-pressed="true">Pickup</button>
+            <button type="button" class="cart-fulfill-pill" id="method-shipping" data-method="shipping" aria-pressed="false">Shipping</button>
+          </div>
+
+          <div class="cart-fulfill-panel" id="cart-pickup-panel">
+            <p class="cart-pickup-title" id="cart-pickup-title">Pickup in Wasilla</p>
+            <p class="cart-pickup-addr" id="cart-pickup-addr"></p>
+            <p class="cart-pickup-note" id="cart-pickup-note"></p>
+            <label class="auth-field cart-ship-field">
+              <span class="auth-field-label">Phone (so we can call when it’s ready)</span>
+              <input type="tel" id="pickup-phone" name="pickup-phone" autocomplete="tel" placeholder="907.202.5634" />
+            </label>
+          </div>
+
+          <div class="cart-fulfill-panel" id="cart-shipping-panel" hidden>
+            <div class="cart-ship-grid">
+              <label class="auth-field cart-ship-field cart-ship-field--wide">
+                <span class="auth-field-label">Name</span>
+                <input type="text" id="ship-name" name="ship-name" autocomplete="name" />
+              </label>
+              <label class="auth-field cart-ship-field cart-ship-field--wide">
+                <span class="auth-field-label">Address</span>
+                <input type="text" id="ship-line1" name="ship-line1" autocomplete="address-line1" />
+              </label>
+              <label class="auth-field cart-ship-field cart-ship-field--wide">
+                <span class="auth-field-label">Apartment, suite (optional)</span>
+                <input type="text" id="ship-line2" name="ship-line2" autocomplete="address-line2" />
+              </label>
+              <label class="auth-field cart-ship-field">
+                <span class="auth-field-label">City</span>
+                <input type="text" id="ship-city" name="ship-city" autocomplete="address-level2" />
+              </label>
+              <label class="auth-field cart-ship-field">
+                <span class="auth-field-label">State</span>
+                <select id="ship-region" name="ship-region" autocomplete="address-level1"></select>
+              </label>
+              <label class="auth-field cart-ship-field">
+                <span class="auth-field-label">ZIP</span>
+                <input type="text" id="ship-postal" name="ship-postal" autocomplete="postal-code" />
+              </label>
+              <label class="auth-field cart-ship-field">
+                <span class="auth-field-label">Country</span>
+                <select id="ship-country" name="ship-country" autocomplete="country">
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                </select>
+              </label>
+              <label class="auth-field cart-ship-field cart-ship-field--wide">
+                <span class="auth-field-label">Phone</span>
+                <input type="tel" id="ship-phone" name="ship-phone" autocomplete="tel" />
+              </label>
+            </div>
+            <p class="cart-rate-note" id="cart-rate-note"></p>
+          </div>
+        </section>
+
         <div class="cart-summary">
           <p class="cart-summary-row"><span>Subtotal (guide)</span><strong id="cart-subtotal">$0.00</strong></p>
+          <p class="cart-summary-row"><span id="cart-shipping-label">Pickup</span><strong id="cart-shipping">$0.00</strong></p>
+          <p class="cart-summary-row cart-summary-total"><span>Total</span><strong id="cart-total">$0.00</strong></p>
+          <p class="cart-pay-note" id="cart-pay-note">Payment gateway coming soon. Choose pickup or shipping now — card checkout is next.</p>
           <div class="cart-summary-actions">
             <button type="button" class="btn btn-primary" id="cart-email">Email quote to Hoodoo</button>
             <button type="button" class="btn btn-secondary" id="cart-save-order">Save order to account</button>
+            <button type="button" class="btn btn-ghost" id="cart-pay" disabled>Pay — coming soon</button>
             <button type="button" class="btn btn-ghost" id="cart-clear">Clear cart</button>
           </div>
           <p class="config-add-cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p>
@@ -72,8 +134,9 @@
   </footer>
 
   <script src="/js/api.js"></script>
+  <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
-  <script src="/js/auth-nav.js"></script>
-  <script src="/cart.js"></script>
+  <script src="/js/auth-nav.js?v=20260917f"></script>
+  <script src="/cart.js?v=20260917b"></script>
 </body>
 </html>

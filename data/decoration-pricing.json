@@ -1,37 +1,82 @@
 {
   "meta": {
     "currency": "USD",
-    "disclaimer": "Guide / rough estimate only — not a final invoice. Digitizing, art, fabric, and rush can change the number. Submit the estimate and we confirm before production.",
+    "market": "Wasilla / Southcentral Alaska",
+    "updated": "2026-09",
+    "disclaimer": "Guide rates for Alaska in-house embroidery — not a final invoice. Digitizing, fabric, hoop difficulty, and rush can change the number. Confirm before we stitch.",
     "contactEmail": "shannnon@hoodooak.com",
     "contactPhone": "907.202.5634",
-    "qtyTiers": [1, 6, 12, 24, 48, 72, 144]
+    "qtyTiers": [1, 6, 12, 24, 48, 72, 144],
+    "qtyTierLabels": {
+      "1": "1–5",
+      "6": "6–11",
+      "12": "12–23",
+      "24": "24–47",
+      "48": "48–71",
+      "72": "72–143",
+      "144": "144+"
+    },
+    "notes": [
+      "No order minimum. One piece is fine; the per-piece rate drops as the run grows.",
+      "Same logo, same placement. Unique names or new art restart the stitch/digitizing math.",
+      "Thread colors are included in the stitch price (not priced per color like screen print).",
+      "Bring a DST/EMB stitch file and we waive digitizing on that design."
+    ]
   },
   "garments": [
     { "id": "tee", "name": "T-shirt", "blank": 12 },
     { "id": "heavy-tee", "name": "Heavyweight tee", "blank": 16 },
     { "id": "hoodie", "name": "Pullover hoodie", "blank": 28 },
     { "id": "crew", "name": "Crewneck", "blank": 24 },
-    { "id": "hat", "name": "Hat / beanie", "blank": 14 },
+    { "id": "hat", "name": "Hat / beanie", "blank": 14, "hatHoop": true },
     { "id": "jersey", "name": "Jersey", "blank": 38 },
     { "id": "gauntlet", "name": "Ultimate Paw Cover (pair)", "blank": 94 },
     { "id": "jumpsuit", "name": "Custom jumpsuit (base sew)", "blank": 625 }
   ],
   "embroidery": {
-    "digitizingFirst": 45,
-    "digitizingAdditional": 25,
+    "intro": "Typical Southcentral Alaska shop rates: billed by stitch count, then cheaper per piece as quantity goes up. Guide numbers for Wasilla, aligned with published Anchorage embroidery tables (2026).",
+    "digitizingFirst": 55,
+    "digitizingAdditional": 35,
+    "digitizingTextOnly": 25,
     "minStitchesBilled": 5000,
-    "extraLocationFactor": 0.85,
+    "oversizedQuoteAt": 15001,
+    "extraLocationFactor": 0.9,
+    "hatHoop": {
+      "1": 4.00,
+      "6": 3.00,
+      "12": 2.50,
+      "24": 2.00,
+      "48": 1.50,
+      "72": 1.25,
+      "144": 1.00
+    },
+    "individualName": {
+      "1": 12.00,
+      "6": 10.00,
+      "12": 9.00,
+      "24": 8.00,
+      "48": 7.00,
+      "72": 6.50,
+      "144": 6.00
+    },
+    "stitchGuide": [
+      { "id": "name", "label": "Name / call sign", "typicalStitches": 5000, "note": "Lettering is billed at the 5,000-stitch minimum." },
+      { "id": "chest", "label": "Left chest logo", "typicalStitches": 5000, "note": "Most team and shop logos land here." },
+      { "id": "hat", "label": "Hat / cap front", "typicalStitches": 6000, "note": "Structured caps add a hoop surcharge." },
+      { "id": "detail", "label": "Detailed chest", "typicalStitches": 8000, "note": "More fill, small type, or a second icon." },
+      { "id": "back", "label": "Jacket / hoodie back", "typicalStitches": 12000, "note": "Large back hits. Over 15k is a custom quote." }
+    ],
     "stitchBands": [
-      { "id": "5k", "label": "Up to 5,000 stitches", "maxStitches": 5000 },
-      { "id": "8k", "label": "5,001–8,000 stitches", "maxStitches": 8000 },
-      { "id": "12k", "label": "8,001–12,000 stitches", "maxStitches": 12000 },
-      { "id": "15k", "label": "12,001+ stitches", "maxStitches": 999999 }
+      { "id": "5k", "label": "Up to 5,000 stitches", "maxStitches": 5000, "hint": "Left chest, name, simple hat" },
+      { "id": "8k", "label": "5,001–8,000 stitches", "maxStitches": 8000, "hint": "Standard logo" },
+      { "id": "12k", "label": "8,001–12,000 stitches", "maxStitches": 12000, "hint": "Large chest / small back" },
+      { "id": "15k", "label": "12,001–15,000 stitches", "maxStitches": 15000, "hint": "Jacket back" }
     ],
     "perPiece": {
-      "5k":  { "1": 18.00, "6": 12.00, "12": 9.00, "24": 7.00, "48": 5.50, "72": 4.75, "144": 4.00 },
-      "8k":  { "1": 22.00, "6": 15.00, "12": 11.00, "24": 8.50, "48": 6.50, "72": 5.50, "144": 4.50 },
-      "12k": { "1": 28.00, "6": 18.00, "12": 14.00, "24": 10.00, "48": 8.00, "72": 6.75, "144": 5.50 },
-      "15k": { "1": 34.00, "6": 22.00, "12": 16.00, "24": 12.00, "48": 9.50, "72": 8.00, "144": 6.50 }
+      "5k":  { "1": 28.00, "6": 16.00, "12": 14.50, "24": 12.00, "48": 9.50, "72": 8.50, "144": 7.75 },
+      "8k":  { "1": 32.00, "6": 16.00, "12": 15.00, "24": 12.50, "48": 9.00, "72": 8.50, "144": 8.00 },
+      "12k": { "1": 38.00, "6": 19.00, "12": 17.50, "24": 14.75, "48": 11.25, "72": 10.25, "144": 9.50 },
+      "15k": { "1": 45.00, "6": 22.00, "12": 20.00, "24": 17.00, "48": 13.50, "72": 12.25, "144": 11.50 }
     }
   },
   "screenPrint": {

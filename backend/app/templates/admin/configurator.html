@@ -41,6 +41,10 @@
     .status { min-height:1.3em; color:var(--brand); margin:0 0 1rem; }
     .status.err { color:#ff8a8a; }
     .muted { color:var(--muted); font-size:.85rem; }
+    .rail-group { margin: 0 0 .85rem; }
+    .rail-group__title { margin: .35rem 0 .4rem; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .group-row { align-items:flex-end; margin-bottom:.55rem; }
+    .group-row .btn { margin-bottom:.75rem; }
     @media (max-width: 860px) { .wrap { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -61,11 +65,30 @@
     </aside>
     <main class="main">
       <p class="status" id="status" role="status"></p>
+      <section class="card" id="groups-card">
+        <h2>Groups</h2>
+        <p class="muted">These headings show on the public Pattern step. Add a group, then assign each garment with the dropdown.</p>
+        <div id="group-list"></div>
+        <div class="row" style="align-items:flex-end;margin-top:.4rem">
+          <label>New group name <input id="new-group-name" placeholder="e.g. Apparel" /></label>
+          <button type="button" class="btn btn-primary" id="btn-add-group" style="margin-bottom:.75rem">Add group</button>
+        </div>
+        <h3 class="muted" style="margin:1.1rem 0 .5rem">Assign garments</h3>
+        <div class="ops-table-wrap" style="overflow-x:auto">
+          <table class="ops-table">
+            <thead><tr><th>Garment</th><th>Group</th></tr></thead>
+            <tbody id="group-assign"></tbody>
+          </table>
+        </div>
+      </section>
       <section class="card" id="add-card" hidden>
         <h2>New garment</h2>
         <div class="row">
           <label>Name <input id="new-name" placeholder="Ultimate Paw Covers" /></label>
           <label>Category / kicker <input id="new-cat" placeholder="Snowmachine Gauntlets" /></label>
+          <label>Group
+            <select id="new-group"></select>
+          </label>
           <label>Start from
             <select id="new-tmpl">
               <option value="jacket">Jacket</option>
@@ -89,6 +112,9 @@
         <div class="row">
           <label>Name <input id="g-name" /></label>
           <label>Category <input id="g-cat" /></label>
+          <label>Group
+            <select id="g-group"></select>
+          </label>
           <label>Blurb <input id="g-blurb" /></label>
         </div>
         <div class="fits" id="g-fits"></div>
@@ -116,6 +142,6 @@
       </section>
     </main>
   </div>
-  <script src="/js/admin-configurator.js"></script>
+  <script src="/js/admin-configurator.js?v=20260907p"></script>
 </body>
 </html>

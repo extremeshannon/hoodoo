@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Hoodoo Alaska embroidery, screen print, and jumpsuit guide pricing. Wasilla, AK." />
+  <meta name="description" content="Hoodoo Alaska embroidery pricing — stitch bands that drop as quantity goes up. Wasilla, AK." />
   <meta name="theme-color" content="#0a0b0d" />
-  <title>Pricing | Hoodoo Alaska</title>
+  <title>Embroidery pricing | Hoodoo Alaska</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,7 +13,8 @@
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/quote.css" />
 </head>
-<body>
+<body class="page-quote page-pricing">
+  <a class="skip-link" href="#price-main">Skip to pricing</a>
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="/index.html"><img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" /></a>
@@ -27,43 +28,26 @@
           <li><a href="/suit.html">Jumpsuits</a></li>
           <li><a href="/pricing.html" aria-current="page">Pricing</a></li>
           <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count"></span></a></li>
-          <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
+          <li><a class="nav-cta" href="/quote.html">Quote</a></li>
         </ul>
       </nav>
     </div>
   </header>
-  <main class="quote-main">
-    <p class="quote-eyebrow">Guide rates · per stitch / per color · per garment count</p>
-    <h1 class="hero-title" style="font-size:clamp(2rem,4vw,3rem)">Pricing schedule</h1>
-    <p class="quote-lede">Same structure as the big shops: a per-unit decoration rate that drops as quantity goes up, plus setup. Totals are estimates — confirm before we print.</p>
+  <main id="price-main" class="quote-main">
+    <p class="quote-eyebrow">Wasilla, Alaska · embroidery cost guide</p>
+    <h1 class="hero-title" style="font-size:clamp(2rem,4vw,3rem)">What embroidery costs</h1>
+    <p class="quote-lede" id="price-intro">The more pieces in the run, the lower the stitch price. Same structure Alaska shops use: stitch band × quantity, plus a one-time digitize.</p>
+    <p class="price-actions">
+      <a class="btn btn-primary" href="/quote.html">Instant embroidery quote</a>
+    </p>
     <div id="price-tables"></div>
     <p class="quote-disclaimer" style="margin-top:2rem">7362 W Parks Hwy PMB 213, Wasilla, AK 99623 · 907.202.5634 · shannnon@hoodooak.com</p>
   </main>
   <footer class="site-footer"><div class="footer-inner"><p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p></div></footer>
   <script src="/js/api.js"></script>
+  <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
   <script src="/js/auth-nav.js"></script>
-  <script>
-    function money(n) { return "$" + Number(n).toFixed(2); }
-    function table(title, bands, matrix, tiers, bandKey) {
-      var head = "<tr><th>" + bandKey + "</th>" + tiers.map(function (t) { return "<th>" + t + "+</th>"; }).join("") + "</tr>";
-      var body = bands.map(function (b) {
-        var row = matrix[b.id] || {};
-        return "<tr><th>" + b.label + "</th>" + tiers.map(function (t) { return "<td>" + money(row[String(t)]) + "</td>"; }).join("") + "</tr>";
-      }).join("");
-      return "<section class='section'><h2 class='section-title'>" + title + "</h2><div class='config-table-wrap'><table class='config-table'>" + head + body + "</table></div></section>";
-    }
-    fetch("/api/pricing/decoration").then(function (r) { return r.json(); }).then(function (d) {
-      var el = document.getElementById("price-tables");
-      var t = d.meta.qtyTiers;
-      el.innerHTML =
-        table("Embroidery — per garment (by stitch band × qty)", d.embroidery.stitchBands, d.embroidery.perPiece, t, "Stitches") +
-        "<p class='quote-hint'>Digitizing $" + d.embroidery.digitizingFirst + " first location, $" + d.embroidery.digitizingAdditional + " each extra. Minimum billed stitches: " + d.embroidery.minStitchesBilled.toLocaleString() + ".</p>" +
-        table("Screen print — per garment (by ink colors × qty)", d.screenPrint.colorBands, d.screenPrint.perPiece, t, "Colors") +
-        "<p class='quote-hint'>Screen setup $" + d.screenPrint.screenFeePerColor + " per color, waived at " + d.screenPrint.screenFeeWaivedAtQty + "+ pieces.</p>" +
-        table("Dye sublimation — per garment", [{ id: "ds", label: "Full / panel print" }], { ds: d.dyeSub.perPiece }, t, "Method") +
-        "<p class='quote-hint'>Art setup $" + d.dyeSub.setup + ".</p>";
-    });
-  </script>
+  <script src="/js/pricing.js"></script>
 </body>
 </html>

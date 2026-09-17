@@ -1,56 +1,58 @@
 (function () {
-  function placeAuthLi(ul) {
-    var cta = ul.querySelector("a.nav-cta");
-    return cta ? cta.closest("li") : null;
+  function markStaff(on) {
+    document.body.classList.toggle("is-hoodoo-staff", !!on);
   }
 
-  function renderLoggedOut(ul, insertBefore) {
+  function clearAuth(ul) {
+    ul.querySelectorAll(".nav-auth-item").forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  function addItem(ul, html) {
     var li = document.createElement("li");
-    li.id = "nav-auth-slot";
-    li.innerHTML =
-      '<a href="/register">Sign up</a> <span class="nav-auth-sep" aria-hidden="true">·</span> <a href="/login">Sign in</a>';
-    if (insertBefore) ul.insertBefore(li, insertBefore);
-    else ul.appendChild(li);
+    li.className = "nav-auth-item";
+    li.innerHTML = html;
+    ul.appendChild(li);
+    return li;
+  }
+
+  function logout() {
+    var base = (window.HoodooApi && window.HoodooApi.apiUrl) ? window.HoodooApi.apiUrl("/auth/logout") : "/api/auth/logout";
+    fetch(base, { method: "POST", credentials: "same-origin" }).finally(function () {
+      if (window.HoodooApi) window.HoodooApi.clearToken();
+      window.location.href = "/";
+    });
+  }
+
+  function renderLoggedOut(ul) {
+    markStaff(false);
+    addItem(ul, '<a href="/login">Sign in</a>');
   }
 
   function run() {
     var ul = document.querySelector(".nav-list");
     if (!ul || !window.HoodooApi) return;
-    var old = document.getElementById("nav-auth-slot");
-    if (old) old.remove();
-    var insertBefore = placeAuthLi(ul);
+    clearAuth(ul);
     var tok = window.HoodooApi.getToken();
     if (!tok) {
-      renderLoggedOut(ul, insertBefore);
+      renderLoggedOut(ul);
       return;
     }
     window.HoodooApi.fetchJson("/auth/me")
       .then(function (u) {
-        var li = document.createElement("li");
-        li.id = "nav-auth-slot";
-        var bits = [
-          '<a href="/account.html">Account</a>',
-        ];
-        if (u.role === "staff" || u.role === "admin") {
-          bits.push('<a href="/admin.html">Staff</a>');
+        var isStaff = u && (u.role === "staff" || u.role === "admin");
+        markStaff(isStaff);
+        if (isStaff) {
+          addItem(ul, '<a href="/admin.html">Staff</a>');
         }
-        bits.push(
-          '<button type="button" class="nav-logout" id="nav-logout-btn" aria-label="Log out">Log out</button>'
-        );
-        li.innerHTML = bits.join(' <span class="nav-auth-sep" aria-hidden="true">·</span> ');
-        if (insertBefore) ul.insertBefore(li, insertBefore);
-        else ul.appendChild(li);
+        addItem(ul, '<button type="button" class="nav-logout" id="nav-logout-btn">Log out</button>');
         var btn = document.getElementById("nav-logout-btn");
-        if (btn) {
-          btn.addEventListener("click", function () {
-            window.HoodooApi.clearToken();
-            window.location.href = "/index.html";
-          });
-        }
+        if (btn) btn.addEventListener("click", logout);
       })
       .catch(function () {
         window.HoodooApi.clearToken();
-        renderLoggedOut(ul, insertBefore);
+        renderLoggedOut(ul);
       });
   }
 

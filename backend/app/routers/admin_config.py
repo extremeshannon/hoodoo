@@ -20,7 +20,10 @@ from app.configurator_store import (
     MAX_GLB_BYTES,
     StoreError,
     add_garment,
+    add_group,
     clo_dir,
+    delete_group,
+    rename_group,
     save_maps,
     save_materials,
     set_glb,
@@ -173,6 +176,30 @@ def config_add_garment(body: dict, _: User = Depends(require_staff_session)):
 def config_patch_garment(product_id: str, body: dict, _: User = Depends(require_staff_session)):
     try:
         return update_garment(_root(), product_id, body)
+    except StoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/admin/config/groups")
+def config_add_group(body: dict, _: User = Depends(require_staff_session)):
+    try:
+        return add_group(_root(), body)
+    except StoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.patch("/admin/config/groups/{group_id}")
+def config_rename_group(group_id: str, body: dict, _: User = Depends(require_staff_session)):
+    try:
+        return rename_group(_root(), group_id, body)
+    except StoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.delete("/admin/config/groups/{group_id}")
+def config_delete_group(group_id: str, _: User = Depends(require_staff_session)):
+    try:
+        return delete_group(_root(), group_id)
     except StoreError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

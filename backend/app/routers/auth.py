@@ -5,7 +5,7 @@ import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import delete, or_, select
 from sqlalchemy.orm import Session
@@ -34,6 +34,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=Token)
 def register(body: UserRegister, db: Session = Depends(get_db)):
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Public signup is closed while the shop is in progress. Contact the shop for access.",
+    )
     email = body.email.lower().strip()
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
@@ -62,6 +66,7 @@ def register(body: UserRegister, db: Session = Depends(get_db)):
 @router.post("/token", response_model=Token)
 def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """OAuth2 password flow: `username` = email address or username handle, `password` = password."""
@@ -83,7 +88,21 @@ def login(
         )
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account disabled")
+    if user.role in ("staff", "admin"):
+        request.session["uid"] = str(user.id)
+        request.session["role"] = user.role
+        if not request.session.get("csrf"):
+            request.session["csrf"] = secrets.token_urlsafe(24)
+    else:
+        request.session.pop("uid", None)
+        request.session.pop("role", None)
     return Token(access_token=create_access_token(user.id, {"role": user.role}))
+
+
+@router.post("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return {"ok": True}
 
 
 @router.get("/me", response_model=UserOut)

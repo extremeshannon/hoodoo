@@ -10,8 +10,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="/configurator.css" />
+  <link rel="stylesheet" href="/styles.css?v=20260917g" />
+  <link rel="stylesheet" href="/configurator.css?v=20260917g" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/js/vendor/three/three.module.js",
+      "three/addons/": "/js/vendor/three/addons/"
+    }
+  }
+  </script>
 </head>
 <body class="page-configurator">
   <a class="skip-link" href="#config-main">Skip to configurator</a>
@@ -29,14 +37,11 @@
       <nav class="site-nav" id="site-nav" aria-label="Primary">
         <ul class="nav-list">
           <li><a href="/index.html">Home</a></li>
-          <li><a href="/index.html#services">Services</a></li>
           <li><a href="/configurator.html" aria-current="page">Configurator</a></li>
           <li><a href="/suit.html">Jumpsuits</a></li>
           <li><a href="/pricing.html">Pricing</a></li>
           <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
-          <li><a href="/viewer.html">3D viewer</a></li>
-          <li><a href="/index.html#contact">Contact</a></li>
-          <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
+          <li><a class="nav-cta" href="/quote.html">Quote</a></li>
         </ul>
       </nav>
     </div>
@@ -91,11 +96,20 @@
 
         <article id="config-panel" class="config-panel" hidden>
           <header class="config-panel-head">
-            <div>
+            <figure class="config-variant-photo" id="panel-photo">
+              <canvas id="panel-photo-3d" class="config-variant-photo-3d" hidden></canvas>
+              <img id="panel-photo-img" alt="" />
+              <figcaption class="config-variant-photo-empty" id="panel-photo-empty">
+                <span class="config-variant-photo-mark">Variant photo</span>
+                <span class="config-variant-photo-hint" id="panel-photo-hint">Photo coming soon</span>
+              </figcaption>
+            </figure>
+            <div class="config-panel-copy">
               <p class="config-panel-category" id="panel-category"></p>
               <h2 class="config-panel-title" id="panel-title"></h2>
               <p class="config-panel-sku" id="panel-sku"></p>
               <p class="config-panel-summary" id="panel-summary"></p>
+              <p class="config-panel-3d-link" id="panel-3d-link" hidden><a href="/suit.html">Open 3D builder →</a></p>
             </div>
             <div class="config-panel-stock" id="panel-stock" aria-live="polite"></div>
           </header>
@@ -171,8 +185,10 @@
   </footer>
 
   <script src="/js/api.js"></script>
+  <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
-  <script src="/js/auth-nav.js"></script>
-  <script src="/configurator.js"></script>
+  <script src="/js/auth-nav.js?v=20260917f"></script>
+  <script src="/configurator.js?v=20260917h"></script>
+  <script type="module" src="/js/config-preview.js?v=20260917d"></script>
 </body>
 </html>

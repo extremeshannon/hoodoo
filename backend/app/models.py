@@ -134,6 +134,7 @@ class Cart(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    fulfillment: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
 
     items: Mapped[list[CartItem]] = relationship(
         back_populates="cart",
@@ -187,6 +188,9 @@ class Order(Base):
     status: Mapped[str] = mapped_column(String(40), nullable=False, default="submitted")
     # submitted | acknowledged | in_production | fulfilled | cancelled
     subtotal: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    shipping_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False, default=Decimal("0"))
+    total: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False, default=Decimal("0"))
+    fulfillment: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     customer_note: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

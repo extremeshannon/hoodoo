@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=20260917g" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -28,14 +28,13 @@
       <nav class="site-nav" id="site-nav" aria-label="Primary">
         <ul class="nav-list">
           <li><a href="#services">Services</a></li>
-          <li><a href="/configurator.html">Configurator</a></li>
-          <li><a href="/suit.html">Jumpsuits</a></li>
-          <li><a href="/pricing.html">Pricing</a></li>
-          <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
-          <li><a href="/viewer.html">3D viewer</a></li>
+          <li class="js-staff-shop"><a href="/configurator.html">Configurator</a></li>
+          <li class="js-staff-shop"><a href="/suit.html">Jumpsuits</a></li>
+          <li class="js-staff-shop"><a href="/pricing.html">Pricing</a></li>
+          <li class="js-staff-shop"><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
-          <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
+          <li class="js-staff-shop"><a class="nav-cta" href="/quote.html">Quote</a></li>
         </ul>
       </nav>
     </div>
@@ -51,11 +50,13 @@
           Hoodoo is your full-service branding partner—from pattern and cut &amp; sew to embroidery,
           laser-cut patches, dye sublimation, and screen printing—all under one roof.
         </p>
+        <p class="hero-wip">Online ordering and the configurator are in progress. For custom work, call or email the shop.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="/suit.html">Build a jumpsuit</a>
-          <a class="btn btn-ghost" href="/configurator.html">Configure apparel &amp; gauntlets</a>
-          <a class="btn btn-ghost" href="/quote.html">Instant quote</a>
-          <a class="btn btn-ghost" href="tel:+19072025634">907.202.5634</a>
+          <a class="btn btn-primary js-staff-shop" href="/suit.html">Build a jumpsuit</a>
+          <a class="btn btn-ghost js-staff-shop" href="/configurator.html">Configure apparel &amp; gauntlets</a>
+          <a class="btn btn-ghost js-staff-shop" href="/quote.html">Instant quote</a>
+          <a class="btn btn-primary" href="tel:+19072025634">907.202.5634</a>
+          <a class="btn btn-ghost" href="mailto:shannnon@hoodooak.com">Email the shop</a>
         </div>
       </div>
       <div class="hero-clip" aria-hidden="true"></div>
@@ -110,17 +111,19 @@
     <section class="section shop-spotlight" id="shop" aria-labelledby="shop-heading">
       <div class="section-inner shop-spotlight-inner">
         <div class="shop-spotlight-copy">
-          <p class="shop-spotlight-eyebrow">Ultimate Paw Covers</p>
-          <h2 id="shop-heading" class="section-title">Tees, jerseys, and Alaska-built gauntlets</h2>
+          <p class="shop-spotlight-eyebrow">Work in progress</p>
+          <h2 id="shop-heading" class="section-title">Custom gear, built in Wasilla</h2>
           <p class="shop-spotlight-text">
-            Use our online configurator to browse <strong>inventory</strong>, see <strong>guide pricing</strong>, and build a line sheet for
-            snowmachine gauntlets (Ultimate Paw Covers), T-shirts, jerseys, and more—then email it straight to the shop.
+            We cut and sew skydiving jumpsuits, Ultimate Paw Covers, and branded apparel in-house—plus embroidery,
+            laser-cut patches, dye sublimation, and screen printing. The online shop and 3D configurator are not
+            open to the public yet. Reach out and we’ll spec the job with you.
           </p>
         </div>
         <div class="shop-spotlight-cta">
-          <a class="btn btn-primary" href="/configurator.html">Open configurator</a>
-          <a class="btn btn-ghost" href="/suit.html">Jumpsuit builder</a>
-          <a class="btn btn-ghost" href="/quote.html">Instant quote</a>
+          <a class="btn btn-primary" href="mailto:shannnon@hoodooak.com">Email for a quote</a>
+          <a class="btn btn-ghost" href="tel:+19072025634">Call 907.202.5634</a>
+          <a class="btn btn-ghost js-staff-shop" href="/configurator.html">Open configurator</a>
+          <a class="btn btn-ghost js-staff-shop" href="/suit.html">Jumpsuit builder</a>
         </div>
       </div>
     </section>
@@ -179,7 +182,7 @@
   </footer>
 
   <script src="/js/api.js"></script>
-  <script src="/main.js"></script>
-  <script src="/js/auth-nav.js"></script>
+  <script src="/main.js?v=20260917f"></script>
+  <script src="/js/auth-nav.js?v=20260917f"></script>
 </body>
 </html>

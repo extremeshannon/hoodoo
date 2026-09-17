@@ -9,11 +9,13 @@ from sqlalchemy import select
 
 from app.config import get_settings
 from app.database import get_db
+from app.deps import require_staff
 from app.models import Cart, CartItem, Product
 from app.pricing import PricingError, compute_line, load_product_for_pricing, validate_quantity
-from app.schemas import CartItemAdd, CartItemOut, CartItemUpdate, CartOut
+from app.schemas import CartFulfillmentIn, CartItemAdd, CartItemOut, CartItemUpdate, CartOut, FulfillmentOut
+from app.shipping import default_fulfillment, money, quote
 
-router = APIRouter(prefix="/cart", tags=["cart"])
+router = APIRouter(prefix="/cart", tags=["cart"], dependencies=[Depends(require_staff)])
 
 
 def _parse_cart_cookie(request: Request) -> uuid.UUID | None:
@@ -54,6 +56,26 @@ def _get_or_create_cart(db: Session, request: Request, response: Response | None
     return cart
 
 
+def _empty_cart() -> CartOut:
+    ful = default_fulfillment()
+    return CartOut(
+        cart_id=None,
+        items=[],
+        subtotal="0.00",
+        shipping="0.00",
+        total="0.00",
+        item_count=0,
+        fulfillment=FulfillmentOut.model_validate(ful),
+    )
+
+
+def _quote_for_cart(cart: Cart, item_count: int) -> dict:
+    stored = cart.fulfillment if isinstance(cart.fulfillment, dict) else {}
+    method = stored.get("method") or "pickup"
+    dest = stored.get("destination") if method == "shipping" else None
+    return quote(method, dest, item_count or 1)
+
+
 def _serialize_cart(db: Session, cart: Cart) -> CartOut:
     items_out: list[CartItemOut] = []
     sub = Decimal("0")
@@ -89,11 +111,17 @@ def _serialize_cart(db: Session, cart: Cart) -> CartOut:
                 configuration=line.configuration,
             )
         )
+    ful = _quote_for_cart(cart, count or 1)
+    ship = Decimal(ful.get("shipping_amount") or "0")
+    total = sub + ship
     return CartOut(
         cart_id=cart.id,
         items=items_out,
-        subtotal=f"{sub:.2f}",
+        subtotal=money(sub),
+        shipping=money(ship),
+        total=money(total),
         item_count=count,
+        fulfillment=FulfillmentOut.model_validate(ful),
     )
 
 
@@ -101,10 +129,10 @@ def _serialize_cart(db: Session, cart: Cart) -> CartOut:
 def get_cart(request: Request, db: Session = Depends(get_db)):
     cid = _parse_cart_cookie(request)
     if not cid:
-        return CartOut(cart_id=None, items=[], subtotal="0.00", item_count=0)
+        return _empty_cart()
     cart = db.get(Cart, cid)
     if not cart:
-        return CartOut(cart_id=None, items=[], subtotal="0.00", item_count=0)
+        return _empty_cart()
     return _serialize_cart(db, cart)
 
 
@@ -164,6 +192,31 @@ def update_cart_item(
     except PricingError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     item.quantity = body.quantity
+    db.commit()
+    return _serialize_cart(db, cart)
+
+
+@router.patch("/fulfillment", response_model=CartOut)
+def update_cart_fulfillment(
+    request: Request,
+    response: Response,
+    body: CartFulfillmentIn,
+    db: Session = Depends(get_db),
+):
+    cart = _get_or_create_cart(db, request, response)
+    dest = {
+        "name": body.name or "",
+        "line1": body.line1 or "",
+        "line2": body.line2 or "",
+        "city": body.city or "",
+        "region": body.region or "",
+        "postal": body.postal or "",
+        "country": body.country or "US",
+        "phone": body.phone or "",
+    }
+    count = sum(i.quantity for i in cart.items) or 1
+    cart.fulfillment = quote(body.method, dest, count)
+    db.add(cart)
     db.commit()
     return _serialize_cart(db, cart)
 

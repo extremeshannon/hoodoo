@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
+from app.deps import require_staff
 from app.production_pack import build_pack_zip
 
-router = APIRouter(tags=["production"])
+router = APIRouter(tags=["production"], dependencies=[Depends(require_staff)])
 
 
 class ProductionJob(BaseModel):

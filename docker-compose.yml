@@ -49,12 +49,23 @@ services:
       - ./3d:/app/3d
       - ./assets:/app/assets
       - ./index.html:/app/index.html
+      - ./login.html:/app/login.html
+      - ./register.html:/app/register.html
+      - ./account.html:/app/account.html
+      - ./order.html:/app/order.html
+      - ./viewer.html:/app/viewer.html
+      - ./admin.html:/app/admin.html
       - ./quote.html:/app/quote.html
       - ./quote.css:/app/quote.css
       - ./pricing.html:/app/pricing.html
       - ./suit.html:/app/suit.html
       - ./suit.css:/app/suit.css
       - ./configurator.html:/app/configurator.html
+      - ./configurator.css:/app/configurator.css
+      - ./configurator.js:/app/configurator.js
+      - ./cart.html:/app/cart.html
+      - ./cart.js:/app/cart.js
+      - ./styles.css:/app/styles.css
       - ./main.js:/app/main.js
     depends_on:
       db:

@@ -29,7 +29,7 @@
           <li><a href="/index.html">Home</a></li>
           <li><a href="/configurator.html">Configurator</a></li>
           <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
-          <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
+          <li><a class="nav-cta" href="/quote.html">Quote</a></li>
         </ul>
       </nav>
     </div>
@@ -45,6 +45,7 @@
       <div id="order-body" hidden>
         <header class="order-head">
           <p class="order-meta" id="order-meta"></p>
+          <p class="order-fulfill" id="order-fulfill"></p>
           <p class="order-total" id="order-total"></p>
           <p class="order-note" id="order-note" hidden></p>
         </header>
@@ -62,6 +63,7 @@
   </footer>
 
   <script src="/js/api.js"></script>
+  <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
   <script src="/js/auth-nav.js"></script>
   <script>
@@ -93,7 +95,15 @@
           var d = new Date(o.created_at);
           document.getElementById("order-meta").textContent =
             "Order " + o.id + " · " + d.toLocaleString() + " · " + o.status;
-          document.getElementById("order-total").textContent = "Subtotal $" + o.subtotal;
+          var fulEl = document.getElementById("order-fulfill");
+          if (fulEl) {
+            fulEl.textContent = o.fulfillment_label
+              ? "Fulfillment: " + o.fulfillment_label
+              : "";
+          }
+          var shipBit = o.shipping && o.shipping !== "0.00" ? " · Shipping $" + o.shipping : "";
+          document.getElementById("order-total").textContent =
+            "Subtotal $" + o.subtotal + shipBit + " · Total $" + (o.total || o.subtotal);
           var note = document.getElementById("order-note");
           if (o.customer_note) {
             note.hidden = false;

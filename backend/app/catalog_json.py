@@ -8,12 +8,21 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models import Category, Product, ProductOptionChoice
+from app.product_preview import is_made_to_order, preview_for_product
 
 
 def _dec(d: Decimal | None) -> float:
     if d is None:
         return 0.0
     return float(d)
+
+
+def _variant_image_path(product_slug: str, variant_slug: str) -> str:
+    """Colorway photo: upc-pro/s-black → /assets/products/upc-pro/black.jpg."""
+    colorway = variant_slug.rsplit("-", 1)[-1] if variant_slug else ""
+    if colorway:
+        return f"/assets/products/{product_slug}/{colorway}.jpg"
+    return f"/assets/products/{product_slug}.jpg"
 
 
 def build_catalog_dict(db: Session, meta_override: dict | None = None) -> dict:
@@ -61,14 +70,20 @@ def build_catalog_dict(db: Session, meta_override: dict | None = None) -> dict:
                 "sku": p.sku,
                 "summary": p.summary or "",
                 "pricingModel": p.pricing_model,
+                "madeToOrder": is_made_to_order(cat.slug, p.slug),
             }
+            preview = preview_for_product(p.slug, p.name)
+            if preview:
+                row["preview"] = preview
             if p.pricing_model == "variants":
+                row["image"] = f"/assets/products/{p.slug}.jpg"
                 row["variants"] = [
                     {
                         "id": v.variant_slug,
                         "label": v.label,
                         "price": _dec(v.price),
                         "inventory": v.inventory,
+                        "image": _variant_image_path(p.slug, v.variant_slug),
                     }
                     for v in sorted(p.variants, key=lambda x: (x.sort_order, x.id))
                 ]
@@ -82,6 +97,7 @@ def build_catalog_dict(db: Session, meta_override: dict | None = None) -> dict:
                     for a in sorted(p.addons, key=lambda x: (x.sort_order, x.id))
                 ]
             elif p.pricing_model == "options":
+                row["image"] = f"/assets/products/{p.slug}.jpg"
                 row["basePrice"] = _dec(p.base_price or Decimal("0"))
                 row["optionGroups"] = []
                 for g in sorted(p.option_groups, key=lambda x: (x.sort_order, x.id)):

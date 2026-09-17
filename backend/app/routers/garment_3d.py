@@ -5,10 +5,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.deps import require_staff
 from app.models import Garment3dAsset, Product
 from app.schemas import Garment3dAssetOut
 
-router = APIRouter(prefix="/products", tags=["garment-3d"])
+router = APIRouter(prefix="/products", tags=["garment-3d"], dependencies=[Depends(require_staff)])
 
 
 @router.get("/{slug}/3d", response_model=list[Garment3dAssetOut])

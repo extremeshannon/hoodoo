@@ -7,6 +7,10 @@
   var stitchesEl = document.getElementById("q-stitches");
   var colorsEl = document.getElementById("q-colors");
   var locEl = document.getElementById("q-locations");
+  var presetEl = document.getElementById("q-stitch-preset");
+  var dstEl = document.getElementById("q-dst");
+  var textOnlyEl = document.getElementById("q-text-only");
+  var namesEl = document.getElementById("q-names");
   var embFields = document.getElementById("q-emb-fields");
   var screenFields = document.getElementById("q-screen-fields");
   var subEl = document.getElementById("q-subtotal");
@@ -40,7 +44,7 @@
         return "<li><span>" + l.label + "</span><strong>" + money(l.amount) + "</strong></li>";
       })
       .join("");
-    discEl.textContent = est.disclaimer || "";
+    discEl.textContent = [est.disclaimer || ""].concat(est.notes || []).filter(Boolean).join(" ");
     var body = [
       "Hoodoo instant estimate (guide only)",
       "Garment: " + (est.garment && est.garment.name),
@@ -66,6 +70,9 @@
       stitches: Number(stitchesEl.value || 5000),
       colors: Number(colorsEl.value || 1),
       locations: Number(locEl.value || 1),
+      hasDst: !!(dstEl && dstEl.checked),
+      textOnly: !!(textOnlyEl && textOnlyEl.checked),
+      names: Number(namesEl && namesEl.value ? namesEl.value : 0),
     };
     fetch((window.HOODOO_API_BASE || "") + "/api/quote/estimate", {
       method: "POST",
@@ -82,6 +89,12 @@
         subEl.textContent = "—";
         eachEl.textContent = e.message || "Could not estimate";
       });
+  }
+
+  if (presetEl && stitchesEl) {
+    presetEl.addEventListener("change", function () {
+      stitchesEl.value = presetEl.value;
+    });
   }
 
   window.HoodooApi.fetchJson("/pricing/decoration").then(function (data) {

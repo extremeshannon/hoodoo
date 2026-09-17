@@ -19,6 +19,8 @@ This VPS bind-mounts `3d/` into `hoodoo_api`. After `scp` finishes, refresh http
 | Ultimate Paw Covers · Unisex | `3d/clo/upc/` | `UPC.glb` (snowmachine gauntlets — one model) |
 | Jumpsuit · Female | `3d/clo/female-jumpsuit/` | `FamaleJumpSuit.glb` (as typed) **or** `FemaleJumpSuit.glb` — configurator tries Famale first |
 | Jumpsuit · Male | `3d/clo/male-jumpsuit/` | `MaleJumpSuit.glb` |
+| Male Jersey (Blunt Collar) · Male | `3d/clo/male-jersey-blunt-collar/` | `MaleJersey-BluntCollar.glb` |
+| Hockey · Unisex | `3d/clo/hockey/` | `Hockey.glb` |
 
 Youth and Camera Jacket slots stay wired to later filenames.
 
@@ -36,6 +38,8 @@ scp "C:\Users\shannon\Dropbox\Master Website\Hoodoo Config\UPC.glb" ubuntu@vps-d
 scp "C:\Users\shannon\Dropbox\Master Website\Hoodoo Config\FamaleJumpSuit.glb" ubuntu@vps-dd0254d6.vps.ovh.us:/home/ubuntu/projects/hoodoo/3d/clo/female-jumpsuit/FamaleJumpSuit.glb
 scp "C:\Users\shannon\Dropbox\Master Website\Hoodoo Config\FemaleJumpSuit.glb" ubuntu@vps-dd0254d6.vps.ovh.us:/home/ubuntu/projects/hoodoo/3d/clo/female-jumpsuit/FemaleJumpSuit.glb
 scp "C:\Users\shannon\Dropbox\Master Website\Hoodoo Config\MaleJumpSuit.glb" ubuntu@vps-dd0254d6.vps.ovh.us:/home/ubuntu/projects/hoodoo/3d/clo/male-jumpsuit/MaleJumpSuit.glb
+scp "C:\Users\shannon\Dropbox\Master Website\Hoodoo Config\MaleJersey-BluntCollar.glb" ubuntu@vps-dd0254d6.vps.ovh.us:/home/ubuntu/projects/hoodoo/3d/clo/male-jersey-blunt-collar/MaleJersey-BluntCollar.glb
+scp "C:\Users\shannon\Dropbox\Master Website\Hoodoo Config\Hockey.glb" ubuntu@vps-dd0254d6.vps.ovh.us:/home/ubuntu/projects/hoodoo/3d/clo/hockey/Hockey.glb
 ```
 
 Female jumpsuit: Shannon typed **FamaleJumpSuit**. Paste the Famale line if that’s the file on disk; paste the Female line if the export is spelled correctly. The Pattern card loads Famale first, then Female.
@@ -45,6 +49,7 @@ Female jumpsuit: Shannon typed **FamaleJumpSuit**. Paste the Famale line if that
 - Jacket: `torso` / `body`, `sleeve` / `arm`, `collar`, `cordura`, `trim`
 - Jumpsuit: same as jacket plus `leg` / `pant` / `thigh` (inspect after GLBs land)
 - Pants: `leg` / `pant`, `bootie`, `cordura`, `trim`
+- Jerseys (Apparel): Male Jersey — Collar, Front, Back, Sleeves, Hem, Stitch (six cloned CLO materials). Hockey — Collar, Yoke, Front, Back, Sleeves, Sleeve stripe 1/2/3, Hem stripe 1/2/3, Stitch (each `HockeyBasic_*` is its own part). Taslan stock; light white/silver/charcoal defaults.
 - Ultimate Paw Covers: `body` (black Taslan shells **and cuff**), `trim` (Taslan stock — not in current UPC.glb; add piping/binding in CLO and re-export), `embroidery` (text + thread; no mesh in current UPC.glb)
 
 ## Cut / print (optional)

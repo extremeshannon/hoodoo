@@ -30,6 +30,14 @@ def ensure_legacy_schema(engine) -> None:
 
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(80)"))
+        conn.execute(text("ALTER TABLE carts ADD COLUMN IF NOT EXISTS fulfillment JSONB"))
+        conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment JSONB"))
+        conn.execute(
+            text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_amount NUMERIC(12,2) NOT NULL DEFAULT 0")
+        )
+        conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS total NUMERIC(12,2)"))
+        conn.execute(text("UPDATE orders SET total = COALESCE(total, subtotal + COALESCE(shipping_amount, 0))"))
+        conn.execute(text("ALTER TABLE orders ALTER COLUMN total SET DEFAULT 0"))
 
 
 def get_db() -> Generator[Session, None, None]:
