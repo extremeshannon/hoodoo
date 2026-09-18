@@ -526,6 +526,17 @@ function setFit(id) {
   });
   var note = document.getElementById("youth-note");
   if (note) note.hidden = id !== "youth";
+  syncDyesubLink();
+}
+
+function syncDyesubLink() {
+  var a = document.getElementById("btn-dyesub");
+  if (!a) return;
+  a.href =
+    "/dyesub.html?product=" +
+    encodeURIComponent(state.product || "freefly-jacket") +
+    "&fit=" +
+    encodeURIComponent(state.fit || "male");
 }
 
 function go(step) {
@@ -1581,6 +1592,7 @@ document.getElementById("suit-steps").addEventListener("click", function (e) {
 document.getElementById("to-sizing").addEventListener("click", function () { go(3); });
 document.getElementById("btn-pack").addEventListener("click", downloadPack);
 document.getElementById("btn-suit-email").addEventListener("click", emailBuild);
+syncDyesubLink();
 buildSizeFit();
 ["sz-height", "sz-weight", "sz-chest", "sz-waist", "sz-torso", "sz-inseam", "sz-arm"].forEach(function (id) {
   var el = document.getElementById(id);

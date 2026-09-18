@@ -5,7 +5,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Numeric, String, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, LargeBinary, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -175,6 +175,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     orders: Mapped[list["Order"]] = relationship(back_populates="user")
+    dyesub_jobs: Mapped[list["DyeSubJob"]] = relationship(back_populates="user")
 
 
 class Order(Base):
@@ -252,3 +253,49 @@ class PasswordResetToken(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class DyeSubJob(Base):
+    """Saved dye-sub layout (piece placements) owned by a customer or staff account."""
+
+    __tablename__ = "dyesub_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    garment_id: Mapped[str] = mapped_column(String(80), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, default="Untitled print")
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="draft")
+    layout: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    user: Mapped["User"] = relationship(back_populates="dyesub_jobs")
+    artworks: Mapped[list["DyeSubArt"]] = relationship(
+        back_populates="job",
+        cascade="all, delete-orphan",
+        order_by="DyeSubArt.created_at",
+    )
+
+
+class DyeSubArt(Base):
+    """Uploaded artwork bytes for a dye-sub job."""
+
+    __tablename__ = "dyesub_art"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("dyesub_jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    mime: Mapped[str] = mapped_column(String(80), nullable=False, default="image/png")
+    byte_size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    data: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    job: Mapped[DyeSubJob] = relationship(back_populates="artworks")
+

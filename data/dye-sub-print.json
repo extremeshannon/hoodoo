@@ -1,0 +1,21 @@
+{
+  "shop": "Hoodoo Alaska",
+  "printer": {
+    "name": "Epson SureColor F6200",
+    "type": "dye-sublimation",
+    "rollWidthIn": 44,
+    "nativeDpi": 720,
+    "artDpi": 300,
+    "colorSpace": "sRGB"
+  },
+  "construction": {
+    "seamAllowanceIn": 0.5,
+    "bleedIn": 0.25,
+    "bleedNote": "Standard garment dye-sub bleed (1/4 in). Confirm if you meant 4 mm instead."
+  },
+  "output": {
+    "pieceFormat": "png",
+    "nestFormat": "tiff",
+    "includeOriginalArt": true
+  }
+}
