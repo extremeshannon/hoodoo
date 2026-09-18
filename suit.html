@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=20260918a" />
-  <link rel="stylesheet" href="/suit.css?v=20260918a" />
+  <link rel="stylesheet" href="/styles.css?v=20260918b" />
+  <link rel="stylesheet" href="/suit.css?v=20260918b" />
   <script type="importmap">
   {
     "imports": {
@@ -38,7 +38,7 @@
       <h1 class="suit-pattern-title">What are we building?</h1>
       <div class="suit-fit-row" id="fit-row" role="group" aria-label="Fit"></div>
       <p class="suit-youth-note" id="youth-note" hidden>Youth is ready for CLO files later — pick it now and we’ll use a stand-in until you drop the GLB.</p>
-      <div class="suit-pattern-grid" id="pattern-grid"></div>
+      <div id="pattern-grid"></div>
     </div>
   </section>
 
@@ -76,12 +76,19 @@
         <label class="suit-art-scale">Move Y
           <input type="range" id="part-art-y" min="-0.5" max="0.5" step="0.01" value="0" />
         </label>
-        <p class="suit-art-hint">Art sits as a graphic you can size and move — it does not stretch across the whole panel. For print-accurate placement use the pattern pieces.</p>
+        <p class="suit-art-hint">Art is a graphic you move on the panel — it should not stretch over the whole jacket. Use pattern pieces for print-accurate placement.</p>
         <button type="button" class="btn btn-primary" id="to-sizing">Proceed to sizing →</button>
       </div>
     </aside>
     <div class="suit-stage">
       <canvas id="suit-canvas"></canvas>
+      <div class="suit-logo-loader" id="suit-logo-loader" hidden role="status" aria-live="polite">
+        <div class="suit-logo-loader__mark">
+          <span class="suit-logo-loader__glow" aria-hidden="true"></span>
+          <img src="/assets/logo.png" alt="Hoodoo" width="741" height="628" />
+        </div>
+        <p class="suit-logo-loader__msg" id="suit-logo-loader-msg">Loading garment…</p>
+      </div>
       <p class="suit-watermark">HOODOO</p>
       <p class="suit-clo-note" id="clo-note"></p>
     </div>
@@ -96,7 +103,7 @@
         </div>
         <button type="button" class="btn btn-ghost" id="dyesub-overlay-close">Done</button>
       </header>
-      <p class="dyesub-overlay-lede">This outline is the real Male Freefly Jacket cut (layer 84, includes 0.5 in seam). Drag to move, corners resize, top handle rotates. This is what prints on the F6200 — the 3D view is only a preview.</p>
+      <p class="dyesub-overlay-lede">This outline is the real cut piece (including 0.5 in seam). Drag to move, corners resize, top handle rotates. This is what prints — the 3D view is a preview.</p>
       <div class="dyesub-overlay-body">
         <ul id="dyesub-overlay-pieces" class="dyesub-overlay-pieces"></ul>
         <canvas id="dyesub-overlay-canvas" width="720" height="820"></canvas>
@@ -111,9 +118,12 @@
   </div>
 
   <section class="suit-step suit-sizing" id="step-3" hidden>
+    <!-- hoodoo-sizing-avatar-20260911a -->
     <div class="size-col size-col-model">
-      <div class="size-figure" id="size-figure" aria-hidden="true"></div>
-      <p class="size-360">360°</p>
+      <div class="size-figure" id="size-figure" data-fit="male" data-measure="chest">
+        <canvas id="size-avatar-canvas" aria-label="3D wireframe sizing figure"></canvas>
+      </div>
+      <p class="size-360" id="size-360-label">360°</p>
       <div class="size-gender" id="size-fit">
         <button type="button" data-g="male" class="is-on">Male</button>
         <button type="button" data-g="female">Female</button>
@@ -121,9 +131,11 @@
       </div>
     </div>
     <div class="size-col size-col-guide">
-      <div class="size-guide-art" id="size-guide-art"></div>
-      <h2 id="measure-title">Inseam</h2>
-      <p id="measure-copy">Stand straight, no shoes. Start the tape high in the crotch and measure straight down to the floor.</p>
+      <div class="size-guide-art" id="size-guide-art" data-fit="male" data-measure="chest">
+        <canvas id="size-guide-canvas" aria-label="Measurement close-up"></canvas>
+      </div>
+      <h2 id="measure-title">Chest</h2>
+      <p id="measure-copy">This is the standard measurement around the chest over the nipples. For women do one additional measurement above the breast.</p>
     </div>
     <form class="size-col size-col-form" id="size-form">
       <h2>Your measurements</h2>
@@ -135,6 +147,7 @@
       <label>Chest <input id="sz-chest" placeholder="40" /></label>
       <label>Waist <input id="sz-waist" placeholder="32" /></label>
       <label>Torso <input id="sz-torso" placeholder="18" /></label>
+      <label>Leg <input id="sz-leg" placeholder="24" /></label>
       <label>Inseam <input id="sz-inseam" placeholder="32" /></label>
       <label>Arm <input id="sz-arm" placeholder="25" /></label>
       <p class="size-sub">Final touch: proper sizing is comfort on the ground and confidence in freefall.</p>
@@ -215,7 +228,7 @@
           window.dispatchEvent(new CustomEvent("hoodoo-color", { detail: { part: part, color: s.dataset.c, name: s.dataset.name } }));
         }
       });
-      fetch("/data/materials.json?v=20260918a")
+      fetch("/data/materials.json?v=20260908a")
         .then(function (r) { return r.json(); })
         .then(function (data) {
           mats = data;
@@ -224,7 +237,9 @@
         .catch(function () {});
     })();
   </script>
-  <script src="/js/api.js?v=20260918a"></script>
-  <script type="module" src="/js/suit-configurator.js?v=20260918a"></script>
+  <script src="/js/api.js?v=20260918b"></script>
+  <script src="/js/staff-gate.js"></script>
+  <script type="module" src="/js/sizing-avatar.js?v=20260911a"></script>
+  <script type="module" src="/js/suit-configurator.js?v=20260918b"></script>
 </body>
 </html>
