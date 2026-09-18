@@ -1,0 +1,13 @@
+{
+  "garments": [
+    {
+      "id": "male-jacket",
+      "product": "freefly-jacket",
+      "fit": "male",
+      "name": "Male Freefly Jacket",
+      "size": "M",
+      "piecesFile": "male-jacket-pieces.json",
+      "ready": true
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "garment": "freefly-jacket",
+  "fit": "male",
+  "files": {
+    "glb": "MaleJacket.glb",
+    "dxf": "MaleJacket.dxf",
+    "patternPdf": "MaleJacket-pattern.pdf",
+    "layoutPng": "MaleJacket.png"
+  },
+  "seamAllowanceIn": 0.5,
+  "bleedIn": 0.25,
+  "printer": "Epson SureColor F6200",
+  "rollWidthIn": 44,
+  "artDpi": 300,
+  "sizeSource": "DXF closed outline layer 84 (cut, includes 0.5 in SA). Grainlines ignored.",
+  "pieces": [
+    {"dxf": "Body_Front_3_M", "role": "front", "side": "pair-a", "cutWin": 11.11, "cutHin": 23.09},
+    {"dxf": "Body_Front_4_M", "role": "front", "side": "pair-b", "cutWin": 11.11, "cutHin": 23.09},
+    {"dxf": "Body_Back_2_M", "role": "back", "side": "pair-a", "cutWin": 10.48, "cutHin": 23.73},
+    {"dxf": "Body_Back_3_M", "role": "back", "side": "pair-b", "cutWin": 10.48, "cutHin": 23.73},
+    {"dxf": "Left Sleeve_M", "role": "sleeve", "side": "left", "cutWin": 17.49, "cutHin": 30.66},
+    {"dxf": "Right Sleeve_M", "role": "sleeve", "side": "right", "cutWin": 17.49, "cutHin": 30.66},
+    {"dxf": "CollarLeft_M", "role": "collar", "side": "left", "cutWin": 8.58, "cutHin": 2.39},
+    {"dxf": "Collar Right_M", "role": "collar", "side": "right", "cutWin": 8.58, "cutHin": 2.39},
+    {"dxf": "Wait Left_M", "role": "waist", "side": "left", "cutWin": 19.76, "cutHin": 10.89, "note": "typo Wait vs Waist; height includes SA flap"},
+    {"dxf": "Right_M", "role": "waist", "side": "right", "cutWin": 19.76, "cutHin": 10.89, "note": "likely Waist Right"}
+  ],
+  "glbMaterials": {
+    "body": "Talsan_8292",
+    "sleeves": "Sleeves_8298",
+    "collarOrWaist": "Spandex_8295",
+    "zipperTape": "Zipper 1_TapeFabric_8333",
+    "stitch": "Double Needle_8318"
+  }
+}

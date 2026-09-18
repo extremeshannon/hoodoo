@@ -14,7 +14,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.bootstrap import bootstrap_staff_if_configured
 from app.config import get_settings
 from app.database import Base, SessionLocal, engine, ensure_legacy_schema
-from app.routers import admin, admin_config, auth, cart, catalog, garment_3d, orders, production, shop_quote
+from app.routers import admin, admin_config, auth, cart, catalog, dyesub, garment_3d, orders, production, shop_quote
 from app.seed import seed_if_empty
 
 
@@ -89,8 +89,10 @@ async def no_cache_configurator(request, call_next):
     response = await call_next(request)
     path = request.url.path
     if (
-        path in ("/suit", "/suit.html", "/suit.css")
+        path in ("/suit", "/suit.html", "/suit.css", "/dyesub", "/dyesub.html", "/dyesub.css")
         or path.startswith("/js/suit-configurator.js")
+        or path.startswith("/js/dyesub.js")
+        or path.startswith("/js/dyesub-place.js")
         or path.startswith("/3d/clo/manifest.json")
         or path.startswith("/data/materials.json")
         or path.startswith("/admin/")
@@ -106,6 +108,7 @@ app.include_router(orders.router, prefix="/api")
 app.include_router(garment_3d.router, prefix="/api")
 app.include_router(shop_quote.router, prefix="/api")
 app.include_router(production.router, prefix="/api")
+app.include_router(dyesub.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(admin_config.router)
 
@@ -162,6 +165,14 @@ def _attach_static():
     @app.get("/suit.html")
     def serve_suit_html():
         return _html("suit.html")
+
+    @app.get("/dyesub")
+    def serve_dyesub():
+        return _html("dyesub.html")
+
+    @app.get("/dyesub.html")
+    def serve_dyesub_html():
+        return _html("dyesub.html")
 
     # Explicit home page so we never use StaticFiles(html=True), which serves index.html
     # for *any* missing path (e.g. /api/health) if that mount handles the request first.
