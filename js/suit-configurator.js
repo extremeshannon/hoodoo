@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { PiecePlacer, defaultPlacement, loadGarmentSpec, piecesForPart } from "./dyesub-place.js";
 
 const JACKET_PART_IDS = ["collar", "front", "back", "sleeves", "zipper", "waistband", "stitch"];
 const JUMPSUIT_PART_IDS = ["collar", "frontTorso", "backTorso", "sleeves", "frontLegs", "backLegs", "zipper", "stitch"];
 const UPC_PART_IDS = ["body", "trim", "embroidery"];
-const CACHE_V = "20260907n";
+const CACHE_V = "20260918a";
 
 const PARTS = [
   { id: "collar", label: "Collar" },
@@ -741,6 +742,10 @@ function syncPalette() {
   if (picker) picker.hidden = true;
   var scale = document.getElementById("part-art-scale");
   if (scale) scale.value = String((state.art[state.part] && state.art[state.part].repeat) || 1);
+  var ox = document.getElementById("part-art-x");
+  var oy = document.getElementById("part-art-y");
+  if (ox) ox.value = String((state.art[state.part] && state.art[state.part].offsetX) || 0);
+  if (oy) oy.value = String((state.art[state.part] && state.art[state.part].offsetY) || 0);
   var embWrap = document.getElementById("embroidery-fields");
   if (embWrap) {
     embWrap.hidden = state.part !== "embroidery";
@@ -793,20 +798,305 @@ function setPartColor(hex, name) {
   applyColors();
 }
 
+var overlayState = {
+  garment: null,
+  placer: null,
+  arts: [],
+  placements: [],
+  jobId: null,
+  partId: "front",
+};
+
+function overlayStatus(msg) {
+  var el = document.getElementById("dyesub-overlay-status");
+  if (el) el.textContent = msg || "";
+}
+
+function uuidArt() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function renderOverlayPieces() {
+  var ul = document.getElementById("dyesub-overlay-pieces");
+  if (!ul || !overlayState.garment || !overlayState.placer) return;
+  var list = piecesForPart(overlayState.garment, overlayState.partId);
+  if (!list.length) list = overlayState.garment.pieces || [];
+  ul.innerHTML = "";
+  list.forEach(function (p) {
+    var li = document.createElement("li");
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = overlayState.placer.piece && overlayState.placer.piece.id === p.id ? "is-on" : "";
+    b.textContent = (p.label || p.id) + " · " + Number(p.cutWin).toFixed(1) + "×" + Number(p.cutHin).toFixed(1) + " in";
+    b.addEventListener("click", function () {
+      overlayState.placer.setPiece(p);
+      renderOverlayPieces();
+    });
+    li.appendChild(b);
+    ul.appendChild(li);
+  });
+}
+
+function ensureOverlayPlacer() {
+  var canvas = document.getElementById("dyesub-overlay-canvas");
+  if (!canvas) return null;
+  if (!overlayState.placer) {
+    overlayState.placer = new PiecePlacer(canvas, {
+      onChange: function (placer) {
+        overlayState.placements = placer.placements;
+        syncDecalFromPlacement();
+      },
+    });
+  }
+  return overlayState.placer;
+}
+
+function syncDecalFromPlacement() {
+  var piece = overlayState.placer && overlayState.placer.piece;
+  var art = state.art[overlayState.partId];
+  if (!piece || !art) return;
+  var pl = overlayState.placements.filter(function (p) {
+    return p.pieceId === piece.id;
+  })[0];
+  if (!pl) return;
+  art.repeat = Math.max(0.2, (pl.wIn / piece.cutWin) / 0.4);
+  art.offsetX = (pl.xIn + pl.wIn / 2) / piece.cutWin - 0.5;
+  art.offsetY = 0.5 - (pl.yIn + pl.hIn / 2) / piece.cutHin;
+  var ox = document.getElementById("part-art-x");
+  var oy = document.getElementById("part-art-y");
+  var sc = document.getElementById("part-art-scale");
+  if (ox) ox.value = String(art.offsetX);
+  if (oy) oy.value = String(art.offsetY);
+  if (sc) sc.value = String(art.repeat);
+  applyColors();
+}
+
+function addOverlayArt(dataUrl, filename, aspect, partId) {
+  var placer = ensureOverlayPlacer();
+  if (!placer || !overlayState.garment) return;
+  var img = new Image();
+  var artId = uuidArt();
+  img.onload = function () {
+    placer.setImage(artId, img);
+    var list = piecesForPart(overlayState.garment, partId || overlayState.partId);
+    var piece = (placer.piece && list.some(function (p) { return p.id === placer.piece.id; }))
+      ? placer.piece
+      : list[0] || overlayState.garment.pieces[0];
+    if (!piece) return;
+    placer.setPiece(piece);
+    var pl = defaultPlacement(piece, artId, aspect || img.width / img.height);
+    overlayState.placements.push(pl);
+    overlayState.arts.push({ id: artId, filename: filename || "art.png", dataUrl: dataUrl, local: true });
+    placer.setPlacements(overlayState.placements);
+    placer.selectedId = pl.id;
+    placer.draw();
+    renderOverlayPieces();
+    syncDecalFromPlacement();
+    overlayStatus("Drag the art on the cut piece. Save when it sits where you want it printed.");
+  };
+  img.src = dataUrl;
+}
+
+function showOverlay() {
+  var el = document.getElementById("dyesub-overlay");
+  if (el) el.hidden = false;
+  var full = document.getElementById("dyesub-overlay-full");
+  if (full) {
+    full.href =
+      "/dyesub.html?product=" +
+      encodeURIComponent(state.product || "freefly-jacket") +
+      "&fit=" +
+      encodeURIComponent(state.fit || "male");
+  }
+  requestAnimationFrame(function () {
+    if (overlayState.placer) overlayState.placer.draw();
+  });
+}
+
+function hideOverlay() {
+  var el = document.getElementById("dyesub-overlay");
+  if (el) el.hidden = true;
+}
+
+function queuePatternArt(partId, dataUrl, filename) {
+  var aspect = 1;
+  loadGarmentSpec(state.product, state.fit)
+    .then(function (g) {
+      overlayState.garment = g;
+      overlayState.partId = partId;
+      var placer = ensureOverlayPlacer();
+      placer.setGarment(g);
+      placer.setBaseColor(state.colors[partId] || "#36B4E5");
+      addOverlayArt(dataUrl, filename, aspect, partId);
+      showOverlay();
+    })
+    .catch(function (e) {
+      overlayStatus(e.message || "Could not load pattern pieces.");
+      showOverlay();
+    });
+}
+
+function openPatternPlacer(partId, dataUrl, filename, aspect, isNew) {
+  overlayState.partId = partId || state.part;
+  loadGarmentSpec(state.product, state.fit)
+    .then(function (g) {
+      overlayState.garment = g;
+      var placer = ensureOverlayPlacer();
+      placer.setGarment(g);
+      placer.setBaseColor(state.colors[overlayState.partId] || "#36B4E5");
+      var list = piecesForPart(g, overlayState.partId);
+      placer.setPiece(list[0] || g.pieces[0]);
+      placer.setPlacements(overlayState.placements);
+      if (isNew && dataUrl) addOverlayArt(dataUrl, filename, aspect, overlayState.partId);
+      else {
+        renderOverlayPieces();
+        placer.draw();
+      }
+      showOverlay();
+      if (!isNew && !overlayState.placements.length) {
+        overlayStatus("Upload art first, then place it on this cut piece.");
+      }
+    })
+    .catch(function (e) {
+      overlayStatus(e.message || "Print pieces for this garment are not ready yet.");
+      showOverlay();
+    });
+}
+
+function dyesubAuthHeaders() {
+  var h = {};
+  var tok = window.HoodooApi && window.HoodooApi.getToken();
+  if (tok) h.Authorization = "Bearer " + tok;
+  return h;
+}
+
+function dataUrlToBlob(dataUrl) {
+  var m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl || "");
+  if (!m) return null;
+  var bin = atob(m[2]);
+  var arr = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: m[1] });
+}
+
+function saveOverlayJob() {
+  if (!window.HoodooApi || !window.HoodooApi.getToken()) {
+    overlayStatus("Sign in to save this print to your account.");
+    window.location.href = "/login?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+    return Promise.reject(new Error("Not authenticated"));
+  }
+  if (!overlayState.garment) return Promise.reject(new Error("No garment"));
+  overlayStatus("Saving…");
+  var layout = {
+    baseColor: state.colors[overlayState.partId] || "#36B4E5",
+    baseColors: {},
+    placements: overlayState.placements,
+  };
+  var body = {
+    garment_id: overlayState.garment.id || "male-jacket",
+    name: (overlayState.garment.name || "Print") + " · " + (state.fit || ""),
+    layout: layout,
+  };
+  var req = overlayState.jobId
+    ? window.HoodooApi.fetchJson("/dyesub/jobs/" + overlayState.jobId, { method: "PUT", body: JSON.stringify({ name: body.name, layout: layout }) })
+    : window.HoodooApi.fetchJson("/dyesub/jobs", { method: "POST", body: JSON.stringify(body) });
+  return req
+    .then(function (job) {
+      overlayState.jobId = job.id;
+      var chain = Promise.resolve();
+      overlayState.arts.forEach(function (a) {
+        if (!a.local || !a.dataUrl) return;
+        chain = chain.then(function () {
+          var blob = dataUrlToBlob(a.dataUrl);
+          if (!blob) return;
+          var fd = new FormData();
+          fd.append("file", blob, a.filename || "art.png");
+          return fetch("/api/dyesub/jobs/" + job.id + "/art", {
+            method: "POST",
+            headers: dyesubAuthHeaders(),
+            credentials: "same-origin",
+            body: fd,
+          }).then(function (r) {
+            return r.json().then(function (meta) {
+              if (!r.ok) throw new Error((meta && meta.detail) || "Upload failed");
+              overlayState.placements.forEach(function (p) {
+                if (p.artId === a.id) p.artId = meta.id;
+              });
+              a.id = meta.id;
+              a.local = false;
+            });
+          });
+        });
+      });
+      return chain.then(function () {
+        return window.HoodooApi.fetchJson("/dyesub/jobs/" + job.id, {
+          method: "PUT",
+          body: JSON.stringify({ layout: { baseColor: layout.baseColor, placements: overlayState.placements } }),
+        });
+      });
+    })
+    .then(function () {
+      overlayStatus("Saved to your account.");
+    })
+    .catch(function (e) {
+      overlayStatus(e.message || "Could not save.");
+      throw e;
+    });
+}
+
+function downloadOverlayPack() {
+  saveOverlayJob()
+    .then(function () {
+      overlayStatus("Building print pack…");
+      return fetch("/api/dyesub/jobs/" + overlayState.jobId + "/pack", {
+        headers: dyesubAuthHeaders(),
+        credentials: "same-origin",
+      });
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error("Pack failed");
+      return r.blob();
+    })
+    .then(function (blob) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hoodoo-dyesub.zip";
+      a.click();
+      overlayStatus("Downloaded. PRINT PNGs are 300 DPI for the F6200; CLO folder matches pattern piece names.");
+    })
+    .catch(function (e) {
+      overlayStatus(e.message || "Could not build pack.");
+    });
+}
+
+function bindOverlay() {
+  var close = document.getElementById("dyesub-overlay-close");
+  if (close) close.addEventListener("click", hideOverlay);
+  var save = document.getElementById("dyesub-overlay-save");
+  if (save) save.addEventListener("click", function () { saveOverlayJob(); });
+  var pack = document.getElementById("dyesub-overlay-pack");
+  if (pack) pack.addEventListener("click", downloadOverlayPack);
+}
+
 function bindPalette() {
   buildSwatches();
   var file = document.getElementById("part-art-file");
   if (file && !file.dataset.bound) {
     file.dataset.bound = "1";
     file.addEventListener("change", function () {
-      var f = file.files && file.files[0];
+      var files = file.files ? Array.prototype.slice.call(file.files) : [];
       file.value = "";
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        setPartArt(state.part, String(reader.result || ""));
-      };
-      reader.readAsDataURL(f);
+      if (!files.length) return;
+      files.forEach(function (f, i) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var url = String(reader.result || "");
+          if (i === files.length - 1) setPartArt(state.part, url, f.name);
+          else queuePatternArt(state.part, url, f.name);
+        };
+        reader.readAsDataURL(f);
+      });
     });
   }
   var clearBtn = document.getElementById("part-art-clear");
@@ -814,6 +1104,12 @@ function bindPalette() {
     clearBtn.dataset.bound = "1";
     clearBtn.addEventListener("click", function () {
       clearPartArt(state.part);
+      if (overlayState.placements) {
+        overlayState.placements = overlayState.placements.filter(function (p) {
+          var ids = piecesForPart(overlayState.garment, state.part).map(function (x) { return x.id; });
+          return ids.indexOf(p.pieceId) === -1;
+        });
+      }
     });
   }
   var scale = document.getElementById("part-art-scale");
@@ -824,6 +1120,27 @@ function bindPalette() {
       if (!art) return;
       art.repeat = Number(scale.value) || 1;
       applyColors();
+    });
+  }
+  var ox = document.getElementById("part-art-x");
+  var oy = document.getElementById("part-art-y");
+  function bindOffset(el, key) {
+    if (!el || el.dataset.bound) return;
+    el.dataset.bound = "1";
+    el.addEventListener("input", function () {
+      var art = state.art[state.part];
+      if (!art) return;
+      art[key] = Number(el.value) || 0;
+      applyColors();
+    });
+  }
+  bindOffset(ox, "offsetX");
+  bindOffset(oy, "offsetY");
+  var placeBtn = document.getElementById("btn-place-pattern");
+  if (placeBtn && !placeBtn.dataset.bound) {
+    placeBtn.dataset.bound = "1";
+    placeBtn.addEventListener("click", function () {
+      openPatternPlacer(state.part, null, null, null, false);
     });
   }
   var embInput = document.getElementById("embroidery-text");
@@ -1275,21 +1592,25 @@ function prepareGarment(root) {
   });
 }
 
-function fitTextureToUv(tex, bounds, repeatMul, offX, offY) {
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
+function fitTextureAsDecal(tex, bounds, size, offsetX, offsetY, aspect) {
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.flipY = false;
-  var rep = repeatMul || 1;
-  if (bounds) {
-    var spanU = Math.max(Math.abs(bounds.maxU - bounds.minU), 1e-4);
-    var spanV = Math.max(Math.abs(bounds.maxV - bounds.minV), 1e-4);
-    tex.repeat.set(rep / spanU, rep / spanV);
-    tex.offset.set(-bounds.minU * tex.repeat.x + (offX || 0), -bounds.minV * tex.repeat.y + (offY || 0));
-  } else {
-    tex.repeat.set(rep, rep);
-    tex.offset.set(offX || 0, offY || 0);
+  var spanU = bounds ? Math.max(Math.abs(bounds.maxU - bounds.minU), 1e-4) : 1;
+  var spanV = bounds ? Math.max(Math.abs(bounds.maxV - bounds.minV), 1e-4) : 1;
+  var cover = Math.min(0.9, Math.max(0.08, 0.4 * (size || 1)));
+  var coverU = spanU * cover;
+  var imgAspect = aspect && aspect > 0.05 ? aspect : 1;
+  var coverV = coverU / imgAspect;
+  if (coverV > spanV * 0.9) {
+    coverV = spanV * 0.9;
+    coverU = coverV * imgAspect;
   }
+  tex.repeat.set(1 / coverU, 1 / coverV);
+  var cx = (bounds ? (bounds.minU + bounds.maxU) / 2 : 0.5) + (offsetX || 0) * spanU;
+  var cy = (bounds ? (bounds.minV + bounds.maxV) / 2 : 0.5) + (offsetY || 0) * spanV;
+  tex.offset.set(0.5 - cx * tex.repeat.x, 0.5 - cy * tex.repeat.y);
   tex.needsUpdate = true;
 }
 
@@ -1303,7 +1624,14 @@ function tintMaterial(mesh, m, partId) {
   if (art && art.texture) {
     var t = art.texture.clone();
     t.needsUpdate = true;
-    fitTextureToUv(t, mesh.userData.uvBounds, art.repeat || 1, art.offsetX || 0, art.offsetY || 0);
+    fitTextureAsDecal(
+      t,
+      mesh.userData.uvBounds,
+      art.repeat || 1,
+      art.offsetX || 0,
+      art.offsetY || 0,
+      art.aspect || 1
+    );
     m.map = t;
   } else if (m.userData && m.userData.baseMap) {
     m.map = m.userData.baseMap;
@@ -1341,22 +1669,28 @@ function applyColors() {
   });
 }
 
-function setPartArt(partId, dataUrl) {
+function setPartArt(partId, dataUrl, filename) {
   if (!partId || !dataUrl) return;
   texLoader.load(dataUrl, function (tex) {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.flipY = false;
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
+    tex.wrapS = THREE.ClampToEdgeWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
     var prev = state.art[partId];
+    var img = tex.image;
+    var aspect = img && img.width && img.height ? img.width / img.height : 1;
     state.art[partId] = {
       dataUrl: dataUrl,
+      filename: filename || (prev && prev.filename) || "art.png",
       texture: tex,
       repeat: (prev && prev.repeat) || 1,
-      offsetX: 0,
-      offsetY: 0,
+      offsetX: prev && typeof prev.offsetX === "number" ? prev.offsetX : 0,
+      offsetY: prev && typeof prev.offsetY === "number" ? prev.offsetY : 0,
+      aspect: aspect,
     };
     applyColors();
+    syncPalette();
+    openPatternPlacer(partId, dataUrl, filename, aspect, true);
   });
 }
 
@@ -1605,6 +1939,7 @@ buildSizeFit();
 
 buildParts();
 bindPalette();
+bindOverlay();
 window.addEventListener("hoodoo-color", function (e) {
   if (!e.detail) return;
   if (e.detail.part && currentParts().some(function (p) { return p.id === e.detail.part; })) {

@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=20260907n" />
-  <link rel="stylesheet" href="/suit.css?v=20260907n" />
+  <link rel="stylesheet" href="/styles.css?v=20260918a" />
+  <link rel="stylesheet" href="/suit.css?v=20260918a" />
   <script type="importmap">
   {
     "imports": {
@@ -63,12 +63,20 @@
         </div>
         <div class="suit-swatches" id="swatches" role="group" aria-label="Taslan stock colors"></div>
         <label class="btn btn-ghost suit-art-upload">Upload art
-          <input type="file" id="part-art-file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" />
+          <input type="file" id="part-art-file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" multiple />
         </label>
         <button type="button" class="btn btn-ghost" id="part-art-clear">Clear art</button>
-        <label class="suit-art-scale">Scale
+        <button type="button" class="btn btn-ghost" id="btn-place-pattern">Place on pattern pieces</button>
+        <label class="suit-art-scale">Size
           <input type="range" id="part-art-scale" min="0.2" max="4" step="0.05" value="1" />
         </label>
+        <label class="suit-art-scale">Move X
+          <input type="range" id="part-art-x" min="-0.5" max="0.5" step="0.01" value="0" />
+        </label>
+        <label class="suit-art-scale">Move Y
+          <input type="range" id="part-art-y" min="-0.5" max="0.5" step="0.01" value="0" />
+        </label>
+        <p class="suit-art-hint">Art sits as a graphic you can size and move — it does not stretch across the whole panel. For print-accurate placement use the pattern pieces.</p>
         <button type="button" class="btn btn-primary" id="to-sizing">Proceed to sizing →</button>
       </div>
     </aside>
@@ -78,6 +86,29 @@
       <p class="suit-clo-note" id="clo-note"></p>
     </div>
   </section>
+
+  <div id="dyesub-overlay" class="dyesub-overlay" hidden>
+    <div class="dyesub-overlay-card" role="dialog" aria-labelledby="dyesub-overlay-title">
+      <header class="dyesub-overlay-head">
+        <div>
+          <p class="dyesub-overlay-kicker">Print placement · CLO cut piece</p>
+          <h2 id="dyesub-overlay-title">Place art on the pattern</h2>
+        </div>
+        <button type="button" class="btn btn-ghost" id="dyesub-overlay-close">Done</button>
+      </header>
+      <p class="dyesub-overlay-lede">This outline is the real Male Freefly Jacket cut (layer 84, includes 0.5 in seam). Drag to move, corners resize, top handle rotates. This is what prints on the F6200 — the 3D view is only a preview.</p>
+      <div class="dyesub-overlay-body">
+        <ul id="dyesub-overlay-pieces" class="dyesub-overlay-pieces"></ul>
+        <canvas id="dyesub-overlay-canvas" width="720" height="820"></canvas>
+      </div>
+      <p id="dyesub-overlay-status" class="dyesub-overlay-status" role="status"></p>
+      <footer class="dyesub-overlay-foot">
+        <button type="button" class="btn btn-primary" id="dyesub-overlay-save">Save to account</button>
+        <button type="button" class="btn btn-ghost" id="dyesub-overlay-pack">Download print pack</button>
+        <a class="btn btn-ghost" id="dyesub-overlay-full" href="/dyesub.html">Full print builder</a>
+      </footer>
+    </div>
+  </div>
 
   <section class="suit-step suit-sizing" id="step-3" hidden>
     <div class="size-col size-col-model">
@@ -184,7 +215,7 @@
           window.dispatchEvent(new CustomEvent("hoodoo-color", { detail: { part: part, color: s.dataset.c, name: s.dataset.name } }));
         }
       });
-      fetch("/data/materials.json?v=20260907n")
+      fetch("/data/materials.json?v=20260918a")
         .then(function (r) { return r.json(); })
         .then(function (data) {
           mats = data;
@@ -193,7 +224,7 @@
         .catch(function () {});
     })();
   </script>
-  <script src="/js/api.js?v=20260907n"></script>
-  <script type="module" src="/js/suit-configurator.js?v=20260907n"></script>
+  <script src="/js/api.js?v=20260918a"></script>
+  <script type="module" src="/js/suit-configurator.js?v=20260918a"></script>
 </body>
 </html>

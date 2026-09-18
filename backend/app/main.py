@@ -92,6 +92,7 @@ async def no_cache_configurator(request, call_next):
         path in ("/suit", "/suit.html", "/suit.css", "/dyesub", "/dyesub.html", "/dyesub.css")
         or path.startswith("/js/suit-configurator.js")
         or path.startswith("/js/dyesub.js")
+        or path.startswith("/js/dyesub-place.js")
         or path.startswith("/3d/clo/manifest.json")
         or path.startswith("/data/materials.json")
         or path.startswith("/admin/")

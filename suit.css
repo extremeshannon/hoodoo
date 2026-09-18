@@ -245,7 +245,107 @@
   font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #cfd3d8;
 }
 .suit-art-scale input { width: 5.5rem; }
+.suit-art-hint {
+  margin: 0.35rem 0 0.15rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: #8b95a5;
+}
 .suit-palette .btn { white-space: nowrap; display: block; width: 100%; margin-top: 0.4rem; text-align: center; }
+
+.dyesub-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(10, 11, 13, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.dyesub-overlay[hidden] { display: none; }
+.dyesub-overlay-card {
+  width: min(1100px, 100%);
+  max-height: 94dvh;
+  overflow: auto;
+  background: #12151a;
+  color: #e8ecf1;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 1.1rem;
+}
+.dyesub-overlay-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.dyesub-overlay-kicker {
+  margin: 0 0 0.2rem;
+  color: #36B4E5;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dyesub-overlay-head h2 { margin: 0; font-size: 1.25rem; }
+.dyesub-overlay-lede {
+  color: #8b95a5;
+  font-size: 0.85rem;
+  margin: 0.6rem 0 0.85rem;
+}
+.dyesub-overlay-body {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 0.75rem;
+  min-height: 28rem;
+}
+.dyesub-overlay-pieces {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.dyesub-overlay-pieces button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+}
+.dyesub-overlay-pieces button.is-on {
+  border-color: #36B4E5;
+}
+#dyesub-overlay-canvas {
+  width: 100%;
+  height: min(70dvh, 820px);
+  background: #0a0b0d;
+  border-radius: 8px;
+  touch-action: none;
+}
+.dyesub-overlay-status {
+  min-height: 1.2em;
+  margin: 0.5rem 0 0;
+  color: #8b95a5;
+  font-size: 0.8rem;
+}
+.dyesub-overlay-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.dyesub-overlay-foot .btn { width: auto; display: inline-flex; }
+@media (max-width: 800px) {
+  .dyesub-overlay-body { grid-template-columns: 1fr; }
+}
 .suit-sizing {
   display: grid;
   grid-template-columns: 1fr 1.1fr 1fr;
