@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <title>Dye-sub print builder | Hoodoo Alaska</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=20260918o" />
+  <link rel="stylesheet" href="/dyesub.css?v=20260918o" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/js/vendor/three/three.module.js",
+      "three/addons/": "/js/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body class="page-app page-dyesub">
+  <a class="skip-link" href="#dyesub-main">Skip to print builder</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Hoodoo Alaska home">
+        <img src="/assets/logo.png" alt="Hoodoo Alaska" width="741" height="628" class="brand-logo" />
+      </a>
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/suit.html">Jumpsuits</a></li>
+          <li><a href="/dyesub.html" aria-current="page">Dye-sub</a></li>
+          <li><a href="/account.html">Account</a></li>
+          <li><a class="nav-cta" href="/quote.html">Quote</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="dyesub-main" class="dyesub-main">
+    <div id="dyesub-gate" class="app-panel dyesub-gate" hidden>
+      <h1 class="app-title">Dye-sub print builder</h1>
+      <p class="app-lede">Sign in to place art on the Male Freefly Jacket, save it to your account, and send it to Hoodoo for a quote.</p>
+      <p><a class="btn btn-primary" href="/login?next=%2Fdyesub.html">Sign in</a> <a class="btn btn-ghost" href="/register?next=%2Fdyesub.html">Create account</a></p>
+    </div>
+
+    <div id="dyesub-app" hidden>
+      <div class="dyesub-toolbar">
+        <div class="dyesub-toolbar-copy">
+          <p class="dyesub-kicker" id="garment-kicker">Male Freefly Jacket · size M</p>
+          <label class="dyesub-name-label">Job name
+            <input type="text" id="job-name" maxlength="255" value="Untitled print" />
+          </label>
+        </div>
+        <div class="dyesub-toolbar-actions">
+          <button type="button" class="btn btn-ghost" id="btn-save">Save to account</button>
+          <button type="button" class="btn btn-primary" id="btn-quote">Send in for quote</button>
+          <button type="button" class="btn btn-ghost" id="btn-pack" hidden>Download print pack</button>
+        </div>
+      </div>
+      <p id="dyesub-status" class="dyesub-status" role="status" aria-live="polite"></p>
+
+      <div class="dyesub-layout">
+        <aside class="dyesub-col dyesub-pieces" aria-label="Pattern pieces">
+          <h2>Pieces</h2>
+          <p class="dyesub-hint">Each piece has its own base fabric color. Cut sizes from CLO DXF layer 84, including 0.5 in seam. Bleed 0.25 in.</p>
+          <ul id="piece-list" class="dyesub-piece-list"></ul>
+          <div class="dyesub-hardware">
+            <h3>Hardware</h3>
+            <label class="dyesub-color">Zipper
+              <button type="button" class="dyesub-swatch-btn" id="zip-swatch" data-palette="zip" aria-label="Zipper color"></button>
+            </label>
+            <label class="dyesub-check">
+              <input type="checkbox" id="thread-opposing" />
+              Opposing thread
+            </label>
+            <label class="dyesub-color" id="thread-color-row" hidden>
+              Thread
+              <button type="button" class="dyesub-swatch-btn" id="thread-swatch" data-palette="thread" aria-label="Thread color"></button>
+            </label>
+          </div>
+        </aside>
+
+        <section class="dyesub-stage" aria-label="Piece canvas">
+          <div class="dyesub-stage-frame">
+            <canvas id="piece-canvas" width="1" height="1"></canvas>
+          </div>
+          <p class="dyesub-stage-meta" id="stage-meta"></p>
+        </section>
+
+        <section class="dyesub-stage dyesub-stage-3d" aria-label="3D preview">
+          <div class="dyesub-stage-frame">
+            <canvas id="dyesub-3d" width="1" height="1"></canvas>
+            <div id="dyesub-3d-load" class="dyesub-3d-load" hidden>
+              <div class="dyesub-3d-spinner" aria-hidden="true"></div>
+              <p class="dyesub-3d-load-title" id="dyesub-3d-load-title">Loading 3D jacket</p>
+              <p class="dyesub-3d-load-pct" id="dyesub-3d-pct">0%</p>
+              <div class="dyesub-3d-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="dyesub-3d-barwrap">
+                <span id="dyesub-3d-bar"></span>
+              </div>
+              <p class="dyesub-3d-load-detail" id="dyesub-3d-detail">Starting download…</p>
+            </div>
+          </div>
+          <p class="dyesub-stage-meta" id="stage-3d-meta">3D preview · drag to orbit · click a panel to edit that piece</p>
+        </section>
+
+        <aside class="dyesub-col dyesub-art" aria-label="Artwork">
+          <h2>Artwork</h2>
+          <button type="button" class="btn btn-ghost dyesub-upload" id="btn-add-art">Add artwork</button>
+          <input type="file" id="art-files" class="dyesub-file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" multiple />
+          <ul id="art-list" class="dyesub-art-list"></ul>
+          <div id="sel-props" class="dyesub-props" hidden>
+            <h3>Selected art</h3>
+            <label>Width (in) <input type="number" id="prop-w" min="0.1" step="0.05" /></label>
+            <label>Height (in) <input type="number" id="prop-h" min="0.1" step="0.05" /></label>
+            <label>X (in) <input type="number" id="prop-x" step="0.05" /></label>
+            <label>Y (in) <input type="number" id="prop-y" step="0.05" /></label>
+            <label>Rotate <input type="number" id="prop-rot" step="1" /></label>
+            <div class="dyesub-prop-actions">
+              <button type="button" class="btn btn-ghost" id="btn-mirror">Mirror to pair</button>
+              <button type="button" class="btn btn-ghost" id="btn-remove">Remove from piece</button>
+            </div>
+          </div>
+          <p class="dyesub-hint">Drag to move. Corners resize. The top handle rotates. Files save on your account so the shop can print and import into CLO3D.</p>
+        </aside>
+      </div>
+      <div id="dyesub-palette" class="dyesub-palette" hidden>
+        <div class="dyesub-palette-head">
+          <p id="dyesub-palette-title">Fabric color</p>
+          <button type="button" class="btn btn-ghost" id="dyesub-palette-close">Close</button>
+        </div>
+        <div id="dyesub-palette-body" class="dyesub-palette-body"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="pack-overlay" class="pack-busy" hidden>
+    <div class="pack-busy-card" id="pack-busy-card" role="alertdialog" aria-modal="true" aria-labelledby="pack-busy-title" aria-describedby="pack-busy-detail">
+      <p class="pack-busy-kicker" id="pack-busy-kicker">Epson F6200 · 300 DPI</p>
+      <h2 id="pack-busy-title">Building print pack</h2>
+      <p class="pack-busy-detail" id="pack-busy-detail">Saving job…</p>
+      <p class="pack-busy-pct" id="pack-busy-pct">0%</p>
+      <div class="pack-busy-bar" id="pack-busy-barwrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="pack-busy-bar"></span>
+      </div>
+      <p class="pack-busy-banner" id="pack-busy-banner" hidden>Completed</p>
+      <button type="button" class="btn btn-primary" id="pack-busy-done" hidden>Done</button>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/main.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/pack-busy.js?v=20260918p"></script>
+  <script type="module" src="/js/dyesub-3d.js?v=20260918o"></script>
+  <script defer src="/js/dyesub.js?v=20260918o"></script>
+</body>
+</html>

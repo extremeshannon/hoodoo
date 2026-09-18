@@ -60,6 +60,8 @@ services:
       - ./pricing.html:/app/pricing.html
       - ./suit.html:/app/suit.html
       - ./suit.css:/app/suit.css
+      - ./dyesub.html:/app/dyesub.html
+      - ./dyesub.css:/app/dyesub.css
       - ./configurator.html:/app/configurator.html
       - ./configurator.css:/app/configurator.css
       - ./configurator.js:/app/configurator.js

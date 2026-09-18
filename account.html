@@ -29,7 +29,7 @@
           <li><a href="/index.html">Home</a></li>
           <li><a href="/configurator.html">Configurator</a></li>
           <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
-          <li><a class="nav-cta" href="/quote.html">Quote</a></li>
+          <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
         </ul>
       </nav>
     </div>
@@ -51,6 +51,14 @@
           <p id="orders-empty" class="muted" hidden>No orders yet. Save a cart from the <a href="/cart.html">cart page</a> while logged in.</p>
           <ul id="orders-list" class="orders-list"></ul>
         </section>
+        <section class="account-orders" aria-labelledby="dyesub-heading">
+          <h2 id="dyesub-heading" class="app-section-title">Dye-sub print jobs</h2>
+          <p>
+            <a class="btn btn-primary" href="/dyesub.html?garment=male-jacket">Open print builder</a>
+          </p>
+          <p id="dyesub-empty" class="muted" hidden>No saved prints yet. Open the builder to place art on the Male Freefly Jacket, save it, and send it in for a quote.</p>
+          <ul id="dyesub-list" class="orders-list"></ul>
+        </section>
       </div>
       <p id="account-error" class="auth-feedback" role="status" aria-live="polite"></p>
     </div>
@@ -64,7 +72,6 @@
   </footer>
 
   <script src="/js/api.js"></script>
-  <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
   <script src="/js/auth-nav.js"></script>
   <script>
@@ -97,25 +104,78 @@
           var empty = document.getElementById("orders-empty");
           if (!orders || !orders.length) {
             empty.hidden = false;
+          } else {
+            empty.hidden = true;
+            orders.forEach(function (o) {
+              var li = document.createElement("li");
+              li.className = "orders-row";
+              var d = new Date(o.created_at);
+              var sub = o.subtotal;
+              li.innerHTML =
+                '<a class="orders-row-link" href="/order.html?id=' +
+                encodeURIComponent(o.id) +
+                '"><span class="orders-row-date">' +
+                d.toLocaleString() +
+                '</span><span class="orders-row-total">$' +
+                sub +
+                '</span><span class="orders-row-status">' +
+                o.status +
+                "</span></a>";
+              list.appendChild(li);
+            });
+          }
+          return window.HoodooApi.fetchJson("/dyesub/jobs");
+        })
+        .then(function (jobs) {
+          var list = document.getElementById("dyesub-list");
+          var empty = document.getElementById("dyesub-empty");
+          if (!list) return;
+          if (!jobs || !jobs.length) {
+            if (empty) empty.hidden = false;
             return;
           }
-          empty.hidden = true;
-          orders.forEach(function (o) {
+          if (empty) empty.hidden = true;
+          jobs.forEach(function (j) {
             var li = document.createElement("li");
             li.className = "orders-row";
-            var d = new Date(o.created_at);
-            var sub = o.total || o.subtotal;
+            var d = new Date(j.updated_at || j.created_at);
+            var nArt = (j.artworks && j.artworks.length) || 0;
+            var status = j.status || "draft";
+            var quoteBtn =
+              status === "draft"
+                ? '<button type="button" class="btn btn-ghost account-quote-btn" data-id="' +
+                  j.id +
+                  '">Send for quote</button>'
+                : "";
             li.innerHTML =
-              '<a class="orders-row-link" href="/order.html?id=' +
-              encodeURIComponent(o.id) +
+              '<a class="orders-row-link" href="/dyesub.html?job=' +
+              encodeURIComponent(j.id) +
               '"><span class="orders-row-date">' +
               d.toLocaleString() +
-              '</span><span class="orders-row-total">$' +
-              sub +
+              '</span><span class="orders-row-total">' +
+              (j.name || "Print") +
               '</span><span class="orders-row-status">' +
-              o.status +
-              "</span></a>";
+              nArt +
+              " art · " +
+              status.replace(/_/g, " ") +
+              "</span></a>" +
+              quoteBtn;
             list.appendChild(li);
+          });
+          list.querySelectorAll(".account-quote-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              var id = btn.getAttribute("data-id");
+              btn.disabled = true;
+              window.HoodooApi
+                .fetchJson("/dyesub/jobs/" + id + "/quote", { method: "POST" })
+                .then(function () {
+                  window.location.reload();
+                })
+                .catch(function (e) {
+                  btn.disabled = false;
+                  errEl.textContent = e.message || "Could not send quote.";
+                });
+            });
           });
         })
         .catch(function (e) {

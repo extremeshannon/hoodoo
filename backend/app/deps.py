@@ -49,3 +49,9 @@ def require_staff(user: Annotated[User, Depends(get_current_user)]) -> User:
     if user.role not in ("staff", "admin"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Staff access required")
     return user
+
+
+def require_admin(user: Annotated[User, Depends(get_current_user)]) -> User:
+    if user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    return user

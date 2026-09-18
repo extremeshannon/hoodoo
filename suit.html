@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=20260911a" />
-  <link rel="stylesheet" href="/suit.css?v=20260911a" />
+  <link rel="stylesheet" href="/styles.css?v=20260918m" />
+  <link rel="stylesheet" href="/suit.css?v=20260918af" />
   <script type="importmap">
   {
     "imports": {
@@ -43,35 +43,23 @@
   </section>
 
   <section class="suit-step" id="step-2" hidden>
-    <aside class="suit-side" id="suit-side">
-      <nav class="suit-parts" id="suit-parts" aria-label="Garment parts">
-        <button type="button" class="suit-part is-on" data-id="front">Front</button>
-        <button type="button" class="suit-part" data-id="back">Back</button>
-        <button type="button" class="suit-part" data-id="sleeves">Sleeves</button>
-        <button type="button" class="suit-part" data-id="collar">Collar</button>
-        <button type="button" class="suit-part" data-id="zipper">Zipper</button>
-        <button type="button" class="suit-part" data-id="waistband">Waist Band</button>
-        <button type="button" class="suit-part" data-id="stitch">Stitch</button>
+    <aside class="suit-rail" id="suit-rail">
+      <nav class="suit-cats" id="suit-cats" aria-label="Build options">
+        <button type="button" class="suit-cat" data-rail="type" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm-7 9.5C5 10.12 8.13 9 12 9s7 1.12 7 2.5V14l-3 .5V22h-2.2l-.8-6h-2l-.8 6H8v-7.5L5 14v-2.5z"/></svg>
+          Suit type
+        </button>
+        <button type="button" class="suit-cat" data-rail="options" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/></svg>
+          Options
+        </button>
+        <button type="button" class="suit-cat" data-rail="handles" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4h3v7a2 2 0 1 0 4 0V4h3v7a5 5 0 0 1-10 0V4zm-1 14h12v2H6v-2z"/></svg>
+          Handles
+        </button>
       </nav>
-      <div class="suit-palette" id="suit-palette">
-        <p class="suit-palette-part" id="palette-part-label">Taslan · Front</p>
-        <p class="suit-palette-note" id="palette-note" hidden></p>
-        <div class="suit-embroidery" id="embroidery-fields" hidden>
-          <label class="suit-embroidery-label" for="embroidery-text">Embroidery text
-            <input type="text" id="embroidery-text" maxlength="48" placeholder="Name or text to sew" autocomplete="off" />
-          </label>
-        </div>
-        <div class="suit-swatches" id="swatches" role="group" aria-label="Taslan stock colors"></div>
-        <label class="btn btn-ghost suit-art-upload">Upload art
-          <input type="file" id="part-art-file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" />
-        </label>
-        <button type="button" class="btn btn-ghost" id="part-art-clear">Clear art</button>
-        <label class="suit-art-scale">Scale
-          <input type="range" id="part-art-scale" min="0.2" max="4" step="0.05" value="1" />
-        </label>
-        <button type="button" class="btn btn-primary" id="to-sizing">Proceed to sizing →</button>
-      </div>
     </aside>
+    <div class="suit-flyout" id="suit-flyout" hidden></div>
     <div class="suit-stage">
       <canvas id="suit-canvas"></canvas>
       <div class="suit-logo-loader" id="suit-logo-loader" hidden role="status" aria-live="polite">
@@ -84,13 +72,74 @@
       <p class="suit-watermark">HOODOO</p>
       <p class="suit-clo-note" id="clo-note"></p>
     </div>
+    <div class="suit-dock" id="suit-dock">
+      <div class="suit-dock-meta">
+        <p class="suit-palette-part" id="palette-part-label">Click a panel, then pick a color</p>
+        <p class="suit-palette-note" id="palette-note" hidden></p>
+        <nav class="suit-part-tabs" id="suit-part-tabs" aria-label="Garment panels"></nav>
+        <div class="suit-embroidery" id="embroidery-fields" hidden>
+          <label class="suit-embroidery-label" for="embroidery-text">Embroidery text
+            <input type="text" id="embroidery-text" maxlength="48" placeholder="Name or text to sew" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+      <div class="suit-swatches" id="swatches" role="group" aria-label="Taslan stock colors"></div>
+      <div class="suit-dock-tools">
+        <label class="btn btn-ghost suit-art-upload">Upload art
+          <input type="file" id="part-art-file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" multiple />
+        </label>
+        <button type="button" class="btn btn-ghost" id="part-art-clear">Clear art</button>
+        <button type="button" class="btn btn-ghost" id="btn-place-pattern">Place on pattern</button>
+        <label class="suit-art-scale">Size
+          <input type="range" id="part-art-scale" min="0.2" max="4" step="0.05" value="1" />
+        </label>
+        <label class="suit-art-scale">Move X
+          <input type="range" id="part-art-x" min="-0.5" max="0.5" step="0.01" value="0" />
+        </label>
+        <label class="suit-art-scale">Move Y
+          <input type="range" id="part-art-y" min="-0.5" max="0.5" step="0.01" value="0" />
+        </label>
+        <p class="suit-art-hint">Click a panel on the suit, then a color. Printed suits go to dye-sub for art.</p>
+        <button type="button" class="btn btn-primary" id="to-sizing">Proceed to sizing →</button>
+      </div>
+    </div>
   </section>
 
+  <div id="dyesub-overlay" class="dyesub-overlay" hidden>
+    <div class="dyesub-overlay-card" role="dialog" aria-labelledby="dyesub-overlay-title">
+      <header class="dyesub-overlay-head">
+        <div>
+          <p class="dyesub-overlay-kicker">Print placement · CLO cut piece</p>
+          <h2 id="dyesub-overlay-title">Place art on the pattern</h2>
+        </div>
+        <button type="button" class="btn btn-ghost" id="dyesub-overlay-close">Done</button>
+      </header>
+      <p class="dyesub-overlay-lede">This outline is the real cut piece (including 0.5 in seam). Drag to move, corners resize, top handle rotates. This is what prints — the 3D view is a preview.</p>
+      <div class="dyesub-overlay-body">
+        <ul id="dyesub-overlay-pieces" class="dyesub-overlay-pieces"></ul>
+        <canvas id="dyesub-overlay-canvas" width="720" height="820"></canvas>
+      </div>
+      <p id="dyesub-overlay-status" class="dyesub-overlay-status" role="status"></p>
+      <footer class="dyesub-overlay-foot">
+        <button type="button" class="btn btn-primary" id="dyesub-overlay-save">Save to account</button>
+        <button type="button" class="btn btn-ghost" id="dyesub-overlay-pack">Download print pack</button>
+        <a class="btn btn-ghost" id="dyesub-overlay-full" href="/dyesub.html">Full print builder</a>
+      </footer>
+    </div>
+  </div>
+
   <section class="suit-step suit-sizing" id="step-3" hidden>
-    <!-- hoodoo-sizing-avatar-20260911a -->
+    <!-- hoodoo-sizing-avatar-20260918ag -->
     <div class="size-col size-col-model">
       <div class="size-figure" id="size-figure" data-fit="male" data-measure="chest">
         <canvas id="size-avatar-canvas" aria-label="3D wireframe sizing figure"></canvas>
+        <div class="size-avatar-loader" id="size-avatar-loader" hidden role="status" aria-live="polite">
+          <div class="size-avatar-loader__mark">
+            <span class="size-avatar-loader__glow" aria-hidden="true"></span>
+            <img src="/assets/logo.png" alt="Hoodoo" width="741" height="628" />
+          </div>
+          <p class="size-avatar-loader__pct" id="size-avatar-loader-pct">0%</p>
+        </div>
       </div>
       <p class="size-360" id="size-360-label">360°</p>
       <div class="size-gender" id="size-fit">
@@ -121,7 +170,8 @@
       <label>Arm <input id="sz-arm" placeholder="25" /></label>
       <p class="size-sub">Final touch: proper sizing is comfort on the ground and confidence in freefall.</p>
       <div class="size-actions">
-        <button type="button" class="btn btn-primary" id="btn-pack">Download print &amp; cut files</button>
+        <a class="btn btn-primary" id="btn-dyesub" href="/dyesub.html?product=freefly-jacket&amp;fit=male">Place dye-sub art</a>
+        <button type="button" class="btn btn-ghost" id="btn-pack">Download print &amp; cut files</button>
         <button type="button" class="btn btn-ghost" id="btn-suit-email">Email this build</button>
       </div>
       <p id="pack-status" class="quote-hint" role="status"></p>
@@ -205,9 +255,9 @@
         .catch(function () {});
     })();
   </script>
-  <script src="/js/api.js?v=20260908c"></script>
+  <script src="/js/api.js?v=20260918m"></script>
   <script src="/js/staff-gate.js"></script>
-  <script type="module" src="/js/sizing-avatar.js?v=20260911a"></script>
-  <script type="module" src="/js/suit-configurator.js?v=20260917h"></script>
+  <script type="module" src="/js/sizing-avatar.js?v=20260918ag"></script>
+  <script type="module" src="/js/suit-configurator.js?v=20260918m"></script>
 </body>
 </html>

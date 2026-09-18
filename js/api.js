@@ -73,6 +73,7 @@
       return fetch(this.apiUrl(path), req).then(function (r) {
         if (r.status === 204) return null;
         return r.text().then(function (text) {
+          if (r.status === 204 || r.status === 205 || (!text && r.ok)) return null;
           var j = null;
           try {
             j = text ? JSON.parse(text) : null;

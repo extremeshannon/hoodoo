@@ -4,6 +4,17 @@ from __future__ import annotations
 
 from urllib.parse import quote
 
+# Logged-in customers: save prints, send quotes, open account history.
+CUSTOMER_AUTH_PREFIXES = (
+    "/dyesub",
+    "/account",
+    "/order",
+    "/js/dyesub",
+    "/3d/",
+    "/data/dyesub",
+    "/data/materials.json",
+)
+
 STAFF_PREFIXES = (
     "/configurator",
     "/cart",
@@ -11,11 +22,8 @@ STAFF_PREFIXES = (
     "/quote",
     "/pricing",
     "/viewer",
-    "/account",
-    "/order",
     "/register",
     "/admin.html",
-    "/3d/",
     "/data/",
     "/js/suit-configurator",
     "/js/sizing-avatar",
@@ -28,6 +36,16 @@ STAFF_PREFIXES = (
 )
 
 
+def _matches(path: str, prefixes: tuple[str, ...]) -> bool:
+    return any(path == prefix or path.startswith(prefix) for prefix in prefixes)
+
+
+def is_customer_auth_path(path: str) -> bool:
+    if path.startswith("/api/"):
+        return False
+    return _matches(path, CUSTOMER_AUTH_PREFIXES)
+
+
 def is_staff_only_path(path: str) -> bool:
     if path.startswith("/api/"):
         return False
@@ -37,7 +55,9 @@ def is_staff_only_path(path: str) -> bool:
         return False
     if path.startswith("/admin/"):
         return True
-    return any(path == prefix or path.startswith(prefix) for prefix in STAFF_PREFIXES)
+    if is_customer_auth_path(path):
+        return False
+    return _matches(path, STAFF_PREFIXES)
 
 
 def login_redirect_url(path: str, query: str = "") -> str:

@@ -44,8 +44,9 @@
         var isStaff = u && (u.role === "staff" || u.role === "admin");
         markStaff(isStaff);
         if (isStaff) {
-          addItem(ul, '<a href="/admin.html">Staff</a>');
+          addItem(ul, u.role === "admin" ? '<a href="/admin.html">Admin</a>' : '<a href="/admin.html">Staff</a>');
         }
+        addItem(ul, '<a href="/account.html">Account</a>');
         addItem(ul, '<button type="button" class="nav-logout" id="nav-logout-btn">Log out</button>');
         var btn = document.getElementById("nav-logout-btn");
         if (btn) btn.addEventListener("click", logout);

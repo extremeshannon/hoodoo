@@ -8,19 +8,19 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
-from app.deps import require_staff
+from app.deps import get_current_user
 from app.models import Order, OrderLine, User
 from app.orders_format import order_to_out
 from app.pricing import PricingError, compute_line, load_product_for_pricing
 from app.schemas import OrderCreateIn, OrderOut
 from app.shipping import quote
 
-router = APIRouter(prefix="/orders", tags=["orders"], dependencies=[Depends(require_staff)])
+router = APIRouter(prefix="/orders", tags=["orders"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("", response_model=list[OrderOut])
 def list_my_orders(
-    user: User = Depends(require_staff),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     q = (
@@ -36,7 +36,7 @@ def list_my_orders(
 @router.get("/{order_id}", response_model=OrderOut)
 def get_order(
     order_id: UUID,
-    user: User = Depends(require_staff),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     o = db.scalar(select(Order).where(Order.id == order_id).options(selectinload(Order.lines)))
@@ -50,7 +50,7 @@ def get_order(
 @router.post("", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
 def create_order(
     body: OrderCreateIn,
-    user: User = Depends(require_staff),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """

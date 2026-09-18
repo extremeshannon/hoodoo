@@ -14,9 +14,21 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.bootstrap import bootstrap_staff_if_configured
 from app.config import get_settings
 from app.database import Base, SessionLocal, engine, ensure_legacy_schema
-from app.routers import admin, admin_config, auth, cart, catalog, garment_3d, orders, production, shipping, shop_quote
+from app.routers import (
+    admin,
+    admin_config,
+    auth,
+    cart,
+    catalog,
+    dyesub,
+    garment_3d,
+    orders,
+    production,
+    shipping,
+    shop_quote,
+)
 from app.seed import seed_if_empty
-from app.staff_pages import is_staff_only_path, login_redirect_url
+from app.staff_pages import is_customer_auth_path, is_staff_only_path, login_redirect_url
 
 
 def resolve_repo_root(settings) -> Path:
@@ -71,14 +83,21 @@ app = FastAPI(title="Hoodoo Alaska API", lifespan=lifespan)
 _settings = get_settings()
 
 
+def _deny_shop_page(path: str, query: str, detail: str):
+    if path.startswith("/3d/") or path.startswith("/data/") or path.startswith("/js/"):
+        return JSONResponse({"detail": detail}, status_code=401)
+    return RedirectResponse(login_redirect_url(path, query), status_code=302)
+
+
 @app.middleware("http")
 async def staff_only_shop_pages(request, call_next):
     path = request.url.path
     session = request.scope.get("session") or {}
-    if is_staff_only_path(path) and not session.get("uid"):
-        if path.startswith("/3d/") or path.startswith("/data/") or path.startswith("/js/"):
-            return JSONResponse({"detail": "Staff access required"}, status_code=401)
-        return RedirectResponse(login_redirect_url(path, request.url.query), status_code=302)
+    role = session.get("role")
+    if is_staff_only_path(path) and role not in ("staff", "admin"):
+        return _deny_shop_page(path, request.url.query, "Staff access required")
+    if is_customer_auth_path(path) and not session.get("uid"):
+        return _deny_shop_page(path, request.url.query, "Sign in required")
     return await call_next(request)
 
 
@@ -87,16 +106,17 @@ async def no_cache_configurator(request, call_next):
     response = await call_next(request)
     path = request.url.path
     if (
-        path in ("/suit", "/suit.html", "/suit.css")
+        path in ("/suit", "/suit.html", "/suit.css", "/dyesub", "/dyesub.html", "/dyesub.css")
         or path.startswith("/js/suit-configurator.js")
         or path.startswith("/js/sizing-avatar.js")
+        or path.startswith("/js/dyesub")
+        or path.startswith("/js/config-preview.js")
         or path.startswith("/3d/sizing/")
         or path.startswith("/3d/clo/manifest.json")
         or path.startswith("/data/materials.json")
         or path.startswith("/admin/")
         or path.startswith("/js/admin-configurator.js")
         or path in ("/configurator.html", "/configurator.js", "/configurator.css", "/cart.html", "/cart.js")
-        or path.startswith("/js/config-preview.js")
     ):
         response.headers["Cache-Control"] = "no-cache, must-revalidate"
     return response
@@ -109,6 +129,7 @@ app.include_router(garment_3d.router, prefix="/api")
 app.include_router(shop_quote.router, prefix="/api")
 app.include_router(shipping.router, prefix="/api")
 app.include_router(production.router, prefix="/api")
+app.include_router(dyesub.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(admin_config.router)
 
@@ -165,6 +186,14 @@ def _attach_static():
     @app.get("/suit.html")
     def serve_suit_html():
         return _html("suit.html")
+
+    @app.get("/dyesub")
+    def serve_dyesub():
+        return _html("dyesub.html")
+
+    @app.get("/dyesub.html")
+    def serve_dyesub_html():
+        return _html("dyesub.html")
 
     # Explicit home page so we never use StaticFiles(html=True), which serves index.html
     # for *any* missing path (e.g. /api/health) if that mount handles the request first.

@@ -1,10 +1,15 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const CACHE_V = "20260911a";
-const AVATAR_URL = "/3d/sizing/FemaleAvatar.glb?v=" + CACHE_V;
+const CACHE_V = "20260918ag";
+const AVATAR_URLS = {
+  female: "/3d/sizing/avatar_female.glb?v=" + CACHE_V,
+  male: "/3d/sizing/avatar_male.glb?v=" + CACHE_V,
+  youth: "/3d/sizing/avatar_youth.glb?v=" + CACHE_V,
+};
 const WIRE = 0x36b4e5;
 const TAPE = 0x1e4d8c;
+const BODY = 0xffffff;
 
 const MEASURES = {
   height: "No shoes, stand against a wall. Heels, hips, and shoulders touching. Measure from the floor to the top of the head.",
@@ -30,8 +35,8 @@ const TITLES = {
 
 const FIT_SCALE = {
   female: { x: 1, y: 1, z: 1 },
-  male: { x: 1.14, y: 1.06, z: 1.1 },
-  youth: { x: 0.78, y: 0.74, z: 0.8 },
+  male: { x: 1, y: 1, z: 1 },
+  youth: { x: 1, y: 1, z: 1 },
 };
 
 const SIZE_KEYS = ["height", "weight", "chest", "waist", "torso", "leg", "inseam", "arm"];
@@ -46,24 +51,36 @@ function reduceMotion() {
 
 function makeHotspot() {
   var g = new THREE.Group();
+  var hit = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 12, 10),
+    new THREE.MeshBasicMaterial({
+      color: WIRE, transparent: true, opacity: 0, depthWrite: false, depthTest: false,
+    })
+  );
   var glow = new THREE.Mesh(
-    new THREE.SphereGeometry(0.042, 20, 16),
-    new THREE.MeshBasicMaterial({ color: WIRE, transparent: true, opacity: 0.28, depthWrite: false })
+    new THREE.SphereGeometry(0.012, 14, 12),
+    new THREE.MeshBasicMaterial({
+      color: WIRE, transparent: true, opacity: 0.2, depthWrite: false, depthTest: false,
+    })
   );
   var ring = new THREE.Mesh(
-    new THREE.TorusGeometry(0.026, 0.0045, 10, 28),
-    new THREE.MeshBasicMaterial({ color: WIRE, transparent: true, opacity: 0.95, depthWrite: false })
+    new THREE.TorusGeometry(0.011, 0.002, 8, 22),
+    new THREE.MeshBasicMaterial({ color: WIRE, depthWrite: false, depthTest: false })
   );
   var core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.012, 14, 12),
-    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, depthWrite: false })
+    new THREE.SphereGeometry(0.0065, 12, 10),
+    new THREE.MeshBasicMaterial({ color: WIRE, depthWrite: false, depthTest: false })
   );
-  glow.renderOrder = 2;
-  ring.renderOrder = 3;
-  core.renderOrder = 4;
+  hit.renderOrder = 6;
+  glow.renderOrder = 7;
+  ring.renderOrder = 8;
+  core.renderOrder = 9;
+  ring.visible = false;
+  g.add(hit);
   g.add(glow);
   g.add(ring);
   g.add(core);
+  g.userData.hit = hit;
   g.userData.glow = glow;
   g.userData.ring = ring;
   g.userData.core = core;
@@ -126,9 +143,9 @@ function frontArc(left, right) {
 function collectGeo(root) {
   var geos = [];
   root.traverse(function (o) {
-    if (o.isMesh && o.geometry && o.geometry.attributes && o.geometry.attributes.position) {
-      geos.push(o.geometry);
-    }
+    if (!o.isMesh || !o.geometry || !o.geometry.attributes || !o.geometry.attributes.position) return;
+    if (String(o.name || "").indexOf("_grid_overlay") >= 0) return;
+    geos.push(o.geometry);
   });
   return geos;
 }
@@ -249,21 +266,9 @@ function makeTape(marks, key) {
     var back = ex.thighBack || new THREE.Vector3((hip.x + out.x) * 0.5, out.y, -0.05);
     g.add(tubeFromPoints([hip.clone(), out.clone(), back.clone(), inn.clone(), hip.clone()], true));
   } else if (key === "weight") {
-    var wdot = makeHotspot();
-    wdot.position.copy(pair[0]);
-    g.add(wdot);
+    /* body hotspot already marks weight */
   } else {
     g.add(tubeFromPoints([pair[0].clone(), pair[1].clone()], false));
-  }
-  var a = makeHotspot();
-  a.position.copy(pair[0]);
-  a.userData.tapeEnd = true;
-  g.add(a);
-  if (key !== "weight") {
-    var b = makeHotspot();
-    b.position.copy(pair[1]);
-    b.userData.tapeEnd = true;
-    g.add(b);
   }
   return g;
 }
@@ -271,37 +276,102 @@ function makeTape(marks, key) {
 function skipAvatarExtra(name) {
   var n = String(name || "").toLowerCase();
   return n.indexOf("hair") >= 0 || n.indexOf("tooth") >= 0 || n.indexOf("shoe") >= 0
-    || n.indexOf("eye") >= 0 || n.indexOf("lash") >= 0 || n.indexOf("brow") >= 0;
+    || n.indexOf("eye") >= 0 || n.indexOf("lash") >= 0 || n.indexOf("brow") >= 0
+    || n.indexOf("body_wire") >= 0 || n === "body_wire";
+}
+
+function makeFillMaterial() {
+  return new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    transparent: false,
+    opacity: 1,
+    depthWrite: true,
+    depthTest: true,
+  });
+}
+
+function makeGridMaterial() {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      gridColor: { value: new THREE.Color(WIRE) },
+      ringSpacing: { value: 0.043 },
+      lonCount: { value: 28.0 },
+      gridWidth: { value: 1.0 },
+    },
+    vertexShader: [
+      "varying vec3 vGridPos;",
+      "void main() {",
+      "  vGridPos = position;",
+      "  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+      "}",
+    ].join("\n"),
+    fragmentShader: [
+      "varying vec3 vGridPos;",
+      "uniform vec3 gridColor;",
+      "uniform float ringSpacing;",
+      "uniform float lonCount;",
+      "uniform float gridWidth;",
+      "void main() {",
+      "  float ringX = vGridPos.y / ringSpacing;",
+      "  float ringD = abs(fract(ringX + 0.5) - 0.5);",
+      "  float ringAA = max(fwidth(ringX) * gridWidth, 0.001);",
+      "  float ringLine = 1.0 - smoothstep(0.0, ringAA, ringD);",
+      "  float ang = atan(vGridPos.z, vGridPos.x);",
+      "  float lonX = (ang / 6.28318530718) * lonCount;",
+      "  float lonD = abs(fract(lonX + 0.5) - 0.5);",
+      "  float lonAA = max(min(fwidth(lonX), 1.5) * gridWidth, 0.001);",
+      "  float lonLine = 1.0 - smoothstep(0.0, lonAA, lonD);",
+      "  float a = clamp(ringLine + lonLine, 0.0, 1.0);",
+      "  if (a < 0.02) discard;",
+      "  gl_FragColor = vec4(gridColor, a);",
+      "}",
+    ].join("\n"),
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
+    extensions: { derivatives: true },
+  });
 }
 
 function styleBody(root) {
-  var fillMat = new THREE.MeshLambertMaterial({
-    color: 0x36b4e5,
-    transparent: true,
-    opacity: 0.16,
-    side: THREE.DoubleSide,
-    polygonOffset: true,
-    polygonOffsetFactor: 1,
-    polygonOffsetUnits: 1,
-  });
-  var wireMat = new THREE.MeshBasicMaterial({
-    color: WIRE,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.95,
-    side: THREE.DoubleSide,
-  });
-  root.traverse(function (o) {
-    if (!o.isMesh) return;
-    if (skipAvatarExtra(o.name) || skipAvatarExtra(o.parent && o.parent.name)) {
-      o.visible = false;
+  var fillMat = makeFillMaterial();
+  var gridMat = makeGridMaterial();
+  var bodyMeshes = [];
+  root.traverse(function (obj) {
+    if (!obj.isMesh) return;
+    if (String(obj.name || "").indexOf("_grid_overlay") >= 0) return;
+    if (skipAvatarExtra(obj.name) || skipAvatarExtra(obj.parent && obj.parent.name)) {
+      obj.visible = false;
       return;
     }
-    o.material = fillMat;
-    o.renderOrder = 0;
-    var wire = new THREE.Mesh(o.geometry, wireMat);
-    wire.renderOrder = 1;
-    o.add(wire);
+    bodyMeshes.push(obj);
+  });
+  bodyMeshes.forEach(function (obj) {
+    obj.material = fillMat;
+    obj.visible = true;
+    obj.renderOrder = 1;
+    obj.castShadow = false;
+    obj.receiveShadow = false;
+    var had = false;
+    obj.children.forEach(function (child) {
+      if (String(child.name || "").indexOf("_grid_overlay") >= 0) {
+        child.material = gridMat;
+        child.visible = true;
+        child.renderOrder = 2;
+        had = true;
+      }
+    });
+    if (had) return;
+    var overlay = new THREE.Mesh(obj.geometry, gridMat);
+    overlay.name = (obj.name || "body") + "_grid_overlay";
+    overlay.frustumCulled = obj.frustumCulled;
+    overlay.renderOrder = 2;
+    obj.add(overlay);
   });
 }
 
@@ -365,13 +435,7 @@ function ensureViewer() {
   if (!fig || !guide || !canvasA || !canvasB) return null;
 
   var scene = new THREE.Scene();
-  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-  var key = new THREE.DirectionalLight(0xffffff, 0.55);
-  key.position.set(0.6, 1.8, 1.4);
-  scene.add(key);
-  var fillL = new THREE.DirectionalLight(0x36b4e5, 0.25);
-  fillL.position.set(-1.2, 0.8, -0.6);
-  scene.add(fillL);
+  scene.background = new THREE.Color(0xffffff);
 
   var stage = new THREE.Group();
   scene.add(stage);
@@ -384,10 +448,12 @@ function ensureViewer() {
   var rendererB = new THREE.WebGLRenderer({ canvas: canvasB, antialias: true, alpha: false });
   rendererA.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   rendererB.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  rendererA.setClearColor(0xf4f7f9, 1);
-  rendererB.setClearColor(0xf4f7f9, 1);
+  rendererA.setClearColor(0xffffff, 1);
+  rendererB.setClearColor(0xffffff, 1);
   rendererA.outputColorSpace = THREE.SRGBColorSpace;
   rendererB.outputColorSpace = THREE.SRGBColorSpace;
+  rendererA.toneMapping = THREE.NoToneMapping;
+  rendererB.toneMapping = THREE.NoToneMapping;
 
   viewer = {
     fig: fig,
@@ -399,8 +465,8 @@ function ensureViewer() {
     camB: camB,
     rendererA: rendererA,
     rendererB: rendererB,
-    azimuth: 0.18,
-    auto: !reduceMotion(),
+    azimuth: 0,
+    auto: false,
     drag: false,
     lastX: 0,
     fit: "male",
@@ -411,49 +477,80 @@ function ensureViewer() {
     ring: null,
     ready: false,
     loaded: false,
+    bodies: {},
+    bodyKey: "",
+    pendingKey: "",
     centerY: 0.9,
     heightM: 1.7,
     radius: 2.4,
     raf: 0,
   };
 
+  var ray = new THREE.Raycaster();
+  var ptr = new THREE.Vector2();
+  var down = { x: 0, y: 0, hotspot: null };
+
+  function pickHotspotAt(clientX, clientY) {
+    if (!viewer.ready) return null;
+    var r = canvasA.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    ptr.x = ((clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ptr, camA);
+    var hits = ray.intersectObjects(viewer.hotspots, true);
+    if (!hits.length) return null;
+    var obj = hits[0].object;
+    while (obj && !obj.userData.measure) obj = obj.parent;
+    return obj && obj.userData.measure ? obj : null;
+  }
+
   fig.addEventListener("pointerdown", function (e) {
+    var hit = pickHotspotAt(e.clientX, e.clientY);
+    down = { x: e.clientX, y: e.clientY, hotspot: hit };
+    if (hit) {
+      viewer.drag = false;
+      fig.style.cursor = "pointer";
+      return;
+    }
     viewer.drag = true;
+    viewer.auto = false;
     viewer.lastX = e.clientX;
     fig.classList.add("is-dragging");
+    fig.style.cursor = "grabbing";
     try { fig.setPointerCapture(e.pointerId); } catch (err) {}
   });
   fig.addEventListener("pointermove", function (e) {
-    if (!viewer.drag) return;
-    viewer.azimuth += (e.clientX - viewer.lastX) * 0.008;
-    viewer.lastX = e.clientX;
+    if (viewer.drag) {
+      viewer.azimuth += (e.clientX - viewer.lastX) * 0.008;
+      viewer.lastX = e.clientX;
+      return;
+    }
+    var hover = pickHotspotAt(e.clientX, e.clientY);
+    fig.style.cursor = hover ? "pointer" : "grab";
+    viewer.hotspots.forEach(function (h) {
+      if (h.userData.measure === viewer.measure) return;
+      h.userData.glow.material.opacity = hover === h ? 0.4 : 0.18;
+    });
   });
-  function up() {
+  function up(e) {
+    var moved = e ? Math.hypot(e.clientX - down.x, e.clientY - down.y) : 0;
+    if (down.hotspot && moved < 8) {
+      selectMeasure(down.hotspot.userData.measure, true);
+    }
     viewer.drag = false;
+    down.hotspot = null;
     fig.classList.remove("is-dragging");
+    fig.style.cursor = "grab";
   }
   fig.addEventListener("pointerup", up);
   fig.addEventListener("pointercancel", up);
+  fig.style.cursor = "grab";
 
   var label = document.getElementById("size-360-label");
   if (label) {
+    label.title = "Click to auto-rotate";
     label.addEventListener("click", function () { viewer.auto = !viewer.auto; });
   }
-
-  var ray = new THREE.Raycaster();
-  var ptr = new THREE.Vector2();
-  canvasA.addEventListener("click", function (e) {
-    if (!viewer.ready) return;
-    var r = canvasA.getBoundingClientRect();
-    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
-    ray.setFromCamera(ptr, camA);
-    var hits = ray.intersectObjects(viewer.hotspots, true);
-    if (!hits.length) return;
-    var obj = hits[0].object;
-    while (obj && !obj.userData.measure) obj = obj.parent;
-    if (obj && obj.userData.measure) selectMeasure(obj.userData.measure, true);
-  });
 
   window.addEventListener("resize", resizeViewers);
   return viewer;
@@ -493,16 +590,23 @@ function setTape() {
   viewer.bodyRoot.add(viewer.tape);
   viewer.hotspots.forEach(function (h) {
     var on = h.userData.measure === viewer.measure;
-    h.userData.glow.material.opacity = on ? 0.5 : 0.18;
-    h.scale.setScalar(on ? 1.25 : 0.85);
+    h.userData.glow.material.opacity = on ? 0.45 : 0.18;
+    h.userData.ring.visible = on;
+    h.userData.core.material.color.setHex(on ? 0xffffff : WIRE);
+    h.scale.setScalar(on ? 1.15 : 1);
   });
 }
 
 function placeMainCam() {
-  var y = viewer.centerY * (FIT_SCALE[viewer.fit] || FIT_SCALE.male).y;
-  var r = viewer.radius;
-  viewer.camA.position.set(Math.sin(viewer.azimuth) * r, y, Math.cos(viewer.azimuth) * r);
-  viewer.camA.lookAt(0, y, 0);
+  var s = FIT_SCALE[viewer.fit] || FIT_SCALE.male;
+  var minY = (viewer.marks ? viewer.marks.minY : 0) * s.y;
+  var h = viewer.heightM * s.y;
+  var lookY = minY + h * 0.52;
+  var r = Math.max(3.45, h * 2.08);
+  viewer.camA.fov = 30;
+  viewer.camA.position.set(Math.sin(viewer.azimuth) * r, lookY + h * 0.02, Math.cos(viewer.azimuth) * r);
+  viewer.camA.lookAt(0, lookY, 0);
+  viewer.camA.updateProjectionMatrix();
 }
 
 function placeGuideCam() {
@@ -557,42 +661,41 @@ function tick() {
   if (viewer.auto && !viewer.drag) viewer.azimuth += 0.004;
   placeMainCam();
   placeGuideCam();
-  var t = performance.now() * 0.003;
-  viewer.hotspots.forEach(function (h) {
-    if (h.userData.measure === viewer.measure) {
-      h.scale.setScalar(1.2 + Math.sin(t) * 0.12);
-    }
-  });
   viewer.rendererA.render(viewer.scene, viewer.camA);
   viewer.rendererB.render(viewer.scene, viewer.camB);
+}
+
+function hotspotPos(marks, key) {
+  var pair = marks[key];
+  var ex = marks.extras || {};
+  if (!pair) return null;
+  if (key === "chest") return ex.chestF || pair[0].clone().add(pair[1]).multiplyScalar(0.5);
+  if (key === "waist") return ex.waistF || pair[0].clone().add(pair[1]).multiplyScalar(0.5);
+  if (key === "height") return pair[0];
+  if (key === "weight") return pair[0];
+  if (key === "torso") return pair[0];
+  if (key === "leg") return ex.hip || pair[0];
+  if (key === "inseam") return pair[0];
+  if (key === "arm") return pair[0];
+  return pair[0].z >= pair[1].z ? pair[0] : pair[1];
 }
 
 function setupLandmarks(root) {
   viewer.marks = landmarksFrom(root);
   viewer.heightM = viewer.marks.heightM;
-  viewer.centerY = viewer.marks.minY + viewer.heightM * 0.48;
-  viewer.radius = viewer.heightM * 1.55;
+  viewer.centerY = viewer.marks.minY + viewer.heightM * 0.52;
+  viewer.radius = Math.max(3.45, viewer.heightM * 2.08);
   SIZE_KEYS.forEach(function (key) {
-    var pair = viewer.marks[key];
-    if (!pair) return;
-    pair.forEach(function (p, i) {
-      if (key === "weight" && i === 1) return;
-      var h = makeHotspot();
-      h.position.copy(p);
-      h.userData.measure = key;
-      viewer.bodyRoot.add(h);
-      viewer.hotspots.push(h);
-    });
+    var p = hotspotPos(viewer.marks, key);
+    if (!p) return;
+    var h = makeHotspot();
+    h.position.copy(p);
+    h.userData.measure = key;
+    viewer.bodyRoot.add(h);
+    viewer.hotspots.push(h);
   });
-  if (viewer.marks.extras && viewer.marks.extras.chestF) {
-    var cf = makeHotspot();
-    cf.position.copy(viewer.marks.extras.chestF);
-    cf.userData.measure = "chest";
-    viewer.bodyRoot.add(cf);
-    viewer.hotspots.push(cf);
-  }
   if (viewer.ring) viewer.stage.remove(viewer.ring);
-  viewer.ring = makeRing(0.32);
+  viewer.ring = makeRing(0.38);
   viewer.ring.position.y = viewer.marks.minY;
   viewer.stage.add(viewer.ring);
   applyFit();
@@ -610,6 +713,68 @@ function mountBody(obj) {
   setupLandmarks(obj);
 }
 
+function avatarKey(fit) {
+  if (fit === "female" || fit === "youth") return fit;
+  return "male";
+}
+
+function showCachedBody(key) {
+  var obj = viewer.bodies[key];
+  if (!obj) return false;
+  if (viewer.bodyKey === key && viewer.bodyRoot.children.length) {
+    applyFit();
+    return true;
+  }
+  mountBody(obj);
+  viewer.bodyKey = key;
+  resizeViewers();
+  return true;
+}
+
+function setAvatarLoader(visible, pct) {
+  var el = document.getElementById("size-avatar-loader");
+  var p = document.getElementById("size-avatar-loader-pct");
+  if (!el) return;
+  el.hidden = !visible;
+  if (p && visible) p.textContent = Math.max(0, Math.min(100, Math.round(pct || 0))) + "%";
+}
+
+function loadFitAvatar() {
+  var key = avatarKey(viewer.fit);
+  if (showCachedBody(key)) {
+    setAvatarLoader(false);
+    return;
+  }
+  viewer.pendingKey = key;
+  setAvatarLoader(true, 0);
+  var loader = new GLTFLoader();
+  loader.load(
+    AVATAR_URLS[key],
+    function (gltf) {
+      viewer.bodies[key] = gltf.scene;
+      if (avatarKey(viewer.fit) !== key) return;
+      setAvatarLoader(true, 100);
+      mountBody(gltf.scene);
+      viewer.bodyKey = key;
+      resizeViewers();
+      setAvatarLoader(false);
+    },
+    function (xhr) {
+      if (viewer.pendingKey !== key) return;
+      var pct = 0;
+      if (xhr && xhr.total) pct = (xhr.loaded / xhr.total) * 100;
+      else if (xhr && xhr.loaded) pct = Math.min(90, (xhr.loaded / 1400000) * 100);
+      setAvatarLoader(true, pct);
+    },
+    function (err) {
+      console.warn("Hoodoo sizing: CLO avatar GLB failed for", key, err);
+      if (avatarKey(viewer.fit) !== key) return;
+      setAvatarLoader(false);
+      if (!viewer.bodyRoot.children.length) mountBody(proceduralBody());
+    }
+  );
+}
+
 function loadAvatar() {
   ensureViewer();
   if (!viewer) return;
@@ -618,24 +783,13 @@ function loadAvatar() {
     if (!viewer.raf) tick();
   });
   if (viewer.loaded) {
+    loadFitAvatar();
     resizeViewers();
     return;
   }
   viewer.loaded = true;
-  mountBody(proceduralBody());
-  var loader = new GLTFLoader();
-  loader.load(
-    AVATAR_URL,
-    function (gltf) {
-      mountBody(gltf.scene);
-      resizeViewers();
-      console.info("Hoodoo sizing avatar: FemaleAvatar.glb cyan wireframe");
-    },
-    undefined,
-    function (err) {
-      console.warn("Hoodoo sizing: CLO avatar GLB failed, keeping procedural humanoid", err);
-    }
-  );
+  setAvatarLoader(true, 0);
+  loadFitAvatar();
 }
 
 window.hoodooSizeFit = function (id) {
@@ -647,6 +801,7 @@ window.hoodooSizeFit = function (id) {
   if (fig) fig.setAttribute("data-fit", g);
   if (art) art.setAttribute("data-fit", g);
   applyFit();
+  if (viewer && viewer.loaded) loadFitAvatar();
   var row = document.getElementById("size-fit");
   if (row) {
     row.querySelectorAll("[data-g]").forEach(function (b) {

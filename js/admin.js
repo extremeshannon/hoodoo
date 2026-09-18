@@ -20,6 +20,13 @@
         return;
       }
       bodyEl.hidden = false;
+      if (u.role === "admin") {
+        var tabs = document.getElementById("admin-tabs");
+        var shop = document.getElementById("admin-shop");
+        if (tabs) tabs.hidden = false;
+        if (shop) shop.hidden = false;
+        loadShop();
+      }
       loadInventory();
       loadProductSelect().then(function () {
         refresh3dList();
@@ -29,6 +36,212 @@
       window.HoodooApi.clearToken();
       loginEl.hidden = false;
     });
+
+  function loadShop() {
+    var st = document.getElementById("admin-shop-status");
+    if (st) st.textContent = "Loading shop…";
+    return window.HoodooApi
+      .fetchJson("/admin/shop")
+      .then(function (data) {
+        if (st) st.textContent = "";
+        renderCustomers(data.customers || []);
+        renderShopOrders(data.orders || []);
+        renderPrints(data.prints || []);
+      })
+      .catch(function (e) {
+        if (st) st.textContent = e.message || "Could not load shop.";
+      });
+  }
+
+  function customerLabel(row) {
+    var name = row.owner_name || row.full_name || "";
+    var email = row.owner_email || row.email || "";
+    if (name && email) return name + " · " + email;
+    return name || email || "—";
+  }
+
+  function fmtWhen(iso) {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleString();
+    } catch (e) {
+      return String(iso);
+    }
+  }
+
+  function renderCustomers(rows) {
+    var tb = document.querySelector("#admin-table-customers tbody");
+    if (!tb) return;
+    tb.innerHTML = "";
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" +
+        escapeHtml(customerLabel(r)) +
+        (r.username ? '<br /><span class="muted">@' + escapeHtml(r.username) + "</span>" : "") +
+        "</td><td>" +
+        escapeHtml(r.role) +
+        "</td><td>" +
+        r.order_count +
+        "</td><td>" +
+        r.print_count +
+        "</td><td>" +
+        escapeHtml(fmtWhen(r.created_at)) +
+        "</td>";
+      tb.appendChild(tr);
+    });
+  }
+
+  function statusSelect(current, kind, id) {
+    var opts =
+      kind === "order"
+        ? ["submitted", "acknowledged", "in_production", "fulfilled", "cancelled"]
+        : ["draft", "quote_requested", "quoted", "in_production", "fulfilled", "cancelled"];
+    var html = '<select class="admin-status-select" data-kind="' + kind + '" data-id="' + escapeHtml(id) + '">';
+    if (current && opts.indexOf(current) === -1) opts.unshift(current);
+    opts.forEach(function (s) {
+      html +=
+        '<option value="' +
+        escapeHtml(s) +
+        '"' +
+        (s === current ? " selected" : "") +
+        ">" +
+        escapeHtml(s.replace(/_/g, " ")) +
+        "</option>";
+    });
+    html += "</select>";
+    return html;
+  }
+
+  function renderShopOrders(rows) {
+    var tb = document.querySelector("#admin-table-orders tbody");
+    if (!tb) return;
+    tb.innerHTML = "";
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" +
+        escapeHtml(fmtWhen(r.created_at)) +
+        "</td><td>" +
+        escapeHtml(customerLabel(r)) +
+        (r.line_count ? '<br /><span class="muted">' + r.line_count + " line(s)</span>" : "") +
+        "</td><td>$" +
+        escapeHtml(r.total || r.subtotal || "0.00") +
+        "</td><td>" +
+        statusSelect(r.status, "order", r.id) +
+        '</td><td><a class="btn btn-ghost" href="/order.html?id=' +
+        encodeURIComponent(r.id) +
+        '">Open</a></td>';
+      tb.appendChild(tr);
+    });
+    bindStatusSelects(tb);
+  }
+
+  function renderPrints(rows) {
+    var tb = document.querySelector("#admin-table-prints tbody");
+    if (!tb) return;
+    tb.innerHTML = "";
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" +
+        escapeHtml(r.name || "Print") +
+        '<br /><span class="muted">' +
+        escapeHtml(r.garment_id || "") +
+        "</span></td><td>" +
+        escapeHtml(customerLabel(r)) +
+        "</td><td>" +
+        statusSelect(r.status, "print", r.id) +
+        "</td><td>" +
+        r.art_count +
+        "</td><td>" +
+        escapeHtml(fmtWhen(r.updated_at || r.created_at)) +
+        '</td><td class="admin-shop-actions"><a class="btn btn-ghost" href="/dyesub.html?job=' +
+        encodeURIComponent(r.id) +
+        '">Open</a> <button type="button" class="btn btn-primary admin-pack-btn" data-id="' +
+        escapeHtml(r.id) +
+        '" data-name="' +
+        escapeHtml(r.name || "print") +
+        '">Print pack</button></td>';
+      tb.appendChild(tr);
+    });
+    bindStatusSelects(tb);
+    tb.querySelectorAll(".admin-pack-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        downloadPrintPack(btn.getAttribute("data-id"), btn.getAttribute("data-name"));
+      });
+    });
+  }
+
+  function bindStatusSelects(root) {
+    root.querySelectorAll(".admin-status-select").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        var kind = sel.getAttribute("data-kind");
+        var id = sel.getAttribute("data-id");
+        var path = kind === "order" ? "/admin/orders/" + id : "/admin/prints/" + id;
+        var st = document.getElementById("admin-shop-status");
+        window.HoodooApi
+          .fetchJson(path, { method: "PATCH", body: JSON.stringify({ status: sel.value }) })
+          .then(function () {
+            if (st) st.textContent = "Status saved.";
+            setTimeout(function () {
+              if (st) st.textContent = "";
+            }, 1500);
+          })
+          .catch(function (e) {
+            if (st) st.textContent = e.message || "Could not update status.";
+          });
+      });
+    });
+  }
+
+  function downloadPrintPack(id, name) {
+    var st = document.getElementById("admin-shop-status");
+    if (window.HoodooPackBusy) {
+      window.HoodooPackBusy.start({
+        steps: ["Loading job…", "Rendering pieces at 300 DPI…", "Nesting on 44 in roll…", "Zipping PRINT, CLO, and CUT files…"],
+      });
+    } else if (st) {
+      st.textContent = "Building print pack… this can take a minute.";
+    }
+    var headers = {};
+    var tok = window.HoodooApi.getToken();
+    if (tok) headers.Authorization = "Bearer " + tok;
+    return fetch((window.HoodooApi.base() || "") + "/api/dyesub/jobs/" + id + "/pack", {
+      headers: headers,
+      credentials: "same-origin",
+    })
+      .then(function (r) {
+        return r.arrayBuffer().then(function (buf) {
+          if (!r.ok) {
+            var text = "";
+            try {
+              text = new TextDecoder().decode(buf);
+            } catch (e) {
+              text = "";
+            }
+            var parsed = window.HoodooApi.parseResponse(r, text);
+            throw new Error(parsed.error || "Pack failed");
+          }
+          var disp = r.headers.get("Content-Disposition") || "";
+          var m = /filename="([^"]+)"/.exec(disp);
+          return { blob: new Blob([buf], { type: "application/zip" }), name: (m && m[1]) || "hoodoo-" + (name || "print") + ".zip" };
+        });
+      })
+      .then(function (file) {
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(file.blob);
+        a.download = file.name;
+        a.click();
+        if (st) st.textContent = "Print pack complete.";
+        if (window.HoodooPackBusy) window.HoodooPackBusy.complete("Print pack downloaded.");
+      })
+      .catch(function (e) {
+        var msg = e.message || "Could not build pack.";
+        if (st) st.textContent = msg;
+        if (window.HoodooPackBusy) window.HoodooPackBusy.fail(msg);
+      });
+  }
 
   function loadInventory() {
     var st = document.getElementById("admin-inv-status");

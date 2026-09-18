@@ -1,0 +1,587 @@
+/* Dye-sub print builder — 2D piece canvases at cut size */
+
+body.page-dyesub {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.page-dyesub,
+.page-dyesub * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.page-dyesub *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.page-dyesub .dyesub-main {
+  height: 100dvh;
+  padding: calc(var(--header-anchor) + 0.5rem) 1rem 0.75rem;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#dyesub-app[hidden] {
+  display: none !important;
+}
+
+#dyesub-app:not([hidden]) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dyesub-gate {
+  max-width: 36rem;
+}
+
+.dyesub-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.dyesub-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dyesub-name-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.dyesub-name-label input {
+  min-width: min(100%, 18rem);
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: var(--slate);
+  color: var(--paper);
+  font: inherit;
+}
+
+.dyesub-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dyesub-status {
+  min-height: 1.4em;
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.dyesub-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1.15fr) minmax(0, 1.15fr) 300px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0.85rem;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.dyesub-col {
+  background: rgba(28, 34, 41, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem 0.85rem;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dyesub-col::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.dyesub-pieces {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dyesub-art {
+  position: relative;
+  z-index: 4;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dyesub-col h2,
+.dyesub-props h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.dyesub-hint {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.dyesub-piece-list,
+.dyesub-art-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dyesub-art-list {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.dyesub-piece-list button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--paper);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.dyesub-art-list button.dyesub-art-pick {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--paper);
+  border-radius: 8px;
+  padding: 0.3rem 0.45rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.dyesub-piece-list button.is-on,
+.dyesub-art-list li.is-on .dyesub-art-pick {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.dyesub-piece-size {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.dyesub-piece-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
+}
+
+.dyesub-piece-row button {
+  flex: 1;
+  min-width: 0;
+}
+
+.dyesub-swatch-btn {
+  flex: 0 0 2.15rem;
+  width: 2.15rem;
+  min-height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  cursor: pointer;
+  background: #36b4e5;
+}
+
+.dyesub-check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.dyesub-check input {
+  accent-color: var(--brand);
+}
+
+.dyesub-palette {
+  position: fixed;
+  z-index: 40;
+  top: calc(var(--header-anchor) + 4.5rem);
+  left: 1rem;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: min(70vh, 36rem);
+  display: flex;
+  flex-direction: column;
+  background: #1c2229;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dyesub-palette[hidden] {
+  display: none !important;
+}
+
+.dyesub-palette-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dyesub-palette-head p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.dyesub-palette-body {
+  overflow: auto;
+  padding: 0.75rem;
+}
+
+.dyesub-palette-group {
+  margin: 0 0 0.85rem;
+}
+
+.dyesub-palette-group h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dyesub-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1.45rem);
+  gap: 0.3rem;
+}
+
+.dyesub-swatch-grid button {
+  width: 1.45rem;
+  height: 1.45rem;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+}
+
+.dyesub-swatch-grid button.is-on {
+  box-shadow: 0 0 0 2px #36b4e5;
+}
+
+.dyesub-swatch-grid button.is-light {
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+.dyesub-hardware {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.dyesub-hardware h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0 0 0.15rem;
+}
+
+.dyesub-color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.dyesub-color input {
+  width: 2.5rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dyesub-stage {
+  background: #10141a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+}
+
+.dyesub-stage-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#piece-canvas,
+#dyesub-3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+#piece-canvas {
+  cursor: default;
+}
+
+#dyesub-3d {
+  cursor: grab;
+  background: #d5d8dc;
+}
+
+.dyesub-3d-load {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 1rem;
+  background: #d5d8dc;
+  color: #0a0b0d;
+  text-align: center;
+}
+
+.dyesub-3d-load[hidden] {
+  display: none !important;
+}
+
+.dyesub-3d-spinner {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 3px solid rgba(54, 180, 229, 0.25);
+  border-top-color: #36b4e5;
+  border-radius: 50%;
+  animation: dyesub-spin 0.8s linear infinite;
+}
+
+.dyesub-3d-load-title,
+.dyesub-3d-load-detail {
+  margin: 0;
+  color: #1c2229;
+  font-size: 0.8125rem;
+}
+
+.dyesub-3d-load-title {
+  font-weight: 600;
+  color: #0a0b0d;
+}
+
+.dyesub-3d-load-pct {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0a0b0d;
+  letter-spacing: 0.02em;
+}
+
+.dyesub-3d-bar {
+  width: min(100%, 12rem);
+  height: 0.45rem;
+  border-radius: 999px;
+  background: rgba(10, 11, 13, 0.12);
+  overflow: hidden;
+}
+
+.dyesub-3d-bar span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: #36b4e5;
+  border-radius: inherit;
+  transition: width 0.12s linear;
+}
+
+@keyframes dyesub-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.dyesub-stage-meta {
+  margin: 0;
+  padding: 0.4rem 0.75rem 0.55rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dyesub-upload {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.dyesub-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dyesub-art-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dyesub-art .dyesub-hint {
+  margin-bottom: 0;
+}
+
+.dyesub-art-thumb {
+  width: 100%;
+  height: 40px;
+  object-fit: contain;
+  background: #0a0b0d;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.dyesub-props input[type="number"] {
+  width: 4.75rem;
+  max-width: 42%;
+  padding: 0.25rem 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+}
+
+.dyesub-art-row {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.dyesub-art-row button {
+  flex: 1;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+  padding: 0.28rem 0.4rem;
+  font-size: 0.75rem;
+}
+
+.dyesub-props {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dyesub-props label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.dyesub-prop-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 1100px) {
+  body.page-dyesub {
+    height: auto;
+    overflow: auto;
+  }
+  .page-dyesub .dyesub-main {
+    height: auto;
+    min-height: 100dvh;
+  }
+  .dyesub-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    flex: none;
+  }
+  .dyesub-pieces {
+    grid-column: 1 / -1;
+    max-height: 16rem;
+  }
+  .dyesub-art {
+    grid-column: 1 / -1;
+    max-height: 22rem;
+  }
+  .dyesub-stage {
+    height: min(52vh, 28rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .dyesub-layout {
+    grid-template-columns: 1fr;
+  }
+  .dyesub-stage {
+    height: min(48vh, 24rem);
+  }
+}

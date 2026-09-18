@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0a0b0d" />
-  <title>Staff · Inventory & 3D | Hoodoo Alaska</title>
+  <title>Admin · Hoodoo Alaska</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=20260918o" />
 </head>
 <body class="page-app page-admin">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -38,8 +38,8 @@
 
   <main id="admin-main" class="app-main">
     <div class="app-panel">
-      <h1 class="app-title">Staff admin</h1>
-      <p class="app-lede">Inventory counts and garment 3D asset rows. Requires a staff or admin account. <a href="/admin/configurator">3D configurator settings</a>.</p>
+      <h1 class="app-title">Shop admin</h1>
+      <p class="app-lede">Customers, quote requests, print packs, and inventory. <a href="/admin/configurator">3D configurator settings</a>.</p>
 
       <div id="admin-login" class="account-gate" hidden>
         <p><a href="/login?next=%2Fadmin.html">Log in</a> to continue.</p>
@@ -48,7 +48,48 @@
         <p>Your account does not have staff access.</p>
       </div>
       <div id="admin-body" class="admin-body" hidden>
-        <section class="admin-section" aria-labelledby="inv-heading">
+        <nav class="admin-tabs" id="admin-tabs" hidden>
+          <a href="#shop">Shop</a>
+          <a href="#inventory">Inventory</a>
+        </nav>
+
+        <section class="admin-section" id="admin-shop" hidden aria-labelledby="shop-heading">
+          <h2 id="shop-heading" class="app-section-title">Shop</h2>
+          <p class="muted">Customer accounts, apparel orders, and dye-sub jobs sent in for quote. Print packs are admin-only.</p>
+          <p id="admin-shop-status" class="auth-feedback" role="status" aria-live="polite"></p>
+
+          <h3 class="admin-subhead">Customers</h3>
+          <div class="admin-scroll">
+            <table class="admin-table" id="admin-table-customers">
+              <thead>
+                <tr><th>Customer</th><th>Role</th><th>Orders</th><th>Prints</th><th>Joined</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <h3 class="admin-subhead">Orders</h3>
+          <div class="admin-scroll">
+            <table class="admin-table" id="admin-table-orders">
+              <thead>
+                <tr><th>When</th><th>Customer</th><th>Total</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <h3 class="admin-subhead">Print packs</h3>
+          <div class="admin-scroll">
+            <table class="admin-table" id="admin-table-prints">
+              <thead>
+                <tr><th>Job</th><th>Customer</th><th>Status</th><th>Art</th><th>Updated</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-inventory" aria-labelledby="inv-heading">
           <h2 id="inv-heading" class="app-section-title">Inventory</h2>
           <p id="admin-inv-status" class="auth-feedback" role="status" aria-live="polite"></p>
           <div class="admin-scroll">
@@ -114,10 +155,24 @@
     </div>
   </main>
 
+  <div id="pack-overlay" class="pack-busy" hidden>
+    <div class="pack-busy-card" id="pack-busy-card" role="alertdialog" aria-modal="true" aria-labelledby="pack-busy-title" aria-describedby="pack-busy-detail">
+      <p class="pack-busy-kicker" id="pack-busy-kicker">Epson F6200 · 300 DPI</p>
+      <h2 id="pack-busy-title">Building print pack</h2>
+      <p class="pack-busy-detail" id="pack-busy-detail">Preparing files…</p>
+      <p class="pack-busy-pct" id="pack-busy-pct">0%</p>
+      <div class="pack-busy-bar" id="pack-busy-barwrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="pack-busy-bar"></span>
+      </div>
+      <p class="pack-busy-banner" id="pack-busy-banner" hidden>Completed</p>
+      <button type="button" class="btn btn-primary" id="pack-busy-done" hidden>Done</button>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <div class="footer-inner">
       <p class="footer-brand">© <span id="year"></span> Hoodoo Alaska</p>
-      <p class="footer-meta">Staff · Wasilla, AK</p>
+      <p class="footer-meta">Admin · Wasilla, AK</p>
     </div>
   </footer>
 
@@ -125,6 +180,7 @@
   <script src="/js/staff-gate.js"></script>
   <script src="/main.js"></script>
   <script src="/js/auth-nav.js"></script>
-  <script src="/js/admin.js"></script>
+  <script src="/js/pack-busy.js?v=20260918p"></script>
+  <script src="/js/admin.js?v=20260918o"></script>
 </body>
 </html>

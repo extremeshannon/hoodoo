@@ -88,14 +88,10 @@ def login(
         )
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account disabled")
-    if user.role in ("staff", "admin"):
-        request.session["uid"] = str(user.id)
-        request.session["role"] = user.role
-        if not request.session.get("csrf"):
-            request.session["csrf"] = secrets.token_urlsafe(24)
-    else:
-        request.session.pop("uid", None)
-        request.session.pop("role", None)
+    request.session["uid"] = str(user.id)
+    request.session["role"] = user.role
+    if not request.session.get("csrf"):
+        request.session["csrf"] = secrets.token_urlsafe(24)
     return Token(access_token=create_access_token(user.id, {"role": user.role}))
 
 
