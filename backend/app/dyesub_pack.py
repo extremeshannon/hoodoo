@@ -101,7 +101,9 @@ def render_piece_png(
     img_w = max(1, int(round((cut_w + bleed_in * 2) * dpi)))
     img_h = max(1, int(round((cut_h + bleed_in * 2) * dpi)))
     rgb = _hex_rgb(base_hex)
-    canvas = Image.new("RGBA", (img_w, img_h), (*rgb, 255))
+    canvas = Image.new("RGBA", (img_w, img_h), (255, 255, 255, 255))
+    fabric = Image.new("RGBA", (img_w, img_h), (*rgb, 255))
+    art_layer = Image.new("RGBA", (img_w, img_h), (0, 0, 0, 0))
 
     for pl in placements:
         art_id = str(pl.get("artId") or "")
@@ -113,7 +115,7 @@ def render_piece_png(
         except Exception:
             continue
         _paste_placement(
-            canvas,
+            art_layer,
             art,
             float(pl.get("xIn") or 0),
             float(pl.get("yIn") or 0),
@@ -130,17 +132,13 @@ def render_piece_png(
     cut_px = _poly_px(cut_yd, dpi, bleed_in, bleed_in)
     if len(cut_px) >= 3:
         mdraw.polygon(cut_px, fill=255)
-        halo = int(round(bleed_in * dpi))
-        if halo > 0:
-            from PIL import ImageFilter
-
-            size = halo * 2 + 1
-            if size % 2 == 0:
-                size += 1
-            size = max(3, min(size, 51))
-            mask = mask.filter(ImageFilter.MaxFilter(size=size))
-        outside = Image.new("RGBA", (img_w, img_h), (255, 255, 255, 0))
-        canvas = Image.composite(canvas, outside, mask)
+        halo = max(1, int(round(bleed_in * dpi)))
+        mdraw.line(cut_px + [cut_px[0]], fill=255, width=halo * 2)
+        canvas = Image.composite(fabric, canvas, mask)
+        canvas = Image.alpha_composite(canvas, Image.composite(art_layer, Image.new("RGBA", (img_w, img_h), (0, 0, 0, 0)), mask))
+    else:
+        canvas = fabric
+        canvas = Image.alpha_composite(canvas, art_layer)
 
     if include_guides and len(cut_px) >= 2:
         overlay = Image.new("RGBA", (img_w, img_h), (0, 0, 0, 0))
