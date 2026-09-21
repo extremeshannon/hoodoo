@@ -20,6 +20,10 @@ from app.models import (
     ProductOptionChoice,
     ProductOptionGroup,
     ProductVariant,
+    ScreenPrintArt,
+    ScreenPrintJob,
+    EmbroideryArt,
+    EmbroideryJob,
     User,
 )
 from app.schemas import (
@@ -290,6 +294,7 @@ class AdminPrintOut(BaseModel):
     owner_name: str | None
     art_count: int
     notes: str | None = None
+    kind: str = "dyesub"
 
 
 class AdminShopOut(BaseModel):
@@ -314,7 +319,13 @@ def admin_shop(
 ):
     users = db.scalars(select(User).order_by(User.created_at.desc())).all()
     order_counts = dict(db.execute(select(Order.user_id, func.count(Order.id)).group_by(Order.user_id)).all())
-    print_counts = dict(db.execute(select(DyeSubJob.user_id, func.count(DyeSubJob.id)).group_by(DyeSubJob.user_id)).all())
+    dyesub_counts = dict(db.execute(select(DyeSubJob.user_id, func.count(DyeSubJob.id)).group_by(DyeSubJob.user_id)).all())
+    screen_counts = dict(
+        db.execute(select(ScreenPrintJob.user_id, func.count(ScreenPrintJob.id)).group_by(ScreenPrintJob.user_id)).all()
+    )
+    em_counts = dict(
+        db.execute(select(EmbroideryJob.user_id, func.count(EmbroideryJob.id)).group_by(EmbroideryJob.user_id)).all()
+    )
     customers = [
         AdminCustomerOut(
             id=u.id,
@@ -325,7 +336,7 @@ def admin_shop(
             is_active=bool(u.is_active),
             created_at=u.created_at,
             order_count=int(order_counts.get(u.id) or 0),
-            print_count=int(print_counts.get(u.id) or 0),
+            print_count=int(dyesub_counts.get(u.id) or 0) + int(screen_counts.get(u.id) or 0) + int(em_counts.get(u.id) or 0),
         )
         for u in users
     ]
@@ -370,9 +381,61 @@ def admin_shop(
             owner_name=j.user.full_name if j.user else None,
             art_count=int(art_counts.get(j.id) or 0),
             notes=j.notes,
+            kind="dyesub",
         )
         for j in jobs
     ]
+    sp_art_counts = dict(
+        db.execute(select(ScreenPrintArt.job_id, func.count(ScreenPrintArt.id)).group_by(ScreenPrintArt.job_id)).all()
+    )
+    sp_jobs = db.scalars(
+        select(ScreenPrintJob).options(selectinload(ScreenPrintJob.user)).order_by(ScreenPrintJob.updated_at.desc())
+    ).unique().all()
+    prints.extend(
+        [
+            AdminPrintOut(
+                id=j.id,
+                name=j.name,
+                garment_id=j.garment_id,
+                status=j.status,
+                created_at=j.created_at,
+                updated_at=j.updated_at,
+                owner_id=j.user_id,
+                owner_email=j.user.email if j.user else "",
+                owner_name=j.user.full_name if j.user else None,
+                art_count=int(sp_art_counts.get(j.id) or 0),
+                notes=j.notes,
+                kind="screenprint",
+            )
+            for j in sp_jobs
+        ]
+    )
+    em_art_counts = dict(
+        db.execute(select(EmbroideryArt.job_id, func.count(EmbroideryArt.id)).group_by(EmbroideryArt.job_id)).all()
+    )
+    em_jobs = db.scalars(
+        select(EmbroideryJob).options(selectinload(EmbroideryJob.user)).order_by(EmbroideryJob.updated_at.desc())
+    ).unique().all()
+    prints.extend(
+        [
+            AdminPrintOut(
+                id=j.id,
+                name=j.name,
+                garment_id=j.garment_id,
+                status=j.status,
+                created_at=j.created_at,
+                updated_at=j.updated_at,
+                owner_id=j.user_id,
+                owner_email=j.user.email if j.user else "",
+                owner_name=j.user.full_name if j.user else None,
+                art_count=int(em_art_counts.get(j.id) or 0),
+                notes=j.notes,
+                kind="embroidery",
+            )
+            for j in em_jobs
+        ]
+    )
+    prints.sort(key=lambda r: r.updated_at, reverse=True)
     return AdminShopOut(customers=customers, orders=order_rows, prints=prints)
 
 
@@ -414,11 +477,27 @@ def admin_patch_print(
     db: Session = Depends(get_db),
 ):
     job = db.scalar(select(DyeSubJob).where(DyeSubJob.id == job_id).options(selectinload(DyeSubJob.user)))
+    kind = "dyesub"
+    if not job:
+        job = db.scalar(
+            select(ScreenPrintJob).where(ScreenPrintJob.id == job_id).options(selectinload(ScreenPrintJob.user))
+        )
+        kind = "screenprint"
+    if not job:
+        job = db.scalar(
+            select(EmbroideryJob).where(EmbroideryJob.id == job_id).options(selectinload(EmbroideryJob.user))
+        )
+        kind = "embroidery"
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Print job not found")
     job.status = body.status.strip() or job.status
     db.commit()
-    art_count = db.scalar(select(func.count(DyeSubArt.id)).where(DyeSubArt.job_id == job.id)) or 0
+    if kind == "screenprint":
+        art_count = db.scalar(select(func.count(ScreenPrintArt.id)).where(ScreenPrintArt.job_id == job.id)) or 0
+    elif kind == "embroidery":
+        art_count = db.scalar(select(func.count(EmbroideryArt.id)).where(EmbroideryArt.job_id == job.id)) or 0
+    else:
+        art_count = db.scalar(select(func.count(DyeSubArt.id)).where(DyeSubArt.job_id == job.id)) or 0
     return AdminPrintOut(
         id=job.id,
         name=job.name,
@@ -431,4 +510,5 @@ def admin_patch_print(
         owner_name=job.user.full_name if job.user else None,
         art_count=int(art_count),
         notes=job.notes,
+        kind=kind,
     )

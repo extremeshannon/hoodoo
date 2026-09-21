@@ -176,6 +176,8 @@ class User(Base):
 
     orders: Mapped[list["Order"]] = relationship(back_populates="user")
     dyesub_jobs: Mapped[list["DyeSubJob"]] = relationship(back_populates="user")
+    screenprint_jobs: Mapped[list["ScreenPrintJob"]] = relationship(back_populates="user")
+    embroidery_jobs: Mapped[list["EmbroideryJob"]] = relationship(back_populates="user")
 
 
 class Order(Base):
@@ -298,4 +300,94 @@ class DyeSubArt(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     job: Mapped[DyeSubJob] = relationship(back_populates="artworks")
+
+
+class ScreenPrintJob(Base):
+    """Saved screen-print layout (garment, art, placements, quote) owned by an account."""
+
+    __tablename__ = "screenprint_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    garment_id: Mapped[str] = mapped_column(String(80), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, default="Untitled screen print")
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="draft")
+    layout: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    user: Mapped["User"] = relationship(back_populates="screenprint_jobs")
+    artworks: Mapped[list["ScreenPrintArt"]] = relationship(
+        back_populates="job",
+        cascade="all, delete-orphan",
+        order_by="ScreenPrintArt.created_at",
+    )
+
+
+class ScreenPrintArt(Base):
+    """Uploaded artwork bytes for a screen-print job."""
+
+    __tablename__ = "screenprint_art"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("screenprint_jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    mime: Mapped[str] = mapped_column(String(80), nullable=False, default="image/png")
+    byte_size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    data: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    job: Mapped[ScreenPrintJob] = relationship(back_populates="artworks")
+
+
+class EmbroideryJob(Base):
+    """Saved embroidery layout (hat/cap, art, stitch estimate, quote) owned by an account."""
+
+    __tablename__ = "embroidery_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    garment_id: Mapped[str] = mapped_column(String(80), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, default="Untitled embroidery")
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="draft")
+    layout: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    user: Mapped["User"] = relationship(back_populates="embroidery_jobs")
+    artworks: Mapped[list["EmbroideryArt"]] = relationship(
+        back_populates="job",
+        cascade="all, delete-orphan",
+        order_by="EmbroideryArt.created_at",
+    )
+
+
+class EmbroideryArt(Base):
+    """Uploaded artwork bytes for an embroidery job."""
+
+    __tablename__ = "embroidery_art"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("embroidery_jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    mime: Mapped[str] = mapped_column(String(80), nullable=False, default="image/png")
+    byte_size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    data: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    job: Mapped[EmbroideryJob] = relationship(back_populates="artworks")
 

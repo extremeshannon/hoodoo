@@ -28,6 +28,8 @@
         <ul class="nav-list">
           <li><a href="/index.html">Home</a></li>
           <li><a href="/configurator.html">Configurator</a></li>
+          <li><a href="/screenprint.html">Screen print</a></li>
+          <li><a href="/embroidery.html">Embroidery</a></li>
           <li><a href="/cart.html">Cart <span class="cart-nav-count" id="cart-nav-count" aria-live="polite"></span></a></li>
           <li><a class="nav-cta" href="/quote.html">Get a quote</a></li>
         </ul>
@@ -58,6 +60,22 @@
           </p>
           <p id="dyesub-empty" class="muted" hidden>No saved prints yet. Open the builder to place art on the Male Freefly Jacket, save it, and send it in for a quote.</p>
           <ul id="dyesub-list" class="orders-list"></ul>
+        </section>
+        <section class="account-orders" aria-labelledby="screenprint-heading">
+          <h2 id="screenprint-heading" class="app-section-title">Screen print jobs</h2>
+          <p>
+            <a class="btn btn-primary" href="/screenprint.html">Open screen print</a>
+          </p>
+          <p id="screenprint-empty" class="muted" hidden>No screen prints yet. Pick a blank, upload art, place logos, and submit a quote.</p>
+          <ul id="screenprint-list" class="orders-list"></ul>
+        </section>
+        <section class="account-orders" aria-labelledby="embroidery-heading">
+          <h2 id="embroidery-heading" class="app-section-title">Embroidery jobs</h2>
+          <p>
+            <a class="btn btn-primary" href="/embroidery.html">Open embroidery</a>
+          </p>
+          <p id="embroidery-empty" class="muted" hidden>No embroidery jobs yet. Pick a cap, beanie, or hat, upload art, and submit a stitch quote.</p>
+          <ul id="embroidery-list" class="orders-list"></ul>
         </section>
       </div>
       <p id="account-error" class="auth-feedback" role="status" aria-live="polite"></p>
@@ -129,11 +147,10 @@
         .then(function (jobs) {
           var list = document.getElementById("dyesub-list");
           var empty = document.getElementById("dyesub-empty");
-          if (!list) return;
+          if (list) {
           if (!jobs || !jobs.length) {
             if (empty) empty.hidden = false;
-            return;
-          }
+          } else {
           if (empty) empty.hidden = true;
           jobs.forEach(function (j) {
             var li = document.createElement("li");
@@ -168,6 +185,120 @@
               btn.disabled = true;
               window.HoodooApi
                 .fetchJson("/dyesub/jobs/" + id + "/quote", { method: "POST" })
+                .then(function () {
+                  window.location.reload();
+                })
+                .catch(function (e) {
+                  btn.disabled = false;
+                  errEl.textContent = e.message || "Could not send quote.";
+                });
+            });
+          });
+          }
+          }
+          return window.HoodooApi.fetchJson("/screenprint/jobs");
+        })
+        .then(function (jobs) {
+          var list = document.getElementById("screenprint-list");
+          var empty = document.getElementById("screenprint-empty");
+          if (list) {
+          if (!jobs || !jobs.length) {
+            if (empty) empty.hidden = false;
+          } else {
+          if (empty) empty.hidden = true;
+          jobs.forEach(function (j) {
+            var li = document.createElement("li");
+            li.className = "orders-row";
+            var d = new Date(j.updated_at || j.created_at);
+            var nArt = (j.artworks && j.artworks.length) || 0;
+            var status = j.status || "draft";
+            var sub = j.quote && j.quote.subtotal != null ? " · $" + j.quote.subtotal : "";
+            var quoteBtn =
+              status === "draft"
+                ? '<button type="button" class="btn btn-ghost account-quote-btn" data-kind="screen" data-id="' +
+                  j.id +
+                  '">Send for quote</button>'
+                : "";
+            li.innerHTML =
+              '<a class="orders-row-link" href="/screenprint.html?job=' +
+              encodeURIComponent(j.id) +
+              '"><span class="orders-row-date">' +
+              d.toLocaleString() +
+              '</span><span class="orders-row-total">' +
+              (j.name || "Screen print") +
+              sub +
+              '</span><span class="orders-row-status">' +
+              nArt +
+              " art · " +
+              status.replace(/_/g, " ") +
+              "</span></a>" +
+              quoteBtn;
+            list.appendChild(li);
+          });
+          list.querySelectorAll(".account-quote-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              var id = btn.getAttribute("data-id");
+              btn.disabled = true;
+              window.HoodooApi
+                .fetchJson("/screenprint/jobs/" + id + "/quote", { method: "POST" })
+                .then(function () {
+                  window.location.reload();
+                })
+                .catch(function (e) {
+                  btn.disabled = false;
+                  errEl.textContent = e.message || "Could not send quote.";
+                });
+            });
+          });
+          }
+          }
+          return window.HoodooApi.fetchJson("/embroidery/jobs");
+        })
+        .then(function (jobs) {
+          var list = document.getElementById("embroidery-list");
+          var empty = document.getElementById("embroidery-empty");
+          if (!list) return;
+          if (!jobs || !jobs.length) {
+            if (empty) empty.hidden = false;
+            return;
+          }
+          if (empty) empty.hidden = true;
+          jobs.forEach(function (j) {
+            var li = document.createElement("li");
+            li.className = "orders-row";
+            var d = new Date(j.updated_at || j.created_at);
+            var nArt = (j.artworks && j.artworks.length) || 0;
+            var status = j.status || "draft";
+            var stitches = j.layout && j.layout.stitches ? " · " + Number(j.layout.stitches).toLocaleString() + " st" : "";
+            var sub = j.quote && j.quote.subtotal != null ? " · $" + j.quote.subtotal : stitches;
+            var quoteBtn =
+              status === "draft"
+                ? '<button type="button" class="btn btn-ghost account-quote-btn" data-kind="embroidery" data-id="' +
+                  j.id +
+                  '">Send for quote</button>'
+                : "";
+            li.innerHTML =
+              '<a class="orders-row-link" href="/embroidery.html?job=' +
+              encodeURIComponent(j.id) +
+              '"><span class="orders-row-date">' +
+              d.toLocaleString() +
+              '</span><span class="orders-row-total">' +
+              (j.name || "Embroidery") +
+              sub +
+              '</span><span class="orders-row-status">' +
+              nArt +
+              " art · " +
+              status.replace(/_/g, " ") +
+              "</span></a>" +
+              quoteBtn;
+            list.appendChild(li);
+          });
+          list.querySelectorAll(".account-quote-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              var id = btn.getAttribute("data-id");
+              btn.disabled = true;
+              window.HoodooApi
+                .fetchJson("/embroidery/jobs/" + id + "/quote", { method: "POST" })
                 .then(function () {
                   window.location.reload();
                 })

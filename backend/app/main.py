@@ -24,6 +24,8 @@ from app.routers import (
     garment_3d,
     orders,
     production,
+    screenprint,
+    embroidery,
     shipping,
     shop_quote,
 )
@@ -107,12 +109,15 @@ async def no_cache_configurator(request, call_next):
     response = await call_next(request)
     path = request.url.path
     if (
-        path in ("/suit", "/suit.html", "/suit.css", "/dyesub", "/dyesub.html", "/dyesub.css")
+        path in ("/suit", "/suit.html", "/suit.css", "/dyesub", "/dyesub.html", "/dyesub.css", "/screenprint", "/screenprint.html", "/screenprint.css", "/embroidery", "/embroidery.html", "/embroidery.css")
         or path.startswith("/js/suit-configurator.js")
         or path.startswith("/js/sizing-avatar.js")
         or path.startswith("/js/dyesub")
+        or path.startswith("/js/screenprint")
+        or path.startswith("/js/embroidery")
         or path.startswith("/js/config-preview.js")
         or path.startswith("/3d/sizing/")
+        or path.startswith("/3d/screenprint/")
         or path.startswith("/3d/clo/manifest.json")
         or path.startswith("/data/materials.json")
         or path.startswith("/admin/")
@@ -131,6 +136,8 @@ app.include_router(shop_quote.router, prefix="/api")
 app.include_router(shipping.router, prefix="/api")
 app.include_router(production.router, prefix="/api")
 app.include_router(dyesub.router, prefix="/api")
+app.include_router(screenprint.router, prefix="/api")
+app.include_router(embroidery.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(admin_config.router)
 app.include_router(site_guide_router, prefix="/api")
@@ -196,6 +203,22 @@ def _attach_static():
     @app.get("/dyesub.html")
     def serve_dyesub_html():
         return _html("dyesub.html")
+
+    @app.get("/screenprint")
+    def serve_screenprint():
+        return _html("screenprint.html")
+
+    @app.get("/screenprint.html")
+    def serve_screenprint_html():
+        return _html("screenprint.html")
+
+    @app.get("/embroidery")
+    def serve_embroidery():
+        return _html("embroidery.html")
+
+    @app.get("/embroidery.html")
+    def serve_embroidery_html():
+        return _html("embroidery.html")
 
     # Explicit home page so we never use StaticFiles(html=True), which serves index.html
     # for *any* missing path (e.g. /api/health) if that mount handles the request first.

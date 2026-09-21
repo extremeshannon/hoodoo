@@ -90,11 +90,14 @@ def estimate(payload: dict[str, Any]) -> dict[str, Any]:
     garments = {g["id"]: g for g in data["garments"]}
     g = garments.get(garment_id) or garments["tee"]
     blank = _money(g["blank"])
+    if payload.get("blankPrice") is not None:
+        blank = _money(payload.get("blankPrice"))
+    garment_name = str(payload.get("garmentName") or g["name"])
     garment_total = blank * qty
 
     lines: list[dict[str, Any]] = [
         {
-            "label": f"{g['name']} blank × {qty}",
+            "label": f"{garment_name} blank × {qty}",
             "amount": float(garment_total),
         }
     ]
@@ -188,7 +191,7 @@ def estimate(payload: dict[str, Any]) -> dict[str, Any]:
         "ok": True,
         "quantity": qty,
         "qtyTier": tier,
-        "garment": g,
+        "garment": {**g, "name": garment_name, "blank": float(blank)},
         "method": method,
         "perPieceDecoration": float(deco_unit),
         "each": float(each),

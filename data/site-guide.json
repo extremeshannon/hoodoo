@@ -33,6 +33,7 @@
     "gauntlet": ["upc", "paw cover", "paw covers", "snowmachine", "mittens", "gloves"],
     "embroidery": ["stitch", "digitize", "hat", "thread"],
     "sublimation": ["dye-sub", "dyesub", "dye sub", "all-over", "print"],
+    "screenprint": ["screen print", "screen-print", "plastisol", "ink"],
     "login": ["sign in", "signin", "account", "password", "staff"],
     "contact": ["email", "phone", "call", "reach", "hours", "open"],
     "location": ["located", "address", "where", "map", "visit"]
@@ -142,11 +143,27 @@
       "keywords": ["dye-sub", "sublimation", "print", "artwork", "jacket"]
     },
     {
+      "id": "screenprint",
+      "title": "Screen print builder",
+      "path": "/screenprint.html",
+      "audience": "customer",
+      "summary": "Pick a vendor blank, upload art, drop ink colors, place logos, preview in 3D, and send a quote to your account.",
+      "keywords": ["screen", "print", "tshirt", "hoodie", "jersey", "plastisol", "logo"]
+    },
+    {
+      "id": "embroidery-builder",
+      "title": "Embroidery builder",
+      "path": "/embroidery.html",
+      "audience": "customer",
+      "summary": "Pick a ball cap, beanie, or hat, upload art, estimate stitch count and thread colors, place logos, preview in 3D, and send a quote to your account.",
+      "keywords": ["embroidery", "hat", "cap", "beanie", "stitch", "digitize", "thread"]
+    },
+    {
       "id": "account",
       "title": "Account",
       "path": "/account.html",
       "audience": "customer",
-      "summary": "Signed-in account: orders and saved dye-sub jobs.",
+      "summary": "Signed-in account: orders, dye-sub jobs, screen-print quotes, and embroidery stitch quotes.",
       "keywords": ["account", "orders", "profile"]
     }
   ],
@@ -196,16 +213,16 @@
       "title": "Apparel",
       "audience": "public",
       "keywords": ["tee", "t-shirt", "hoodie", "jersey", "beanie", "hat", "team", "apparel"],
-      "body": "Hoodoo produces tees, jerseys, hoodies, beanies, and other branded apparel with embroidery, screen print, or dye-sub. Team and volume quotes are available. Reach the shop to spec a run.",
-      "links": [{ "id": "contact" }, { "id": "services" }]
+      "body": "Hoodoo produces tees, jerseys, hoodies, beanies, and other branded apparel with embroidery, screen print, or dye-sub. Team and volume quotes are available. Signed-in customers can build a screen-print quote at /screenprint.html or an embroidery hat quote at /embroidery.html.",
+      "links": [{ "id": "contact" }, { "id": "services" }, { "id": "screenprint" }, { "id": "embroidery-builder" }]
     },
     {
       "id": "embroidery",
       "title": "Embroidery",
       "audience": "public",
       "keywords": ["embroidery", "stitch", "digitize", "hat", "chest", "thread"],
-      "body": "Embroidery is done in-house. Typical left-chest / name work is billed around a 5,000-stitch minimum; hat fronts ~6,000; detailed chest ~8,000; jacket or hoodie backs often 8–12k stitches. Digitizing can be waived if you already have a DST/EMB file. Public pricing tables are in the staff shop; email or call for a real quote.",
-      "links": [{ "id": "contact" }, { "id": "quote" }]
+      "body": "Embroidery is done in-house. Signed-in customers can pick a vendor cap, beanie, or hat, upload art, drop thread colors, and get an estimated stitch count for a quote. Typical left-chest / name work is billed around a 5,000-stitch minimum; hat fronts ~6,000. Digitizing can be waived if you already have a DST/EMB file.",
+      "links": [{ "id": "contact" }, { "id": "embroidery-builder" }, { "id": "quote" }]
     },
     {
       "id": "dye-sub",
@@ -214,6 +231,14 @@
       "keywords": ["dye", "sub", "sublimation", "all-over", "polyester", "print", "photographic"],
       "body": "Dye sublimation bonds all-over color and photographic prints to polyester. Hoodoo also has a staff print builder for placing art on pattern pieces (starting with the Male Freefly Jacket). For a dye-sub job, contact the shop.",
       "links": [{ "id": "contact" }, { "id": "dyesub" }]
+    },
+    {
+      "id": "screen-print",
+      "title": "Screen printing",
+      "audience": "public",
+      "keywords": ["screen", "print", "plastisol", "water-based", "ink", "tshirt", "hoodie", "jersey"],
+      "body": "Screen printing is plastisol and water-based, in-house. Signed-in customers can pick a vendor blank (Gildan, Next Level, Independent, Augusta, and others), upload art, drop ink colors, place logos on multiple locations, preview in 3D, and send a quote to their account.",
+      "links": [{ "id": "contact" }, { "id": "screenprint" }]
     },
     {
       "id": "location",
@@ -243,7 +268,9 @@
         { "id": "quote" },
         { "id": "pricing" },
         { "id": "cart" },
-        { "id": "dyesub" }
+        { "id": "dyesub" },
+        { "id": "screenprint" },
+        { "id": "embroidery-builder" }
       ]
     },
     {

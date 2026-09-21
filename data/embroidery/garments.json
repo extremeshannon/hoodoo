@@ -1,0 +1,211 @@
+{
+  "meta": {
+    "currency": "USD",
+    "updated": "2026-09",
+    "disclaimer": "Stitch counts are estimated from artwork coverage and size. Digitizing, fabric, and hoop difficulty can change the number. Confirm before we stitch.",
+    "minStitchesBilled": 5000,
+    "stitchesPerSqIn": 1600,
+    "sizes": ["OSFM", "S/M", "L/XL"]
+  },
+  "categories": [
+    { "id": "ballcap", "label": "Ball caps" },
+    { "id": "beanie", "label": "Beanies" },
+    { "id": "hat", "label": "Hats" }
+  ],
+  "locations": [
+    { "id": "front", "label": "Front", "maxW": 2.75, "maxH": 2.5, "defaultW": 2.25 },
+    { "id": "back", "label": "Back", "maxW": 3.5, "maxH": 2.25, "defaultW": 2.5 },
+    { "id": "left_side", "label": "Left side", "maxW": 2.25, "maxH": 2.0, "defaultW": 1.75 },
+    { "id": "right_side", "label": "Right side", "maxW": 2.25, "maxH": 2.0, "defaultW": 1.75 },
+    { "id": "cuff", "label": "Cuff / fold", "maxW": 4.5, "maxH": 2.0, "defaultW": 3.5 }
+  ],
+  "garments": [
+    {
+      "id": "richardson-112",
+      "category": "ballcap",
+      "vendor": "Richardson",
+      "model": "112",
+      "name": "Trucker Snapback",
+      "price": 18,
+      "mesh": "ballcap",
+      "hatHoop": true,
+      "locationIds": ["front", "back", "left_side", "right_side"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#1a1a1a" },
+        { "id": "navy", "name": "Navy", "hex": "#1b365d" },
+        { "id": "white", "name": "White", "hex": "#f4f4f0" },
+        { "id": "grey", "name": "Grey", "hex": "#8a8a8a" },
+        { "id": "charcoal", "name": "Charcoal", "hex": "#3f3f3f" },
+        { "id": "red", "name": "Red", "hex": "#c41e3a" },
+        { "id": "royal", "name": "Royal", "hex": "#1a4e8a" },
+        { "id": "khaki", "name": "Khaki", "hex": "#c4b48a" },
+        { "id": "forest", "name": "Forest", "hex": "#1f4d2c" },
+        { "id": "orange", "name": "Orange", "hex": "#e35205" },
+        { "id": "maroon", "name": "Maroon", "hex": "#6b1d2a" },
+        { "id": "camo", "name": "Camo", "hex": "#5a6248" }
+      ]
+    },
+    {
+      "id": "yupoong-6606",
+      "category": "ballcap",
+      "vendor": "Yupoong",
+      "model": "6606",
+      "name": "Dad Hat",
+      "price": 16,
+      "mesh": "ballcap",
+      "hatHoop": true,
+      "locationIds": ["front", "back", "left_side", "right_side"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#161616" },
+        { "id": "navy", "name": "Navy", "hex": "#1a3054" },
+        { "id": "white", "name": "White", "hex": "#f7f7f4" },
+        { "id": "grey", "name": "Light Grey", "hex": "#c5c5c5" },
+        { "id": "khaki", "name": "Khaki", "hex": "#c8b89a" },
+        { "id": "red", "name": "Red", "hex": "#c0122e" },
+        { "id": "royal", "name": "Royal", "hex": "#1857a4" },
+        { "id": "pink", "name": "Pink", "hex": "#e7b7b0" }
+      ]
+    },
+    {
+      "id": "flexfit-6277",
+      "category": "ballcap",
+      "vendor": "Flexfit",
+      "model": "6277",
+      "name": "Wooly Combed Cap",
+      "price": 20,
+      "mesh": "ballcap",
+      "hatHoop": true,
+      "locationIds": ["front", "back", "left_side", "right_side"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#111111" },
+        { "id": "navy", "name": "Navy", "hex": "#15233b" },
+        { "id": "white", "name": "White", "hex": "#f8f8f6" },
+        { "id": "grey", "name": "Dark Grey", "hex": "#4d5358" },
+        { "id": "red", "name": "Red", "hex": "#c51f33" },
+        { "id": "royal", "name": "Royal", "hex": "#1c4f9c" },
+        { "id": "kelly", "name": "Kelly", "hex": "#1c8c3c" },
+        { "id": "gold", "name": "Gold", "hex": "#f0b323" }
+      ]
+    },
+    {
+      "id": "otto-18-153",
+      "category": "ballcap",
+      "vendor": "Otto",
+      "model": "18-153",
+      "name": "Classic Low Profile",
+      "price": 14,
+      "mesh": "ballcap",
+      "hatHoop": true,
+      "locationIds": ["front", "back", "left_side", "right_side"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#1a1a1a" },
+        { "id": "navy", "name": "Navy", "hex": "#1b365d" },
+        { "id": "white", "name": "White", "hex": "#f4f4f0" },
+        { "id": "khaki", "name": "Khaki", "hex": "#c4b48a" },
+        { "id": "red", "name": "Red", "hex": "#c41e3a" },
+        { "id": "royal", "name": "Royal", "hex": "#1a4e8a" },
+        { "id": "charcoal", "name": "Charcoal", "hex": "#3f3f3f" }
+      ]
+    },
+    {
+      "id": "sportsman-sp12",
+      "category": "beanie",
+      "vendor": "Sportsman",
+      "model": "SP12",
+      "name": "12\" Knit Beanie",
+      "price": 14,
+      "mesh": "beanie",
+      "hatHoop": true,
+      "locationIds": ["front", "cuff"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#1a1a1a" },
+        { "id": "navy", "name": "Navy", "hex": "#1b365d" },
+        { "id": "grey", "name": "Heather Grey", "hex": "#9a9a9a" },
+        { "id": "red", "name": "Red", "hex": "#c41e3a" },
+        { "id": "royal", "name": "Royal", "hex": "#1a4e8a" },
+        { "id": "forest", "name": "Forest", "hex": "#1f4d2c" },
+        { "id": "white", "name": "White", "hex": "#f2f2ee" },
+        { "id": "camo", "name": "Camo", "hex": "#5a6248" },
+        { "id": "orange", "name": "Orange", "hex": "#e35205" },
+        { "id": "maroon", "name": "Maroon", "hex": "#6b1d2a" }
+      ]
+    },
+    {
+      "id": "yupoong-1501kc",
+      "category": "beanie",
+      "vendor": "Yupoong",
+      "model": "1501KC",
+      "name": "Cuffed Knit Beanie",
+      "price": 16,
+      "mesh": "beanie",
+      "hatHoop": true,
+      "locationIds": ["front", "cuff"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#161616" },
+        { "id": "navy", "name": "Navy", "hex": "#1a3054" },
+        { "id": "grey", "name": "Grey", "hex": "#8a8a8a" },
+        { "id": "red", "name": "Red", "hex": "#c0122e" },
+        { "id": "royal", "name": "Royal", "hex": "#1857a4" },
+        { "id": "white", "name": "White", "hex": "#f7f7f4" },
+        { "id": "khaki", "name": "Khaki", "hex": "#c8b89a" }
+      ]
+    },
+    {
+      "id": "richardson-137",
+      "category": "beanie",
+      "vendor": "Richardson",
+      "model": "137",
+      "name": "Wharf Beanie",
+      "price": 18,
+      "mesh": "beanie",
+      "hatHoop": true,
+      "locationIds": ["front", "cuff"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#1a1a1a" },
+        { "id": "navy", "name": "Navy", "hex": "#1b365d" },
+        { "id": "grey", "name": "Grey", "hex": "#8a8a8a" },
+        { "id": "red", "name": "Red", "hex": "#c41e3a" },
+        { "id": "royal", "name": "Royal", "hex": "#1a4e8a" },
+        { "id": "camo", "name": "Camo", "hex": "#5a6248" }
+      ]
+    },
+    {
+      "id": "flexfit-5003",
+      "category": "hat",
+      "vendor": "Flexfit",
+      "model": "5003",
+      "name": "Bucket Hat",
+      "price": 18,
+      "mesh": "bucket",
+      "hatHoop": true,
+      "locationIds": ["front", "back"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#111111" },
+        { "id": "navy", "name": "Navy", "hex": "#15233b" },
+        { "id": "khaki", "name": "Khaki", "hex": "#c4b48a" },
+        { "id": "white", "name": "White", "hex": "#f8f8f6" },
+        { "id": "grey", "name": "Grey", "hex": "#8a8a8a" },
+        { "id": "red", "name": "Red", "hex": "#c51f33" }
+      ]
+    },
+    {
+      "id": "sportsman-sp24",
+      "category": "hat",
+      "vendor": "Sportsman",
+      "model": "SP24",
+      "name": "Bucket Hat",
+      "price": 16,
+      "mesh": "bucket",
+      "hatHoop": true,
+      "locationIds": ["front", "back"],
+      "colors": [
+        { "id": "black", "name": "Black", "hex": "#1a1a1a" },
+        { "id": "navy", "name": "Navy", "hex": "#1b365d" },
+        { "id": "khaki", "name": "Khaki", "hex": "#c4b48a" },
+        { "id": "white", "name": "White", "hex": "#f4f4f0" },
+        { "id": "camo", "name": "Camo", "hex": "#5a6248" },
+        { "id": "orange", "name": "Orange", "hex": "#e35205" }
+      ]
+    }
+  ]
+}

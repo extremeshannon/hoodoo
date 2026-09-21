@@ -148,6 +148,7 @@
         escapeHtml(r.name || "Print") +
         '<br /><span class="muted">' +
         escapeHtml(r.garment_id || "") +
+        (r.kind === "embroidery" ? " · embroidery" : r.kind === "screenprint" ? " · screen" : " · dye-sub") +
         "</span></td><td>" +
         escapeHtml(customerLabel(r)) +
         "</td><td>" +
@@ -156,9 +157,12 @@
         r.art_count +
         "</td><td>" +
         escapeHtml(fmtWhen(r.updated_at || r.created_at)) +
-        '</td><td class="admin-shop-actions"><a class="btn btn-ghost" href="/dyesub.html?job=' +
+        '</td><td class="admin-shop-actions"><a class="btn btn-ghost" href="' +
+        (r.kind === "embroidery" ? "/embroidery.html?job=" : r.kind === "screenprint" ? "/screenprint.html?job=" : "/dyesub.html?job=") +
         encodeURIComponent(r.id) +
-        '">Open</a> <button type="button" class="btn btn-primary admin-pack-btn" data-id="' +
+        '">Open</a> <button type="button" class="btn btn-primary admin-pack-btn" data-kind="' +
+        escapeHtml(r.kind || "dyesub") +
+        '" data-id="' +
         escapeHtml(r.id) +
         '" data-name="' +
         escapeHtml(r.name || "print") +
@@ -168,7 +172,7 @@
     bindStatusSelects(tb);
     tb.querySelectorAll(".admin-pack-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        downloadPrintPack(btn.getAttribute("data-id"), btn.getAttribute("data-name"));
+        downloadPrintPack(btn.getAttribute("data-id"), btn.getAttribute("data-name"), btn.getAttribute("data-kind"));
       });
     });
   }
@@ -195,11 +199,15 @@
     });
   }
 
-  function downloadPrintPack(id, name) {
+  function downloadPrintPack(id, name, kind) {
     var st = document.getElementById("admin-shop-status");
+    var isScreen = kind === "screenprint";
+    var isEmb = kind === "embroidery";
     if (window.HoodooPackBusy) {
       window.HoodooPackBusy.start({
-        steps: ["Loading job…", "Rendering pieces at 300 DPI…", "Nesting on 44 in roll…", "Zipping PRINT, CLO, and CUT files…"],
+        steps: isScreen || isEmb
+          ? ["Loading job…", "Collecting artwork…", "Writing placement spec…", "Zipping art and quote…"]
+          : ["Loading job…", "Rendering pieces at 300 DPI…", "Nesting on 44 in roll…", "Zipping PRINT, CLO, and CUT files…"],
       });
     } else if (st) {
       st.textContent = "Building print pack… this can take a minute.";
@@ -207,7 +215,12 @@
     var headers = {};
     var tok = window.HoodooApi.getToken();
     if (tok) headers.Authorization = "Bearer " + tok;
-    return fetch((window.HoodooApi.base() || "") + "/api/dyesub/jobs/" + id + "/pack", {
+    var packUrl = isEmb
+      ? "/api/embroidery/jobs/" + id + "/pack"
+      : isScreen
+        ? "/api/screenprint/jobs/" + id + "/pack"
+        : "/api/dyesub/jobs/" + id + "/pack";
+    return fetch((window.HoodooApi.base() || "") + packUrl, {
       headers: headers,
       credentials: "same-origin",
     })

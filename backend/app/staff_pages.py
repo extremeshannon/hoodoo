@@ -7,11 +7,17 @@ from urllib.parse import quote
 # Logged-in customers: save prints, send quotes, open account history.
 CUSTOMER_AUTH_PREFIXES = (
     "/dyesub",
+    "/screenprint",
+    "/embroidery",
     "/account",
     "/order",
     "/js/dyesub",
+    "/js/screenprint",
+    "/js/embroidery",
     "/3d/",
     "/data/dyesub",
+    "/data/screenprint",
+    "/data/embroidery",
     "/data/materials.json",
 )
 

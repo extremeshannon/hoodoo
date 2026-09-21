@@ -1,0 +1,454 @@
+/* Embroidery builder — hats, ball caps, beanies */
+
+body.page-embroidery {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.page-embroidery,
+.page-embroidery * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.page-embroidery *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.em-main {
+  height: 100dvh;
+  padding: calc(var(--header-anchor) + 0.5rem) 1rem 0.75rem;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#em-app[hidden] {
+  display: none !important;
+}
+
+#em-app:not([hidden]) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.em-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.em-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.em-name-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.em-name-label input,
+.em-qty-label input,
+.em-props input,
+.em-props select {
+  min-width: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: var(--slate);
+  color: var(--paper);
+  font: inherit;
+}
+
+.em-name-label input {
+  min-width: min(100%, 18rem);
+}
+
+.em-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.em-status {
+  min-height: 1.4em;
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.em-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1.1fr) minmax(0, 1.05fr) 300px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0.85rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.em-col,
+.em-stage {
+  background: rgba(28, 34, 41, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem 0.85rem;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.em-col h2,
+.em-col h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.em-col h3 {
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.em-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.em-cat {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.em-cat.is-on {
+  border-color: var(--brand);
+  color: var(--ink);
+  background: var(--brand);
+}
+
+.em-garment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  flex: 0 1 38%;
+  min-height: 6rem;
+}
+
+.em-garment-list li {
+  margin: 0 0 0.4rem;
+}
+
+.em-gbtn {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 11, 13, 0.45);
+  color: var(--paper);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.em-gbtn.is-on {
+  border-color: var(--brand);
+}
+
+.em-gbtn strong {
+  display: block;
+  font-size: 0.8125rem;
+}
+
+.em-gbtn span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.em-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.em-swatch {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  padding: 0;
+}
+
+.em-swatch.is-on {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--brand);
+}
+
+.em-sizes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.em-size {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.em-size input {
+  width: 100%;
+  padding: 0.3rem 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: var(--slate);
+  color: var(--paper);
+  font: inherit;
+}
+
+.em-qty-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.em-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.em-locs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.em-loc {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: var(--paper);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.em-loc.is-on {
+  background: var(--brand);
+  color: var(--ink);
+  border-color: var(--brand);
+}
+
+.em-stage-frame {
+  flex: 1;
+  min-height: 16rem;
+  position: relative;
+  background: #0e1116;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.em-stage-frame canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.em-stage-meta,
+.em-hint {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.em-upload {
+  width: 100%;
+  margin-bottom: 0.55rem;
+}
+
+.em-file {
+  display: none;
+}
+
+.em-art-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  flex: 0 1 30%;
+  min-height: 4rem;
+}
+
+.em-art-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 0.4rem;
+  align-items: start;
+  margin-bottom: 0.55rem;
+}
+
+.em-art-row img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.em-ink {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.em-ink-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.05rem 0.3rem 0.05rem 0.15rem;
+  font-size: 0.65rem;
+  color: var(--paper);
+  background: transparent;
+  cursor: pointer;
+}
+
+.em-ink-chip.is-off {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.em-ink-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.em-props {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.em-prop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.em-quote {
+  margin-top: auto;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.em-quote-kicker {
+  margin: 0;
+  color: var(--brand);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.em-quote-num {
+  margin: 0.15rem 0;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.em-quote-each {
+  margin: 0 0 0.15rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.em-stitch {
+  margin: 0 0 0.4rem;
+  color: var(--brand);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.em-quote-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.em-quote-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+@media (max-width: 1100px) {
+  .em-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto minmax(18rem, 1fr) minmax(18rem, 1fr);
+  }
+  .em-garments { grid-column: 1 / -1; max-height: 16rem; }
+}
+
+@media (max-width: 720px) {
+  body.page-embroidery { height: auto; overflow: auto; }
+  .em-main { height: auto; }
+  .em-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+  .em-stage-frame { min-height: 18rem; }
+}

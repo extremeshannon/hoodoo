@@ -64,6 +64,74 @@ def ensure_legacy_schema(engine) -> None:
             )
         )
         conn.execute(text("CREATE INDEX IF NOT EXISTS ix_dyesub_art_job_id ON dyesub_art (job_id)"))
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS screenprint_jobs (
+                    id UUID PRIMARY KEY,
+                    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    garment_id VARCHAR(80) NOT NULL,
+                    name VARCHAR(255) NOT NULL DEFAULT 'Untitled screen print',
+                    status VARCHAR(40) NOT NULL DEFAULT 'draft',
+                    layout JSONB NOT NULL DEFAULT '{}'::jsonb,
+                    notes TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """
+            )
+        )
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_screenprint_jobs_user_id ON screenprint_jobs (user_id)"))
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS screenprint_art (
+                    id UUID PRIMARY KEY,
+                    job_id UUID NOT NULL REFERENCES screenprint_jobs(id) ON DELETE CASCADE,
+                    filename VARCHAR(255) NOT NULL,
+                    mime VARCHAR(80) NOT NULL DEFAULT 'image/png',
+                    byte_size INTEGER NOT NULL DEFAULT 0,
+                    data BYTEA NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """
+            )
+        )
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_screenprint_art_job_id ON screenprint_art (job_id)"))
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS embroidery_jobs (
+                    id UUID PRIMARY KEY,
+                    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    garment_id VARCHAR(80) NOT NULL,
+                    name VARCHAR(255) NOT NULL DEFAULT 'Untitled embroidery',
+                    status VARCHAR(40) NOT NULL DEFAULT 'draft',
+                    layout JSONB NOT NULL DEFAULT '{}'::jsonb,
+                    notes TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """
+            )
+        )
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_embroidery_jobs_user_id ON embroidery_jobs (user_id)"))
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS embroidery_art (
+                    id UUID PRIMARY KEY,
+                    job_id UUID NOT NULL REFERENCES embroidery_jobs(id) ON DELETE CASCADE,
+                    filename VARCHAR(255) NOT NULL,
+                    mime VARCHAR(80) NOT NULL DEFAULT 'image/png',
+                    byte_size INTEGER NOT NULL DEFAULT 0,
+                    data BYTEA NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """
+            )
+        )
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_embroidery_art_job_id ON embroidery_art (job_id)"))
 
 
 def get_db() -> Generator[Session, None, None]:

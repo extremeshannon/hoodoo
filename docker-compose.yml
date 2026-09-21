@@ -44,6 +44,7 @@ services:
       PUBLIC_BASE_URL: http://localhost:8004
     volumes:
       - ./backend/app:/app/app
+      - ./backend/alembic:/app/alembic
       - ./data:/app/data
       - ./js:/app/js
       - ./3d:/app/3d
@@ -62,6 +63,10 @@ services:
       - ./suit.css:/app/suit.css
       - ./dyesub.html:/app/dyesub.html
       - ./dyesub.css:/app/dyesub.css
+      - ./screenprint.html:/app/screenprint.html
+      - ./screenprint.css:/app/screenprint.css
+      - ./embroidery.html:/app/embroidery.html
+      - ./embroidery.css:/app/embroidery.css
       - ./configurator.html:/app/configurator.html
       - ./configurator.css:/app/configurator.css
       - ./configurator.js:/app/configurator.js
