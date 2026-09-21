@@ -1,15 +1,16 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const CACHE_V = "20260918ag";
+const CACHE_V = "20260921c";
 const AVATAR_URLS = {
   female: "/3d/sizing/avatar_female.glb?v=" + CACHE_V,
   male: "/3d/sizing/avatar_male.glb?v=" + CACHE_V,
   youth: "/3d/sizing/avatar_youth.glb?v=" + CACHE_V,
 };
+const AVATAR_JSON_URLS = {};
 const WIRE = 0x36b4e5;
 const TAPE = 0x1e4d8c;
-const BODY = 0xffffff;
+const BODY = 0xe4f6fb;
 
 const MEASURES = {
   height: "No shoes, stand against a wall. Heels, hips, and shoulders touching. Measure from the floor to the top of the head.",
@@ -52,24 +53,24 @@ function reduceMotion() {
 function makeHotspot() {
   var g = new THREE.Group();
   var hit = new THREE.Mesh(
-    new THREE.SphereGeometry(0.03, 12, 10),
+    new THREE.SphereGeometry(0.04, 12, 10),
     new THREE.MeshBasicMaterial({
       color: WIRE, transparent: true, opacity: 0, depthWrite: false, depthTest: false,
     })
   );
   var glow = new THREE.Mesh(
-    new THREE.SphereGeometry(0.012, 14, 12),
+    new THREE.SphereGeometry(0.02, 14, 12),
     new THREE.MeshBasicMaterial({
-      color: WIRE, transparent: true, opacity: 0.2, depthWrite: false, depthTest: false,
+      color: WIRE, transparent: true, opacity: 0.28, depthWrite: false, depthTest: true,
     })
   );
   var ring = new THREE.Mesh(
-    new THREE.TorusGeometry(0.011, 0.002, 8, 22),
-    new THREE.MeshBasicMaterial({ color: WIRE, depthWrite: false, depthTest: false })
+    new THREE.TorusGeometry(0.02, 0.0035, 8, 24),
+    new THREE.MeshBasicMaterial({ color: 0x1a1d22, depthWrite: false, depthTest: true })
   );
   var core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.0065, 12, 10),
-    new THREE.MeshBasicMaterial({ color: WIRE, depthWrite: false, depthTest: false })
+    new THREE.SphereGeometry(0.016, 14, 12),
+    new THREE.MeshBasicMaterial({ color: WIRE, depthWrite: true, depthTest: true })
   );
   hit.renderOrder = 6;
   glow.renderOrder = 7;
@@ -109,14 +110,6 @@ function tubeFromPoints(pts, closed) {
 function makeLineTape(p0, p1) {
   var g = new THREE.Group();
   g.add(tubeFromPoints([p0.clone(), p1.clone()], false));
-  var a = makeHotspot();
-  var b = makeHotspot();
-  a.position.copy(p0);
-  b.position.copy(p1);
-  a.userData.tapeEnd = true;
-  b.userData.tapeEnd = true;
-  g.add(a);
-  g.add(b);
   return g;
 }
 
@@ -140,41 +133,43 @@ function frontArc(left, right) {
   return tubeFromPoints([left.clone(), mid, right.clone()], false);
 }
 
-function collectGeo(root) {
-  var geos = [];
+function collectPoints(root, space) {
+  var pts = [];
+  if (space) space.updateMatrixWorld(true);
+  root.updateMatrixWorld(true);
+  var inv = space ? new THREE.Matrix4().copy(space.matrixWorld).invert() : new THREE.Matrix4();
+  var v = new THREE.Vector3();
+  var m = new THREE.Matrix4();
   root.traverse(function (o) {
     if (!o.isMesh || !o.geometry || !o.geometry.attributes || !o.geometry.attributes.position) return;
-    if (String(o.name || "").indexOf("_grid_overlay") >= 0) return;
-    geos.push(o.geometry);
-  });
-  return geos;
-}
-
-function pickVert(geos, scoreFn, filterFn) {
-  var best = null;
-  var bestS = -Infinity;
-  var v = new THREE.Vector3();
-  geos.forEach(function (geo) {
-    var pos = geo.attributes.position;
+    if (meshKind(o) !== "body") return;
+    m.multiplyMatrices(inv, o.matrixWorld);
+    var pos = o.geometry.attributes.position;
     for (var i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i);
-      if (filterFn && !filterFn(v)) continue;
-      var s = scoreFn(v);
-      if (s > bestS) {
-        bestS = s;
-        best = v.clone();
-      }
+      pts.push(v.fromBufferAttribute(pos, i).applyMatrix4(m).clone());
     }
   });
+  return pts;
+}
+
+function pickVert(pts, scoreFn, filterFn) {
+  var best = null;
+  var bestS = -Infinity;
+  for (var i = 0; i < pts.length; i++) {
+    var v = pts[i];
+    if (filterFn && !filterFn(v)) continue;
+    var s = scoreFn(v);
+    if (s > bestS) {
+      bestS = s;
+      best = v;
+    }
+  }
   return best;
 }
 
-function bboxOf(geos) {
+function bboxOf(pts) {
   var box = new THREE.Box3();
-  geos.forEach(function (g) {
-    g.computeBoundingBox();
-    if (g.boundingBox) box.union(g.boundingBox);
-  });
+  pts.forEach(function (p) { box.expandByPoint(p); });
   return box;
 }
 
@@ -182,9 +177,12 @@ function v3(p, fb) {
   return p ? p.clone() : new THREE.Vector3(fb[0], fb[1], fb[2]);
 }
 
-function landmarksFrom(root) {
-  var geos = collectGeo(root);
+function landmarksFrom(root, space) {
+  var geos = collectPoints(root, space || root);
   var box = bboxOf(geos);
+  if (!geos.length || box.isEmpty()) {
+    box.set(new THREE.Vector3(-0.4, 0, -0.2), new THREE.Vector3(0.4, 1.76, 0.2));
+  }
   var minY = box.min.y;
   var h = Math.max(box.max.y - minY, 0.5);
   var yAt = function (t) { return minY + h * t; };
@@ -276,104 +274,302 @@ function makeTape(marks, key) {
 function skipAvatarExtra(name) {
   var n = String(name || "").toLowerCase();
   return n.indexOf("hair") >= 0 || n.indexOf("tooth") >= 0 || n.indexOf("shoe") >= 0
-    || n.indexOf("eye") >= 0 || n.indexOf("lash") >= 0 || n.indexOf("brow") >= 0
-    || n.indexOf("body_wire") >= 0 || n === "body_wire";
+    || n.indexOf("eye") >= 0 || n.indexOf("lash") >= 0 || n.indexOf("brow") >= 0;
 }
 
-function makeFillMaterial() {
-  return new THREE.MeshBasicMaterial({
-    color: 0xffffff,
+function meshKind(obj) {
+  var n = String(obj.name || "").toLowerCase();
+  if (n === "gridlight") return "quad_light";
+  if (n === "grid") return "quad";
+  if (n.indexOf("quad_detail") >= 0 || n.indexOf("quad_grid") >= 0 || n.indexOf("quad_edges") >= 0) return "quad";
+  if (n.indexOf("clean_cage") >= 0) return "cage";
+  if (n.indexOf("_grid_overlay") >= 0 || n.indexOf("_quad_grid") >= 0) return "overlay";
+  if (n.indexOf("body_wire_lines") >= 0) return "wirelines";
+  if (n.indexOf("marker") >= 0) return "marker";
+  if (n.indexOf("ring_360") >= 0 || n === "ring_360") return "ring";
+  if (n.indexOf("grid_line") >= 0 || n === "grid_lines") return "grid";
+  if (n.indexOf("body_wire") >= 0 || n === "body_wire") return "wire";
+  if (obj.isLine || obj.isLineSegments) return n.indexOf("ring") >= 0 ? "ring" : "grid";
+  if (skipAvatarExtra(obj.name) || skipAvatarExtra(obj.parent && obj.parent.name)) return "skip";
+  return "body";
+}
+
+function bboxFromBody(root) {
+  var box = new THREE.Box3();
+  root.updateMatrixWorld(true);
+  root.traverse(function (o) {
+    if (!o.isMesh || !o.geometry || meshKind(o) !== "body") return;
+    o.geometry.computeBoundingBox();
+    if (!o.geometry.boundingBox) return;
+    var b = o.geometry.boundingBox.clone();
+    b.applyMatrix4(o.matrixWorld);
+    box.union(b);
+  });
+  return box;
+}
+
+function makeBodyMaterial(box) {
+  var minY = box && !box.isEmpty() ? box.min.y : 0;
+  var h = box && !box.isEmpty() ? Math.max(box.max.y - minY, 0.5) : 1.758;
+  var w = box && !box.isEmpty() ? Math.max(box.max.x - box.min.x, 0.3) : 0.87;
+  var sy = h / 1.758;
+  var sx = w / 0.87;
+  var mat = new THREE.MeshBasicMaterial({
+    color: BODY,
     side: THREE.DoubleSide,
     transparent: false,
     opacity: 1,
     depthWrite: true,
     depthTest: true,
   });
+  mat.extensions = { derivatives: true };
+  var gridColor = new THREE.Color(WIRE);
+  var uRing = 0.045;
+  var uLon = 18.0;
+  var uWidth = 1.1;
+  var uCrotchY = minY + 0.88 * sy;
+  var uArmMaxY = minY + 1.47 * sy;
+  var uArmMinX = 0.19 * sx;
+  var uHeadY = minY + 1.53 * sy;
+  var uLegOffX = 0.095 * sx;
+  var uArmTopY = minY + 1.43 * sy;
+  var uArmLenY = 0.66 * sy;
+  var uArmInnerX = 0.18 * sx;
+  var uArmOuterX = 0.43 * sx;
+  var uLegSpace = 0.032;
+  var uTorsoSpaceX = 0.045;
+  var uTorsoSpaceZ = 0.040;
+  var uMidHalfX = 0.23 * sx;
+  var uMidSpacingX = 0.055;
+  var uMidRingSpacing = 0.065;
+  mat.onBeforeCompile = function (shader) {
+    shader.uniforms.gridColor = { value: gridColor };
+    shader.uniforms.ringSpacing = { value: uRing };
+    shader.uniforms.lonCount = { value: uLon };
+    shader.uniforms.gridWidth = { value: uWidth };
+    shader.uniforms.crotchY = { value: uCrotchY };
+    shader.uniforms.armMaxY = { value: uArmMaxY };
+    shader.uniforms.armMinX = { value: uArmMinX };
+    shader.uniforms.headY = { value: uHeadY };
+    shader.uniforms.legOffX = { value: uLegOffX };
+    shader.uniforms.armTopY = { value: uArmTopY };
+    shader.uniforms.armLenY = { value: uArmLenY };
+    shader.uniforms.armInnerX = { value: uArmInnerX };
+    shader.uniforms.armOuterX = { value: uArmOuterX };
+    shader.uniforms.legSpace = { value: uLegSpace };
+    shader.uniforms.torsoSpaceX = { value: uTorsoSpaceX };
+    shader.uniforms.torsoSpaceZ = { value: uTorsoSpaceZ };
+    shader.uniforms.midHalfX = { value: uMidHalfX };
+    shader.uniforms.midSpacingX = { value: uMidSpacingX };
+    shader.uniforms.midRingSpacing = { value: uMidRingSpacing };
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", "#include <common>\nvarying vec3 vGridPos;")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvGridPos = position;");
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        [
+          "#include <common>",
+          "varying vec3 vGridPos;",
+          "uniform vec3 gridColor;",
+          "uniform float ringSpacing;",
+          "uniform float lonCount;",
+          "uniform float gridWidth;",
+          "uniform float crotchY;",
+          "uniform float armMaxY;",
+          "uniform float armMinX;",
+          "uniform float headY;",
+          "uniform float legOffX;",
+          "uniform float armTopY;",
+          "uniform float armLenY;",
+          "uniform float armInnerX;",
+          "uniform float armOuterX;",
+          "uniform float legSpace;",
+          "uniform float torsoSpaceX;",
+          "uniform float torsoSpaceZ;",
+          "uniform float midHalfX;",
+          "uniform float midSpacingX;",
+          "uniform float midRingSpacing;",
+        ].join("\n")
+      )
+      .replace(
+        "#include <color_fragment>",
+        [
+          "#include <color_fragment>",
+          "float ringX = vGridPos.y / ringSpacing;",
+          "float ringFrac = fract(ringX);",
+          "float ringD = min(ringFrac, 1.0 - ringFrac);",
+          "float ringFw = max(fwidth(ringX) * gridWidth, 0.0008);",
+          "float ringLine = 1.0 - smoothstep(0.0, ringFw, ringD);",
+          "float localX = vGridPos.x;",
+          "float localZ = vGridPos.z;",
+          "float localCount = lonCount;",
+          "if (vGridPos.y < crotchY) {",
+          "  localX -= (vGridPos.x < 0.0 ? -legOffX : legOffX);",
+          "  localCount = 10.0;",
+          "} else if (vGridPos.y < armMaxY && abs(vGridPos.x) > armMinX) {",
+          "  float side = vGridPos.x < 0.0 ? -1.0 : 1.0;",
+          "  float t = clamp((armTopY - vGridPos.y) / max(armLenY, 0.001), 0.0, 1.0);",
+          "  float armCenterX = side * mix(armInnerX, armOuterX, t);",
+          "  localX = vGridPos.x - armCenterX;",
+          "  localCount = 8.0;",
+          "} else if (vGridPos.y > headY) {",
+          "  localCount = 22.0;",
+          "}",
+          "float verticalLine = 0.0;",
+          "if (vGridPos.y > headY) {",
+          "  float ang = atan(localZ, localX);",
+          "  float lonX = (ang / 6.28318530718) * localCount;",
+          "  float lonFrac = fract(lonX);",
+          "  float lonD = min(lonFrac, 1.0 - lonFrac);",
+          "  float lonFw = max(min(fwidth(lonX), 1.5) * gridWidth, 0.0008);",
+          "  verticalLine = 1.0 - smoothstep(0.0, lonFw, lonD);",
+          "} else if (vGridPos.y < armMaxY && abs(vGridPos.x) > armMinX) {",
+          "  float angA = atan(localZ, localX);",
+          "  float lonXA = (angA / 6.28318530718) * localCount;",
+          "  float lonFracA = fract(lonXA);",
+          "  float lonDA = min(lonFracA, 1.0 - lonFracA);",
+          "  float lonFwA = max(min(fwidth(lonXA), 1.5) * gridWidth, 0.0008);",
+          "  verticalLine = 1.0 - smoothstep(0.0, lonFwA, lonDA);",
+          "} else {",
+          "  float spacingX = (vGridPos.y < crotchY) ? legSpace : torsoSpaceX;",
+          "  float spacingZ = (vGridPos.y < crotchY) ? legSpace : torsoSpaceZ;",
+          "  float gx = localX / spacingX;",
+          "  float fx = fract(gx);",
+          "  float dx = min(fx, 1.0 - fx);",
+          "  float wx = max(fwidth(gx) * gridWidth, 0.0008);",
+          "  float xLine = 1.0 - smoothstep(0.0, wx, dx);",
+          "  float gz = localZ / spacingZ;",
+          "  float fz = fract(gz);",
+          "  float dz = min(fz, 1.0 - fz);",
+          "  float wz = max(fwidth(gz) * gridWidth, 0.0008);",
+          "  float zLine = 1.0 - smoothstep(0.0, wz, dz);",
+          "  float ax = abs(localX);",
+          "  float az = abs(localZ);",
+          "  float frontWeight = smoothstep(0.35, 0.65, az / max(ax + az, 0.0001));",
+          "  verticalLine = mix(zLine, xLine, frontWeight);",
+          "  bool frontMid = (vGridPos.y > crotchY && vGridPos.y < armMaxY && vGridPos.z > 0.0 && abs(vGridPos.x) < midHalfX);",
+          "  if (frontMid) {",
+          "    float mgx = vGridPos.x / midSpacingX;",
+          "    float mfx = fract(mgx);",
+          "    float mdx = min(mfx, 1.0 - mfx);",
+          "    float mwx = max(fwidth(mgx) * gridWidth, 0.0008);",
+          "    verticalLine = 1.0 - smoothstep(0.0, mwx, mdx);",
+          "  }",
+          "}",
+          "bool cleanFrontRows = (vGridPos.y > crotchY && vGridPos.y < armMaxY && vGridPos.z > 0.0 && abs(vGridPos.x) < midHalfX);",
+          "if (cleanFrontRows) {",
+          "  float mry = (vGridPos.y - crotchY) / midRingSpacing;",
+          "  float mrf = fract(mry);",
+          "  float mrd = min(mrf, 1.0 - mrf);",
+          "  float mrw = max(fwidth(mry) * gridWidth, 0.0008);",
+          "  ringLine = 1.0 - smoothstep(0.0, mrw, mrd);",
+          "}",
+          "float gridMask = clamp(ringLine + verticalLine, 0.0, 1.0);",
+          "diffuseColor.rgb = mix(diffuseColor.rgb, gridColor, gridMask);",
+        ].join("\n")
+      );
+  };
+  mat.customProgramCacheKey = function () { return "hoodoo-sizing-grid-ap"; };
+  return mat;
 }
 
-function makeGridMaterial() {
-  return new THREE.ShaderMaterial({
-    uniforms: {
-      gridColor: { value: new THREE.Color(WIRE) },
-      ringSpacing: { value: 0.043 },
-      lonCount: { value: 28.0 },
-      gridWidth: { value: 1.0 },
-    },
-    vertexShader: [
-      "varying vec3 vGridPos;",
-      "void main() {",
-      "  vGridPos = position;",
-      "  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
-      "}",
-    ].join("\n"),
-    fragmentShader: [
-      "varying vec3 vGridPos;",
-      "uniform vec3 gridColor;",
-      "uniform float ringSpacing;",
-      "uniform float lonCount;",
-      "uniform float gridWidth;",
-      "void main() {",
-      "  float ringX = vGridPos.y / ringSpacing;",
-      "  float ringD = abs(fract(ringX + 0.5) - 0.5);",
-      "  float ringAA = max(fwidth(ringX) * gridWidth, 0.001);",
-      "  float ringLine = 1.0 - smoothstep(0.0, ringAA, ringD);",
-      "  float ang = atan(vGridPos.z, vGridPos.x);",
-      "  float lonX = (ang / 6.28318530718) * lonCount;",
-      "  float lonD = abs(fract(lonX + 0.5) - 0.5);",
-      "  float lonAA = max(min(fwidth(lonX), 1.5) * gridWidth, 0.001);",
-      "  float lonLine = 1.0 - smoothstep(0.0, lonAA, lonD);",
-      "  float a = clamp(ringLine + lonLine, 0.0, 1.0);",
-      "  if (a < 0.02) discard;",
-      "  gl_FragColor = vec4(gridColor, a);",
-      "}",
-    ].join("\n"),
-    transparent: true,
+function makeMaleFillMaterial() {
+  return new THREE.MeshStandardMaterial({
+    color: BODY,
+    roughness: 0.5,
+    metalness: 0.05,
+    emissive: 0x36b4e5,
+    emissiveIntensity: 0.055,
+    side: THREE.FrontSide,
+    transparent: false,
+    opacity: 1,
+    depthWrite: true,
+    depthTest: true,
+    polygonOffset: true,
+    polygonOffsetFactor: 1.5,
+    polygonOffsetUnits: 2,
+  });
+}
+
+function makeQuadLineMaterial(opacity, color) {
+  return new THREE.LineBasicMaterial({
+    color: color == null ? WIRE : color,
+    transparent: opacity != null && opacity < 1,
+    opacity: opacity == null ? 1 : opacity,
     depthTest: true,
     depthWrite: false,
-    side: THREE.DoubleSide,
-    polygonOffset: true,
-    polygonOffsetFactor: -1,
-    polygonOffsetUnits: -1,
-    extensions: { derivatives: true },
   });
 }
 
 function styleBody(root) {
-  var fillMat = makeFillMaterial();
-  var gridMat = makeGridMaterial();
-  var bodyMeshes = [];
+  if (viewer) viewer.bakedRing = false;
+  var items = [];
+  var hasQuad = false;
   root.traverse(function (obj) {
-    if (!obj.isMesh) return;
-    if (String(obj.name || "").indexOf("_grid_overlay") >= 0) return;
-    if (skipAvatarExtra(obj.name) || skipAvatarExtra(obj.parent && obj.parent.name)) {
+    if (obj.isMesh || obj.isLine || obj.isLineSegments) items.push(obj);
+    var k = meshKind(obj);
+    if (k === "quad" || k === "quad_light") hasQuad = true;
+  });
+  var box = bboxFromBody(root);
+  var fillMat = hasQuad ? makeMaleFillMaterial() : makeBodyMaterial(box);
+  items.forEach(function (obj) {
+    var kind = meshKind(obj);
+    if (kind === "overlay" || kind === "wirelines" || kind === "cage") {
+      if (obj.parent) obj.parent.remove(obj);
+      return;
+    }
+    if (kind === "quad" || kind === "quad_light") {
+      obj.material = makeQuadLineMaterial(1, WIRE);
+      obj.visible = true;
+      obj.renderOrder = 3;
+      obj.frustumCulled = false;
+      return;
+    }
+    if (kind === "skip" || kind === "marker" || kind === "grid" || kind === "wire" || kind === "ring") {
       obj.visible = false;
       return;
     }
-    bodyMeshes.push(obj);
-  });
-  bodyMeshes.forEach(function (obj) {
     obj.material = fillMat;
     obj.visible = true;
     obj.renderOrder = 1;
     obj.castShadow = false;
     obj.receiveShadow = false;
-    var had = false;
-    obj.children.forEach(function (child) {
-      if (String(child.name || "").indexOf("_grid_overlay") >= 0) {
-        child.material = gridMat;
-        child.visible = true;
-        child.renderOrder = 2;
-        had = true;
-      }
-    });
-    if (had) return;
-    var overlay = new THREE.Mesh(obj.geometry, gridMat);
-    overlay.name = (obj.name || "body") + "_grid_overlay";
-    overlay.frustumCulled = obj.frustumCulled;
-    overlay.renderOrder = 2;
-    obj.add(overlay);
+    if (obj.geometry && obj.geometry.computeVertexNormals) obj.geometry.computeVertexNormals();
   });
 }
+
+function buildQuadAvatar(data) {
+  var pos = new THREE.Float32BufferAttribute(new Float32Array(data.pos), 3);
+  var g = new THREE.BufferGeometry();
+  g.setAttribute("position", pos);
+  var ao = data.ao && data.ao.length ? Uint8Array.from(data.ao) : new Uint8Array(pos.count).fill(255);
+  g.setAttribute("ao", new THREE.BufferAttribute(ao, 1, true));
+  g.setIndex(data.tris);
+  g.computeVertexNormals();
+  var skin = new THREE.Mesh(g, makeMaleFillMaterial());
+  skin.name = "body_detail";
+  var group = new THREE.Group();
+  group.name = "quad-avatar";
+  group.add(skin);
+  function addLines(idx, name, opacity) {
+    if (!idx || !idx.length) return;
+    var lg = new THREE.BufferGeometry();
+    lg.setAttribute("position", pos);
+    lg.setIndex(idx);
+    var lines = new THREE.LineSegments(lg, makeQuadLineMaterial(opacity));
+    lines.name = name;
+    lines.userData.quadOpacity = opacity;
+    lines.renderOrder = 3;
+    lines.frustumCulled = false;
+    group.add(lines);
+  }
+  addLines(data.detail, "quad_detail", 0.3);
+  addLines(data.grid, "quad_grid", 0.95);
+  if (!data.grid && data.edges) addLines(data.edges, "quad_edges", 0.85);
+  return group;
+}
+
 
 function proceduralBody() {
   var g = new THREE.Group();
@@ -436,6 +632,16 @@ function ensureViewer() {
 
   var scene = new THREE.Scene();
   scene.background = new THREE.Color(0xffffff);
+  scene.add(new THREE.HemisphereLight(0xeaf8fc, 0xa8c8d4, 0.5));
+  var keyL = new THREE.DirectionalLight(0xffffff, 2.6);
+  keyL.position.set(2.4, 3.6, 3.2);
+  scene.add(keyL);
+  var fillL = new THREE.DirectionalLight(0xe4eef8, 0.55);
+  fillL.position.set(-2.6, 1.0, 1.6);
+  scene.add(fillL);
+  var rimL = new THREE.DirectionalLight(0x7fbfe6, 1.8);
+  rimL.position.set(-1.6, 2.2, -3.4);
+  scene.add(rimL);
 
   var stage = new THREE.Group();
   scene.add(stage);
@@ -452,8 +658,10 @@ function ensureViewer() {
   rendererB.setClearColor(0xffffff, 1);
   rendererA.outputColorSpace = THREE.SRGBColorSpace;
   rendererB.outputColorSpace = THREE.SRGBColorSpace;
-  rendererA.toneMapping = THREE.NoToneMapping;
-  rendererB.toneMapping = THREE.NoToneMapping;
+  rendererA.toneMapping = THREE.ACESFilmicToneMapping;
+  rendererB.toneMapping = THREE.ACESFilmicToneMapping;
+  rendererA.toneMappingExposure = 1.12;
+  rendererB.toneMappingExposure = 1.12;
 
   viewer = {
     fig: fig,
@@ -580,21 +788,12 @@ function applyFit() {
 }
 
 function setTape() {
-  if (!viewer || !viewer.marks) return;
+  if (!viewer) return;
   if (viewer.tape) {
     viewer.bodyRoot.remove(viewer.tape);
     disposeObject(viewer.tape);
     viewer.tape = null;
   }
-  viewer.tape = makeTape(viewer.marks, viewer.measure);
-  viewer.bodyRoot.add(viewer.tape);
-  viewer.hotspots.forEach(function (h) {
-    var on = h.userData.measure === viewer.measure;
-    h.userData.glow.material.opacity = on ? 0.45 : 0.18;
-    h.userData.ring.visible = on;
-    h.userData.core.material.color.setHex(on ? 0xffffff : WIRE);
-    h.scale.setScalar(on ? 1.15 : 1);
-  });
 }
 
 function placeMainCam() {
@@ -602,8 +801,8 @@ function placeMainCam() {
   var minY = (viewer.marks ? viewer.marks.minY : 0) * s.y;
   var h = viewer.heightM * s.y;
   var lookY = minY + h * 0.52;
-  var r = Math.max(3.45, h * 2.08);
-  viewer.camA.fov = 30;
+  var r = Math.max(h * 2.32, 2.7);
+  viewer.camA.fov = 28;
   viewer.camA.position.set(Math.sin(viewer.azimuth) * r, lookY + h * 0.02, Math.cos(viewer.azimuth) * r);
   viewer.camA.lookAt(0, lookY, 0);
   viewer.camA.updateProjectionMatrix();
@@ -681,23 +880,20 @@ function hotspotPos(marks, key) {
 }
 
 function setupLandmarks(root) {
-  viewer.marks = landmarksFrom(root);
+  viewer.marks = landmarksFrom(root, viewer.bodyRoot);
   viewer.heightM = viewer.marks.heightM;
   viewer.centerY = viewer.marks.minY + viewer.heightM * 0.52;
   viewer.radius = Math.max(3.45, viewer.heightM * 2.08);
-  SIZE_KEYS.forEach(function (key) {
-    var p = hotspotPos(viewer.marks, key);
-    if (!p) return;
-    var h = makeHotspot();
-    h.position.copy(p);
-    h.userData.measure = key;
-    viewer.bodyRoot.add(h);
-    viewer.hotspots.push(h);
-  });
-  if (viewer.ring) viewer.stage.remove(viewer.ring);
-  viewer.ring = makeRing(0.38);
-  viewer.ring.position.y = viewer.marks.minY;
-  viewer.stage.add(viewer.ring);
+  viewer.hotspots = [];
+  if (viewer.ring) {
+    viewer.stage.remove(viewer.ring);
+    viewer.ring = null;
+  }
+  if (!viewer.bakedRing) {
+    viewer.ring = makeRing(0.38 * (viewer.heightM / 1.78));
+    viewer.ring.position.y = viewer.marks.minY;
+    viewer.stage.add(viewer.ring);
+  }
   applyFit();
   setTape();
   applyMeasureCopy();
@@ -747,6 +943,32 @@ function loadFitAvatar() {
   }
   viewer.pendingKey = key;
   setAvatarLoader(true, 0);
+  var jsonUrl = AVATAR_JSON_URLS[key];
+  if (jsonUrl) {
+    fetch(jsonUrl, { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("avatar json " + r.status);
+        setAvatarLoader(true, 70);
+        return r.json();
+      })
+      .then(function (data) {
+        var obj = buildQuadAvatar(data);
+        viewer.bodies[key] = obj;
+        if (avatarKey(viewer.fit) !== key) return;
+        setAvatarLoader(true, 100);
+        mountBody(obj);
+        viewer.bodyKey = key;
+        resizeViewers();
+        setAvatarLoader(false);
+      })
+      .catch(function (err) {
+        console.warn("Hoodoo sizing: quad avatar JSON failed for", key, err);
+        if (avatarKey(viewer.fit) !== key) return;
+        setAvatarLoader(false);
+        if (!viewer.bodyRoot.children.length) mountBody(proceduralBody());
+      });
+    return;
+  }
   var loader = new GLTFLoader();
   loader.load(
     AVATAR_URLS[key],

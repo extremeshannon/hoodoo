@@ -121,103 +121,185 @@ const Figure3D = (function () {
       url,
       (gltf) => {
         const group = new THREE.Group();
-        // Two-pass rendering is deliberate here. The avatar body is one
-        // completely opaque white pass. The blue sizing grid is a second
-        // transparent pass laid over the same surface. Keeping the passes
-        // separate prevents the grid shader from ever making the body look
-        // translucent, which was the main visual mismatch with the reference.
+        // MeshBasicMaterial - fully unlit/flat. A lit material (Lambert)
+        // put a real shadow gradient on the far side of every limb, and
+        // that soft, faded-to-gray edge read as the body being partly
+        // see-through rather than just shaded. Flat white removes that
+        // ambiguity outright and matches the reference's flat product-shot
+        // look (no directional shadow, just the grid for form/depth cues).
         const fillMat = new THREE.MeshBasicMaterial({
           color: FILL,
           side: THREE.DoubleSide,
           transparent: false,
           opacity: 1,
-          depthWrite: true,
-          depthTest: true,
         });
 
-        // Clean UPT-style latitude/longitude grid. This follows the body
-        // surface instead of exposing the GLB's triangle topology, so the
-        // result reads as an intentional sizing grid rather than a pile of
-        // triangulation diagonals.
-        const gridMat = new THREE.ShaderMaterial({
-          uniforms: {
-            gridColor: { value: new THREE.Color(GRID) },
-            ringSpacing: { value: 0.043 },
-            lonCount: { value: 28.0 },
-            gridWidth: { value: 1.0 },
-          },
-          vertexShader: `
-            varying vec3 vGridPos;
-            void main() {
-              vGridPos = position;
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            #extension GL_OES_standard_derivatives : enable
-            varying vec3 vGridPos;
-            uniform vec3 gridColor;
-            uniform float ringSpacing;
-            uniform float lonCount;
-            uniform float gridWidth;
-
-            void main() {
+        // Cylindrical grid overlay: evenly-spaced horizontal "ring" lines
+        // (by height) and vertical "longitude" lines (by angle around the
+        // vertical axis), drawn straight into the flat white fragment
+        // color via onBeforeCompile - no separate wireframe mesh needed.
+        // Requires derivative (fwidth) support for stable, non-aliased
+        // lines regardless of surface curvature/distance - three.js
+        // injects the right extension pragma for whichever GL context is
+        // actually in use when this flag is set (WebGL2 has it natively).
+        fillMat.extensions = { derivatives: true };
+        fillMat.onBeforeCompile = (shader) => {
+          shader.uniforms.gridColor = { value: new THREE.Color(GRID) };
+          shader.uniforms.ringSpacing = { value: 0.045 };
+          shader.uniforms.lonCount = { value: 18.0 };
+          shader.uniforms.gridWidth = { value: 1.1 };
+          shader.vertexShader = shader.vertexShader
+            .replace("#include <common>", "#include <common>\nvarying vec3 vGridPos;")
+            .replace("#include <begin_vertex>", "#include <begin_vertex>\nvGridPos = position;");
+          shader.fragmentShader = shader.fragmentShader
+            .replace(
+              "#include <common>",
+              "#include <common>\nvarying vec3 vGridPos;\nuniform vec3 gridColor;\nuniform float ringSpacing;\nuniform float lonCount;\nuniform float gridWidth;"
+            )
+            .replace(
+              "#include <color_fragment>",
+              `#include <color_fragment>
+              // Screen-space-derivative-based line AA: the line stays a
+              // stable ~1px wide no matter how the surface curves away
+              // from the camera, instead of aliasing into dots/dashes.
               float ringX = vGridPos.y / ringSpacing;
-              float ringD = abs(fract(ringX + 0.5) - 0.5);
-              float ringAA = max(fwidth(ringX) * gridWidth, 0.001);
-              float ringLine = 1.0 - smoothstep(0.0, ringAA, ringD);
+              float ringFrac = fract( ringX );
+              float ringD = min( ringFrac, 1.0 - ringFrac );
+              float ringFw = max( fwidth( ringX ) * gridWidth, 0.0008 );
+              float ringLine = 1.0 - smoothstep( 0.0, ringFw, ringD );
 
-              float ang = atan(vGridPos.z, vGridPos.x);
-              float lonX = (ang / 6.28318530718) * lonCount;
-              float lonD = abs(fract(lonX + 0.5) - 0.5);
-              float lonAA = max(min(fwidth(lonX), 1.5) * gridWidth, 0.001);
-              float lonLine = 1.0 - smoothstep(0.0, lonAA, lonD);
+              // Choose a local centerline so the grid wraps each limb instead of
+              // treating the whole person like one giant cylinder.
+              float localX = vGridPos.x;
+              float localZ = vGridPos.z;
+              float localCount = lonCount;
 
-              float a = clamp(ringLine + lonLine, 0.0, 1.0);
-              if (a < 0.02) discard;
-              gl_FragColor = vec4(gridColor, a);
-            }
-          `,
-          transparent: true,
-          depthTest: true,
-          depthWrite: false,
-          side: THREE.DoubleSide,
-          polygonOffset: true,
-          polygonOffsetFactor: -1,
-          polygonOffsetUnits: -1,
-          extensions: { derivatives: true },
-        });
+              // Separate left/right legs below the crotch.
+              if (vGridPos.y < 0.88) {
+                localX -= (vGridPos.x < 0.0 ? -0.095 : 0.095);
+                localCount = 10.0;
+              }
+              // Arms: use an approximate sloping arm centerline. This keeps
+              // the long blue lines attached to the arm instead of fanning
+              // out from the center of the torso.
+              else if (vGridPos.y < 1.47 && abs(vGridPos.x) > 0.19) {
+                float side = vGridPos.x < 0.0 ? -1.0 : 1.0;
+                float t = clamp((1.43 - vGridPos.y) / 0.66, 0.0, 1.0);
+                float armCenterX = side * mix(0.18, 0.43, t);
+                localX = vGridPos.x - armCenterX;
+                localCount = 8.0;
+              }
+              // Head gets a little more detail, like the reference.
+              else if (vGridPos.y > 1.53) {
+                localCount = 22.0;
+              }
 
-        // Keep the GLTF hierarchy intact. CLO/GLB exports can carry transforms
-        // on parent nodes; pulling meshes out and re-parenting them can lose
-        // those transforms. Each visible body mesh gets an opaque white base
-        // plus a child mesh using the exact same geometry for the blue grid.
-        const bodyMeshes = [];
-        gltf.scene.traverse((obj) => {
-          if (obj.isMesh && obj.name !== "body_wire") bodyMeshes.push(obj);
-        });
+              // Straighter, cage-like verticals. The earlier longitude grid
+              // used atan(), so every line bowed toward the waist/chest like
+              // latitude/longitude on a globe. The reference uses much more
+              // rectilinear quad topology. For torso and legs we therefore
+              // draw intersections with evenly spaced X/Z planes. Because the
+              // test is still evaluated on the actual body fragments, the
+              // lines remain glued to the CLO surface while reading much
+              // straighter from the front/3-quarter views.
+              float verticalLine = 0.0;
 
-        bodyMeshes.forEach((obj) => {
+              if (vGridPos.y > 1.53) {
+                // Head: cylindrical topology is useful here and matches the
+                // denser facial cage in the reference.
+                float ang = atan( localZ, localX );
+                float lonX = ( ang / 6.28318530718 ) * localCount;
+                float lonFrac = fract( lonX );
+                float lonD = min( lonFrac, 1.0 - lonFrac );
+                float lonFw = max( min( fwidth( lonX ), 1.5 ) * gridWidth, 0.0008 );
+                verticalLine = 1.0 - smoothstep( 0.0, lonFw, lonD );
+              }
+              else if (vGridPos.y < 1.47 && abs(vGridPos.x) > 0.19) {
+                // Arms are angled, so retain a modest radial wrap rather than
+                // projecting torso lines through them.
+                float ang = atan( localZ, localX );
+                float lonX = ( ang / 6.28318530718 ) * localCount;
+                float lonFrac = fract( lonX );
+                float lonD = min( lonFrac, 1.0 - lonFrac );
+                float lonFw = max( min( fwidth( lonX ), 1.5 ) * gridWidth, 0.0008 );
+                verticalLine = 1.0 - smoothstep( 0.0, lonFw, lonD );
+              }
+              else {
+                // Torso + each leg: rectangular section grid. X-plane lines
+                // dominate front/back; Z-plane lines take over around the
+                // sides, giving a continuous but substantially straighter cage.
+                float spacingX = (vGridPos.y < 0.88) ? 0.032 : 0.045;
+                float spacingZ = (vGridPos.y < 0.88) ? 0.032 : 0.040;
+
+                float gx = localX / spacingX;
+                float fx = fract(gx);
+                float dx = min(fx, 1.0 - fx);
+                float wx = max(fwidth(gx) * gridWidth, 0.0008);
+                float xLine = 1.0 - smoothstep(0.0, wx, dx);
+
+                float gz = localZ / spacingZ;
+                float fz = fract(gz);
+                float dz = min(fz, 1.0 - fz);
+                float wz = max(fwidth(gz) * gridWidth, 0.0008);
+                float zLine = 1.0 - smoothstep(0.0, wz, dz);
+
+                // Prefer X planes on front/back and Z planes on the sides.
+                // Smooth blending prevents a visible seam at the transition.
+                float ax = abs(localX);
+                float az = abs(localZ);
+                float frontWeight = smoothstep(0.35, 0.65, az / max(ax + az, 0.0001));
+                verticalLine = mix(zLine, xLine, frontWeight);
+
+                // FRONT MIDSECTION CLEANUP
+                // On the front of the torso/pelvis, override the generic cage with
+                // a calmer rectilinear grid. This avoids the breast/hip loops and
+                // keeps the abdomen reading like the clean reference topology.
+                bool frontMid = (vGridPos.y > 0.88 && vGridPos.y < 1.47 &&
+                                 vGridPos.z > 0.0 && abs(vGridPos.x) < 0.23);
+                if (frontMid) {
+                  // Five main vertical columns, centered on x=0. The X-plane test
+                  // is evaluated on the real body surface, so these remain attached
+                  // while appearing straight from the front.
+                  float midSpacingX = 0.055;
+                  float mgx = vGridPos.x / midSpacingX;
+                  float mfx = fract(mgx);
+                  float mdx = min(mfx, 1.0 - mfx);
+                  float mwx = max(fwidth(mgx) * gridWidth, 0.0008);
+                  verticalLine = 1.0 - smoothstep(0.0, mwx, mdx);
+                }
+              }
+
+              // Fewer, cleaner horizontal rows across the front midsection.
+              // This suppresses the busy contour-map look between underbust and hips.
+              bool cleanFrontRows = (vGridPos.y > 0.88 && vGridPos.y < 1.47 &&
+                                     vGridPos.z > 0.0 && abs(vGridPos.x) < 0.23);
+              if (cleanFrontRows) {
+                float midRingSpacing = 0.065;
+                float mry = (vGridPos.y - 0.88) / midRingSpacing;
+                float mrf = fract(mry);
+                float mrd = min(mrf, 1.0 - mrf);
+                float mrw = max(fwidth(mry) * gridWidth, 0.0008);
+                ringLine = 1.0 - smoothstep(0.0, mrw, mrd);
+              }
+
+              float gridMask = clamp( ringLine + verticalLine, 0.0, 1.0 );
+              diffuseColor.rgb = mix( diffuseColor.rgb, gridColor, gridMask );`
+            );
+        };
+
+        // Collect mesh references FIRST, then re-parent in a separate pass.
+        // (group.add() below removes each mesh from gltf.scene, which
+        // mutates gltf.scene.children while .traverse() is still walking
+        // that same live array - corrupting the iteration. Two passes
+        // avoids mutating the array we're iterating over.)
+        const meshes = [];
+        gltf.scene.traverse((obj) => { if (obj.isMesh) meshes.push(obj); });
+
+        meshes.forEach((obj) => {
+          if (obj.name === "body_wire") return; // superseded by the shader grid above
           obj.material = fillMat;
-          obj.renderOrder = 1;
-
-          const overlay = new THREE.Mesh(obj.geometry, gridMat);
-          overlay.name = `${obj.name || "body"}_grid_overlay`;
-          overlay.frustumCulled = obj.frustumCulled;
-          overlay.renderOrder = 2;
-          // As a child it inherits the body's transform. Geometry coordinates
-          // are therefore identical and the polygon offset handles z-fighting.
-          obj.add(overlay);
+          group.add(obj);
         });
-
-        // The old decimated body_wire mesh is retained in the GLB for backwards
-        // compatibility but hidden. Its triangle diagonals are not the look we
-        // want for the sizing figure.
-        gltf.scene.traverse((obj) => {
-          if (obj.isMesh && obj.name === "body_wire") obj.visible = false;
-        });
-
-        group.add(gltf.scene);
 
         loadedByGender[genderKey] = group;
         cb(group);

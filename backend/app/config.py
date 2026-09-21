@@ -39,6 +39,14 @@ class Settings(BaseSettings):
     smtp_from: str | None = None
     smtp_use_tls: bool = True
 
+    # Portable site-guide chat (OpenAI-compatible; optional — retrieval works without a key).
+    openai_api_key: str | None = None
+    openai_base_url: str = "https://api.openai.com/v1"
+    openai_model: str = "gpt-4o-mini"
+    site_guide_knowledge_path: str = "data/site-guide.json"
+    site_guide_enabled: bool = True
+    site_guide_rate_per_minute: int = 20
+
 
 @lru_cache
 def get_settings() -> Settings:

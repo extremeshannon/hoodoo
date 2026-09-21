@@ -1,0 +1,258 @@
+{
+  "site": {
+    "name": "Hoodoo Alaska",
+    "shortName": "Hoodoo",
+    "tagline": "Full-service branding and apparel in Wasilla — cut & sew, embroidery, laser patches, dye sublimation, and screen printing.",
+    "url": "https://www.hoodooak.com"
+  },
+  "assistant": {
+    "name": "Hoodoo Guide",
+    "launcherLabel": "Ask Hoodoo",
+    "welcome": "Hi — I can help you find the right page, service, or how to reach the shop.",
+    "placeholder": "Ask about services, quotes, jumpsuits…",
+    "suggestions": [
+      "What services do you offer?",
+      "How do I get a quote?",
+      "Do you make skydiving jumpsuits?",
+      "Where are you located?"
+    ]
+  },
+  "theme": {
+    "accent": "#36b4e5"
+  },
+  "contact": {
+    "email": "shannnon@hoodooak.com",
+    "phone": "907.202.5634",
+    "phoneHref": "tel:+19072025634",
+    "mail": "7362 W Parks Hwy PMB 213, Wasilla, AK 99623",
+    "web": "https://www.hoodooak.com"
+  },
+  "synonyms": {
+    "quote": ["estimate", "price", "pricing", "cost", "how much"],
+    "jumpsuit": ["suit", "skydiving", "skydive", "freefly", "canopy"],
+    "gauntlet": ["upc", "paw cover", "paw covers", "snowmachine", "mittens", "gloves"],
+    "embroidery": ["stitch", "digitize", "hat", "thread"],
+    "sublimation": ["dye-sub", "dyesub", "dye sub", "all-over", "print"],
+    "login": ["sign in", "signin", "account", "password", "staff"],
+    "contact": ["email", "phone", "call", "reach", "hours", "open"],
+    "location": ["located", "address", "where", "map", "visit"]
+  },
+  "rules": [
+    "You are a concise site guide. Help people find the right page or contact the shop.",
+    "Use only the knowledge provided. If something is not listed, say so and offer email or phone.",
+    "Never invent prices, turnaround times, shop hours, or pages.",
+    "The online shop, configurator, jumpsuit builder, quote calculator, and pricing tables are staff-only while the shop is a work in progress. Public signup is closed.",
+    "For public visitors, do not send them to staff-only URLs as if those pages will load. Direct them to call or email for custom work.",
+    "If the visitor is staff, you may link to staff tools.",
+    "Prefer short answers with a next step (a page, email, or phone).",
+    "The public email on the site is spelled shannnon@hoodooak.com — use that spelling."
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "audience": "public",
+      "summary": "Hoodoo Alaska marketing home: services, about, and contact.",
+      "keywords": ["home", "start", "main", "hoodoo", "alaska", "wasilla"],
+      "anchors": [
+        { "label": "Services", "href": "/#services" },
+        { "label": "About", "href": "/#about" },
+        { "label": "Contact", "href": "/#contact" }
+      ]
+    },
+    {
+      "id": "services",
+      "title": "Services",
+      "path": "/#services",
+      "audience": "public",
+      "summary": "Cut & sew, embroidery, laser-cut patches, dye sublimation, and screen printing — all in-house in Wasilla.",
+      "keywords": ["services", "what we do", "production", "branding"]
+    },
+    {
+      "id": "contact",
+      "title": "Contact",
+      "path": "/#contact",
+      "audience": "public",
+      "summary": "Email shannnon@hoodooak.com, call 907.202.5634, or mail 7362 W Parks Hwy PMB 213, Wasilla, AK 99623.",
+      "keywords": ["contact", "email", "phone", "call", "address", "location", "wasilla", "hours"]
+    },
+    {
+      "id": "login",
+      "title": "Staff sign-in",
+      "path": "/login",
+      "audience": "public",
+      "summary": "Staff sign-in for the in-progress shop. Not a public customer portal.",
+      "keywords": ["login", "sign in", "staff", "password"]
+    },
+    {
+      "id": "forgot-password",
+      "title": "Forgot password",
+      "path": "/forgot-password",
+      "audience": "public",
+      "summary": "Request a password reset email for a staff account.",
+      "keywords": ["forgot", "reset", "password"]
+    },
+    {
+      "id": "configurator",
+      "title": "Apparel & gauntlet configurator",
+      "path": "/configurator.html",
+      "audience": "staff",
+      "summary": "Staff tool to configure apparel and Ultimate Paw Covers with guide pricing and live inventory.",
+      "keywords": ["configurator", "order", "inventory", "upc", "gauntlet", "apparel"]
+    },
+    {
+      "id": "jumpsuit-builder",
+      "title": "Jumpsuit builder",
+      "path": "/suit.html",
+      "audience": "staff",
+      "summary": "Staff 3D jumpsuit configurator: pattern, colors, options, handles, and sizing avatar.",
+      "keywords": ["jumpsuit", "suit", "freefly", "skydiving", "sizing", "clo"]
+    },
+    {
+      "id": "quote",
+      "title": "Instant quote",
+      "path": "/quote.html",
+      "audience": "staff",
+      "summary": "Staff live estimate for embroidery, screen print, and dye sublimation.",
+      "keywords": ["quote", "estimate", "embroidery", "screen", "dye-sub"]
+    },
+    {
+      "id": "pricing",
+      "title": "Embroidery pricing",
+      "path": "/pricing.html",
+      "audience": "staff",
+      "summary": "Staff embroidery stitch-band pricing tables.",
+      "keywords": ["pricing", "stitches", "digitize", "embroidery cost"]
+    },
+    {
+      "id": "cart",
+      "title": "Cart",
+      "path": "/cart.html",
+      "audience": "staff",
+      "summary": "Staff cart with Wasilla pickup or shipping.",
+      "keywords": ["cart", "checkout", "shipping", "pickup"]
+    },
+    {
+      "id": "dyesub",
+      "title": "Dye-sub print builder",
+      "path": "/dyesub.html",
+      "audience": "staff",
+      "summary": "Place art on pattern pieces (starting with Male Freefly Jacket), save, and send in for a quote.",
+      "keywords": ["dye-sub", "sublimation", "print", "artwork", "jacket"]
+    },
+    {
+      "id": "account",
+      "title": "Account",
+      "path": "/account.html",
+      "audience": "customer",
+      "summary": "Signed-in account: orders and saved dye-sub jobs.",
+      "keywords": ["account", "orders", "profile"]
+    }
+  ],
+  "facts": [
+    {
+      "id": "about",
+      "title": "Who we are",
+      "audience": "public",
+      "keywords": ["about", "hoodoo", "alaska", "wasilla", "shop", "in-house"],
+      "body": "Hoodoo Alaska is a full-service branding and apparel shop in Wasilla. Work is built in-house: pattern and cut & sew through embroidery, laser-cut patches, dye sublimation, and screen printing.",
+      "links": [{ "id": "home" }, { "id": "contact" }]
+    },
+    {
+      "id": "services-overview",
+      "title": "Services",
+      "audience": "public",
+      "keywords": ["services", "cut", "sew", "embroidery", "laser", "patch", "sublimation", "screen", "print", "what we do"],
+      "body": "Hoodoo offers cut & sew (custom garments, prototypes, small-to-mid runs), embroidery on hats, jackets, bags, and team gear, laser-cut patches, dye sublimation (all-over color on polyester), and screen printing (plastisol and water-based).",
+      "links": [{ "id": "services" }, { "id": "contact" }]
+    },
+    {
+      "id": "custom-work",
+      "title": "How to start a job",
+      "audience": "public",
+      "keywords": ["quote", "order", "custom", "start", "buy", "shop", "online"],
+      "body": "Online ordering and the 3D configurator are in progress and not open to the public yet. For custom work, email shannnon@hoodooak.com or call 907.202.5634 with timeline, quantities, and fabrics. The shop will spec the job with you.",
+      "links": [{ "id": "contact" }]
+    },
+    {
+      "id": "jumpsuits",
+      "title": "Skydiving jumpsuits",
+      "audience": "public",
+      "keywords": ["jumpsuit", "suit", "skydiving", "skydive", "freefly", "camera jacket", "pants"],
+      "body": "Hoodoo cuts and sews skydiving jumpsuits in-house in Wasilla, including freefly jackets, pants, camera jackets, and full suits. The online jumpsuit builder is a staff tool for now. To order a suit, call 907.202.5634 or email shannnon@hoodooak.com.",
+      "links": [{ "id": "contact" }, { "id": "jumpsuit-builder" }]
+    },
+    {
+      "id": "upc",
+      "title": "Ultimate Paw Covers",
+      "audience": "public",
+      "keywords": ["upc", "gauntlet", "paw", "snowmachine", "mittens", "gloves", "trail", "pro", "lite"],
+      "body": "Ultimate Paw Covers are snowmachine gauntlets cut and sewn at Hoodoo — Lite, Trail, Pro, and custom. They are built for Alaska wind, cold, and powder. Public ordering is not live yet; email or call to spec a pair.",
+      "links": [{ "id": "contact" }, { "id": "configurator" }]
+    },
+    {
+      "id": "apparel",
+      "title": "Apparel",
+      "audience": "public",
+      "keywords": ["tee", "t-shirt", "hoodie", "jersey", "beanie", "hat", "team", "apparel"],
+      "body": "Hoodoo produces tees, jerseys, hoodies, beanies, and other branded apparel with embroidery, screen print, or dye-sub. Team and volume quotes are available. Reach the shop to spec a run.",
+      "links": [{ "id": "contact" }, { "id": "services" }]
+    },
+    {
+      "id": "embroidery",
+      "title": "Embroidery",
+      "audience": "public",
+      "keywords": ["embroidery", "stitch", "digitize", "hat", "chest", "thread"],
+      "body": "Embroidery is done in-house. Typical left-chest / name work is billed around a 5,000-stitch minimum; hat fronts ~6,000; detailed chest ~8,000; jacket or hoodie backs often 8–12k stitches. Digitizing can be waived if you already have a DST/EMB file. Public pricing tables are in the staff shop; email or call for a real quote.",
+      "links": [{ "id": "contact" }, { "id": "quote" }]
+    },
+    {
+      "id": "dye-sub",
+      "title": "Dye sublimation",
+      "audience": "public",
+      "keywords": ["dye", "sub", "sublimation", "all-over", "polyester", "print", "photographic"],
+      "body": "Dye sublimation bonds all-over color and photographic prints to polyester. Hoodoo also has a staff print builder for placing art on pattern pieces (starting with the Male Freefly Jacket). For a dye-sub job, contact the shop.",
+      "links": [{ "id": "contact" }, { "id": "dyesub" }]
+    },
+    {
+      "id": "location",
+      "title": "Location",
+      "audience": "public",
+      "keywords": ["where", "location", "located", "address", "wasilla", "alaska", "visit", "mail", "pmb", "parks"],
+      "body": "Hoodoo is in Wasilla, Alaska. Mail: 7362 W Parks Hwy PMB 213, Wasilla, AK 99623. Call 907.202.5634 or email shannnon@hoodooak.com to talk about a shop visit.",
+      "links": [{ "id": "contact" }]
+    },
+    {
+      "id": "hours",
+      "title": "Hours",
+      "audience": "public",
+      "keywords": ["hours", "open", "when", "schedule"],
+      "body": "Shop hours are not listed on the site. Call 907.202.5634 or email shannnon@hoodooak.com to reach someone.",
+      "links": [{ "id": "contact" }]
+    },
+    {
+      "id": "staff-shop",
+      "title": "Staff shop (in progress)",
+      "audience": "staff",
+      "keywords": ["staff", "configurator", "cart", "pricing", "admin", "inventory"],
+      "body": "Staff can use the apparel configurator, jumpsuit builder, quote tool, embroidery pricing, cart (pickup in Wasilla or shipping), dye-sub print builder, and admin. These stay behind staff sign-in while the public shop is a work in progress.",
+      "links": [
+        { "id": "configurator" },
+        { "id": "jumpsuit-builder" },
+        { "id": "quote" },
+        { "id": "pricing" },
+        { "id": "cart" },
+        { "id": "dyesub" }
+      ]
+    },
+    {
+      "id": "accounts",
+      "title": "Accounts",
+      "audience": "public",
+      "keywords": ["account", "register", "signup", "sign up", "login", "password"],
+      "body": "Public signup is closed while the shop is in progress. Staff sign in at /login. If you forgot a password, use Forgot password. For access, contact the shop.",
+      "links": [{ "id": "login" }, { "id": "forgot-password" }, { "id": "contact" }]
+    }
+  ]
+}

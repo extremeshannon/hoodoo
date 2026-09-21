@@ -27,6 +27,7 @@ from app.routers import (
     shipping,
     shop_quote,
 )
+from app.site_guide import router as site_guide_router
 from app.seed import seed_if_empty
 from app.staff_pages import is_customer_auth_path, is_staff_only_path, login_redirect_url
 
@@ -132,6 +133,7 @@ app.include_router(production.router, prefix="/api")
 app.include_router(dyesub.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(admin_config.router)
+app.include_router(site_guide_router, prefix="/api")
 
 
 @app.get("/api/health")

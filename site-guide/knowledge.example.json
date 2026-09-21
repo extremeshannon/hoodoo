@@ -1,0 +1,50 @@
+{
+  "site": {
+    "name": "Example Site",
+    "shortName": "Example",
+    "tagline": "Replace this file with your site map.",
+    "url": "https://example.com"
+  },
+  "assistant": {
+    "name": "Site Guide",
+    "launcherLabel": "Ask",
+    "welcome": "Hi — ask me how to find something on this site.",
+    "placeholder": "Ask a question…",
+    "suggestions": ["What can you help with?", "How do I contact you?"]
+  },
+  "theme": {
+    "accent": "#36b4e5"
+  },
+  "contact": {
+    "email": "hello@example.com",
+    "phone": "555.0100",
+    "phoneHref": "tel:+15550100"
+  },
+  "synonyms": {
+    "contact": ["email", "phone", "call"]
+  },
+  "rules": [
+    "Answer only from this knowledge file.",
+    "If you do not know, say so and offer contact info."
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "audience": "public",
+      "summary": "Site home.",
+      "keywords": ["home", "start"]
+    }
+  ],
+  "facts": [
+    {
+      "id": "about",
+      "title": "About",
+      "audience": "public",
+      "keywords": ["about"],
+      "body": "Replace this with real copy.",
+      "links": [{ "id": "home" }]
+    }
+  ]
+}
